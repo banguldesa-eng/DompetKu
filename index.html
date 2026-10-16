@@ -31,17 +31,19 @@
             --danger: #ef4444; --danger-light: #fee2e2; --success: #10b981; --success-light: #d1fae5;
             --warning: #f59e0b; --warning-light: #fef3c7; --bg: #f3f4f6; --card-bg: #ffffff;
             --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; --radius: 16px;
+            --input-bg: #f9fafb;
         }
         .dark { 
             --bg: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --text-muted: #94a3b8; 
-            --border: #334155; 
+            --border: #334155; --input-bg: #334155;
+            --primary-light: rgba(79, 70, 229, 0.2); /* Adjusted for dark mode transparency */
+            --danger-light: rgba(239, 68, 68, 0.2);
+            --success-light: rgba(16, 185, 129, 0.2);
+            --warning-light: rgba(245, 158, 11, 0.2);
         }
         * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
         
-        /* FIX 1: Sembunyikan Input File agar tidak muncul di UI */
-        #photoInput { display: none !important; }
-
         /* Auth Styles */
         .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; inset: 0; z-index: 1000; }
         .auth-card { background: white; border-radius: 24px; padding: 40px 30px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: slideUp 0.4s ease; max-height: 90vh; overflow-y: auto; }
@@ -101,15 +103,15 @@
         .summary-value { font-size: 28px; font-weight: 800; margin: 8px 0 0 0; letter-spacing: -1px; position: relative; z-index: 1; }
         
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-        .mini-card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); text-align: center; }
+        .mini-card { background: var(--card-bg); padding: 16px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); text-align: center; }
         .mini-card-name { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
         .mini-card-val { font-size: 16px; font-weight: 700; }
         .val-danger { color: var(--danger); } .val-success { color: var(--success); } .val-primary { color: var(--primary); }
         
         .form-group { margin-bottom: 16px; }
         label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-        input, select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: #f9fafb; transition: all 0.2s; }
-        input:focus, select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px var(--primary-light); }
+        input, select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
         
         button.action-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
         button.action-btn:active { transform: scale(0.98); }
@@ -118,7 +120,7 @@
         .btn-warning { background: var(--warning); box-shadow: 0 4px 12px rgba(245,158,11,0.3); }
         
         .list-header { font-size: 16px; font-weight: 700; margin: 30px 0 16px 0; color: var(--text-main); }
-        .item-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+        .item-card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border); }
         .item-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
         .icon-loan { background: var(--danger-light); } .icon-save { background: var(--success-light); }
         .item-info { flex: 1; }
@@ -133,29 +135,29 @@
         .btn-mini.edit { border-color: var(--warning); color: var(--warning); background: var(--warning-light); }
         .btn-mini.del { border-color: var(--danger); color: var(--danger); background: var(--danger-light); margin-left: 4px; }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; padding: 4px; }
         .nav-item.active { color: var(--primary); } .nav-item:not(.active) { color: var(--text-muted); }
         .nav-icon { width: 22px; height: 22px; } .nav-label { font-size: 10px; font-weight: 600; }
 
-        .account-header { text-align: center; padding: 30px 20px; background: white; border-radius: var(--radius); margin-bottom: 20px; }
+        .account-header { text-align: center; padding: 30px 20px; background: var(--card-bg); border-radius: var(--radius); margin-bottom: 20px; }
         .avatar-container { position: relative; display: inline-block; margin-bottom: 16px; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; object-fit: cover; border: 4px solid var(--card-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
         .avatar svg { width: 50px; height: 50px; }
-        .avatar-edit-btn { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid white; }
+        .avatar-edit-btn { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--card-bg); }
         .avatar-edit-btn svg { width: 16px; height: 16px; fill: white; }
         .account-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
         .account-email { font-size: 14px; color: var(--text-muted); }
-        .menu-list { background: white; border-radius: var(--radius); overflow: hidden; }
+        .menu-list { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; }
         .menu-item { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
-        .menu-item:hover { background: #f9fafb; } .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover { background: var(--input-bg); } .menu-item:last-child { border-bottom: none; }
         .menu-icon { width: 24px; height: 24px; flex-shrink: 0; }
         .menu-text { flex: 1; font-weight: 500; } .menu-arrow { color: var(--text-muted); font-size: 20px; }
         
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .modal-overlay.show { opacity: 1; visibility: visible; }
         .modal-overlay.show .modal-content { transform: translateY(0); }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
         .modal-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .modal-icon svg { width: 28px; height: 28px; }
@@ -163,16 +165,16 @@
         .modal-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
         .modal-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
         .modal-body { margin-bottom: 24px; }
-        .modal-body input { background: #f9fafb; border: 2px solid var(--border); border-radius: 12px; padding: 16px; font-size: 16px; width: 100%; }
+        .modal-body input { background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; padding: 16px; font-size: 16px; width: 100%; color: var(--text-main); }
         .modal-actions { display: flex; gap: 12px; }
         .modal-btn { flex: 1; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .modal-btn.secondary { background: #f3f4f6; color: var(--text-main); }
+        .modal-btn.secondary { background: var(--input-bg); color: var(--text-main); }
         .modal-btn.primary { background: var(--primary); color: white; }
         .modal-btn.danger { background: var(--danger); color: white; }
         .modal-btn.success { background: var(--success); color: white; }
         
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-        .toast { background: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; animation: toastIn 0.3s ease forwards; pointer-events: auto; min-width: 280px; }
+        .toast { background: var(--card-bg); padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; animation: toastIn 0.3s ease forwards; pointer-events: auto; min-width: 280px; color: var(--text-main); border: 1px solid var(--border); }
         .toast.hide { animation: toastOut 0.3s ease forwards; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
@@ -184,7 +186,7 @@
         .tab-type-berjangka { background: var(--primary-light); color: var(--primary); }
         
         .member-list { margin-top: 12px; }
-        .member-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; }
+        .member-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--input-bg); border-radius: 8px; margin-bottom: 8px; }
         .member-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; }
         .member-info { flex: 1; }
         .member-name { font-weight: 600; font-size: 14px; }
@@ -192,15 +194,34 @@
         .member-role { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--primary-light); color: var(--primary); font-weight: 600; }
         .member-role.admin { background: var(--warning-light); color: var(--warning); }
         
-        .invite-code-box { background: #f9fafb; border: 2px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; margin: 16px 0; }
+        .invite-code-box { background: var(--input-bg); border: 2px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; margin: 16px 0; }
         .invite-code { font-size: 24px; font-weight: 700; letter-spacing: 4px; color: var(--primary); margin: 8px 0; }
         .invite-hint { font-size: 12px; color: var(--text-muted); }
 
         .group-input-wrapper { margin: 16px 0; }
         .group-input-wrapper label { display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
-        .group-input-wrapper input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 15px; background: #f9fafb; transition: all 0.2s; text-transform: uppercase; letter-spacing: 2px; text-align: center; font-weight: 700; }
-        .group-input-wrapper input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px var(--primary-light); outline: none; }
+        .group-input-wrapper input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); transition: all 0.2s; text-transform: uppercase; letter-spacing: 2px; text-align: center; font-weight: 700; color: var(--text-main); }
+        .group-input-wrapper input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 4px var(--primary-light); outline: none; }
         .group-input-error { font-size: 12px; color: var(--danger); margin-top: 6px; display: none; }
+
+        /* Hidden file input */
+        #photoInput {
+            display: none !important;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Toggle Switch Style (Added) */
+        .toggle-switch {
+            width: 50px; height: 28px; background: #cbd5e1; border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s;
+        }
+        .dark .toggle-switch { background: #475569; }
+        .toggle-switch.active { background: var(--primary); }
+        .toggle-switch::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.active::after { transform: translateX(22px); }
     </style>
 </head>
 <body>
@@ -326,7 +347,11 @@
         </div>
         <div class="list-header">Preferensi</div>
         <div class="menu-list">
-            <div class="menu-item"><div class="menu-icon">🌙</div><div class="menu-text">Mode Gelap</div><div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode(this)"></div></div>
+            <div class="menu-item">
+                <div class="menu-icon">🌙</div>
+                <div class="menu-text">Mode Gelap</div>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode(this)"></div>
+            </div>
         </div>
         <div style="margin-top:30px;"><button class="action-btn" style="background:var(--danger);" onclick="handleLogout()">Keluar dari Akun</button></div>
     </div>
@@ -348,8 +373,7 @@
     </div>
 </div>
 <div class="toast-container" id="toastContainer"></div>
-<!-- FIX 2: Input file disembunyikan via CSS di atas (#photoInput { display: none !important; }) -->
-<input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+<input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none;">
 
 <script>
     let currentUser = null, userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [], members: {}, inviteCode: null };
@@ -364,7 +388,7 @@
         account: { title: 'Akun Saya', subtitle: 'Pengaturan profil' }, 
         settings: { title: 'Pengaturan', subtitle: 'Kelola preferensi' } 
     };
-    const svgIcons = { user: '', lock: '🔒', trash: '️', edit: '✏️', money: '💰', logout: '', warning: '️', group: '👥', invite: '📨', link: '🔗' };
+    const svgIcons = { user: '', lock: '🔒', trash: '🗑️', edit: '✏️', money: '💰', logout: '', warning: '⚠️', group: '👥', invite: '📨', link: '🔗' };
 
     function generateInviteCode() { return Math.random().toString(36).substring(2, 8).toUpperCase(); }
 
@@ -554,7 +578,6 @@
         }, 100);
     }
 
-    // FIX 3: Mengubah logika join agar tidak melanggar permission denied
     async function joinByInviteCode(code) {
         showToast('Mencari kode...', 'warning');
         
@@ -570,12 +593,6 @@
             const ownerUid = codeData.ownerUid;
             const ownerName = codeData.ownerName || 'Pemilik';
             
-            // Cek apakah user mencoba join ke akun sendiri
-            if (ownerUid === currentUser.uid) {
-                showToast('Ini adalah akun Anda sendiri!', 'warning');
-                return;
-            }
-
             const ownerSnap = await database.ref('users/' + ownerUid).once('value');
             const ownerData = ownerSnap.val();
             
@@ -599,31 +616,10 @@
                 joinedAt: Date.now()
             };
             
-            // PERUBAHAN PENTING:
-            // Sebelumnya kode ini menulis ke 'users/' + ownerUid yang menyebabkan Permission Denied
-            // Karena rules hanya mengizinkan write ke UID sendiri.
-            // Solusi: Kita simpan request join di path milik user yang login ('users/' + currentUser.uid)
-            // Nantinya pemilik akun harus menyetujui (fitur ini perlu pengembangan lebih lanjut)
-            // ATAU kita ubah rules Firebase agar mengizinkan write ke members list orang lain.
+            await database.ref('users/' + ownerUid + '/members/' + userKey).set(newMember);
             
-            // Untuk saat ini, karena rules Firebase Anda ketat (hanya owner yang bisa write),
-            // fitur "Gabung Otomatis" tidak bisa berjalan tanpa mengubah Rules Firebase.
-            // 
-            // SOLUSI TERBAIK: Ubah Rules Firebase di Console menjadi seperti ini:
-            // "users": { "$uid": { ".write": "auth != null" } } 
-            // (Ini agak longgar, tapi memungkinkan fitur join bekerja)
-            
-            // Jika Anda ingin tetap aman, gunakan Cloud Functions. Tapi untuk prototype HTML ini:
-            // Kita akan coba tulis ke path owner. Jika gagal, beri tahu user.
-            
-            try {
-                await database.ref('users/' + ownerUid + '/members/' + userKey).set(newMember);
-                closeModal();
-                showToast(`Berhasil bergabung dengan akun ${ownerName}!`, 'success');
-            } catch (permError) {
-                console.error(permError);
-                showToast('Gagal bergabung: Izin ditolak. Minta pemilik untuk mengundang Anda secara manual atau update Rules Firebase.', 'error');
-            }
+            closeModal();
+            showToast(`Berhasil bergabung dengan akun ${ownerName}!`, 'success');
             
         } catch (error) {
             showToast('Gagal: ' + error.message, 'error');
@@ -715,7 +711,7 @@
     function showModal(config) { 
         const overlay = document.getElementById('modalOverlay'), iconEl = document.getElementById('modalIcon'); 
         iconEl.className = 'modal-icon ' + (config.iconType || 'info'); 
-        iconEl.innerHTML = svgIcons[config.icon] || '👤'; 
+        iconEl.innerHTML = svgIcons[config.icon] || ''; 
         document.getElementById('modalTitle').innerText = config.title || ''; 
         document.getElementById('modalDesc').innerText = config.description || ''; 
         document.getElementById('modalDesc').style.display = config.description ? 'block' : 'none'; 
@@ -824,7 +820,20 @@
     function goBack() { switchPage(previousPage); }
     function openSettings() { switchPage('settings'); }
     function toggleSwitch(element) { element.classList.toggle('active'); }
-    function toggleDarkMode(element) { element.classList.toggle('active'); document.body.classList.toggle('dark'); localStorage.setItem('darkMode', document.body.classList.contains('dark')); }
+    
+    // Dark Mode Function Updated
+    function toggleDarkMode(element) { 
+        element.classList.toggle('active'); 
+        document.body.classList.toggle('dark'); 
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('darkMode', isDark);
+        
+        // Update Icon
+        const iconDiv = element.parentElement.querySelector('.menu-icon');
+        if(iconDiv) {
+            iconDiv.innerText = isDark ? '☀️' : '🌙';
+        }
+    }
 
     // ===== DATA OPERATIONS =====
     function confirmResetData() { 
@@ -1045,10 +1054,16 @@
 
     document.getElementById('loanDateStart').valueAsDate = new Date();
     document.getElementById('termStartDate').valueAsDate = new Date();
+    
+    // Initialize Dark Mode from LocalStorage
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark');
         const darkModeToggle = document.getElementById('darkModeToggle');
-        if (darkModeToggle) darkModeToggle.classList.add('active');
+        if (darkModeToggle) {
+            darkModeToggle.classList.add('active');
+            const iconDiv = darkModeToggle.parentElement.querySelector('.menu-icon');
+            if(iconDiv) iconDiv.innerText = '☀️';
+        }
     }
 </script>
 </body>
