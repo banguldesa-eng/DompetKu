@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DompetKu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyBSW2L2tWVCX5rmQvW6WitlWAUEnesSzWI",
+          authDomain: "dompetku-53884.firebaseapp.com",
+          databaseURL: "https://dompetku-53884-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "dompetku-53884",
+          storageBucket: "dompetku-53884.firebasestorage.app",
+          messagingSenderId: "10579592697",
+          appId: "1:10579592697:web:e6e16d2705e28ea1c6a928"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const database = firebase.database();
+    </script>
+    <style>
+        :root {
+            --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #e0e7ff;
+            --danger: #ef4444; --danger-light: #fee2e2; --success: #10b981; --success-light: #d1fae5;
+            --warning: #f59e0b; --warning-light: #fef3c7; --bg: #f3f4f6; --card-bg: #ffffff;
+            --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; --radius: 16px;
+        }
+        .dark { 
+            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --text-muted: #94a3b8; 
+            --border: #334155; 
+        }
+        * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
+        
+        /* FIX 1: Sembunyikan Input File agar tidak muncul di UI */
+        #photoInput { display: none !important; }
+
+        /* Auth Styles */
+        .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; inset: 0; z-index: 1000; }
+        .auth-card { background: white; border-radius: 24px; padding: 40px 30px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: slideUp 0.4s ease; max-height: 90vh; overflow-y: auto; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .auth-header { text-align: center; margin-bottom: 30px; }
+        .auth-logo { width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; }
+        .auth-logo svg { width: 32px; height: 32px; fill: white; }
+        .auth-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+        .auth-subtitle { font-size: 14px; color: #6b7280; }
+        .auth-form .form-group { margin-bottom: 16px; }
+        .auth-form label { display: block; font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 6px; }
+        .auth-form input { width: 100%; padding: 14px 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; background: white; transition: all 0.2s; }
+        .auth-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); }
+        .password-wrapper { position: relative; }
+        .password-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #6b7280; }
+        .remember-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .checkbox-wrapper input[type="checkbox"] { display: none; }
+        .checkmark { width: 20px; height: 20px; border: 2px solid #e5e7eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .checkbox-wrapper input:checked + .checkmark { background: var(--primary); border-color: var(--primary); }
+        .checkmark svg { width: 12px; height: 12px; fill: white; opacity: 0; }
+        .checkbox-wrapper input:checked + .checkmark svg { opacity: 1; }
+        .checkbox-label { font-size: 13px; color: #111827; }
+        .forgot-link { font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .auth-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+        .auth-btn:active { transform: scale(0.98); }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; color: #6b7280; }
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .strength-bar { height: 4px; background: #e5e7eb; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+        .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s; width: 0%; }
+        .strength-fill.weak { width: 33%; background: var(--danger); }
+        .strength-fill.medium { width: 66%; background: var(--warning); }
+        .strength-fill.strong { width: 100%; background: var(--success); }
+        .strength-text { font-size: 11px; margin-top: 4px; color: var(--text-muted); }
+
+        /* App Styles */
+        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; display: none; }
+        header { background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); padding: 24px 20px 30px 20px; color: white; position: sticky; top: 0; z-index: 10; }
+        h1 { font-size: 22px; font-weight: 700; }
+        .subtitle { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+        .header-back { display: inline-flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 12px; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.15); }
+        
+        .page { padding: 24px 20px; display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .summary-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+        .summary-card { padding: 20px; border-radius: var(--radius); color: white; position: relative; overflow: hidden; }
+        .summary-card::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); }
+        .summary-card.savings { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .summary-card.debt { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .summary-card.remaining { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .summary-card.info { background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); }
+        .summary-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; opacity: 0.9; position: relative; z-index: 1; }
+        .summary-value { font-size: 28px; font-weight: 800; margin: 8px 0 0 0; letter-spacing: -1px; position: relative; z-index: 1; }
+        
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+        .mini-card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); text-align: center; }
+        .mini-card-name { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        .mini-card-val { font-size: 16px; font-weight: 700; }
+        .val-danger { color: var(--danger); } .val-success { color: var(--success); } .val-primary { color: var(--primary); }
+        
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        input, select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: #f9fafb; transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px var(--primary-light); }
+        
+        button.action-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        button.action-btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+        .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        .btn-warning { background: var(--warning); box-shadow: 0 4px 12px rgba(245,158,11,0.3); }
+        
+        .list-header { font-size: 16px; font-weight: 700; margin: 30px 0 16px 0; color: var(--text-main); }
+        .item-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+        .item-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
+        .icon-loan { background: var(--danger-light); } .icon-save { background: var(--success-light); }
+        .item-info { flex: 1; }
+        .item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+        .item-sub { font-size: 12px; color: var(--text-muted); }
+        .item-action { text-align: right; }
+        .item-amount { font-weight: 700; font-size: 15px; margin-bottom: 6px; display: block; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-unpaid { background: var(--danger-light); color: var(--danger); } .badge-paid { background: var(--success-light); color: var(--success); }
+        .btn-mini { background: transparent; border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 6px; color: var(--text-muted); }
+        .btn-mini.pay { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .btn-mini.edit { border-color: var(--warning); color: var(--warning); background: var(--warning-light); }
+        .btn-mini.del { border-color: var(--danger); color: var(--danger); background: var(--danger-light); margin-left: 4px; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; padding: 4px; }
+        .nav-item.active { color: var(--primary); } .nav-item:not(.active) { color: var(--text-muted); }
+        .nav-icon { width: 22px; height: 22px; } .nav-label { font-size: 10px; font-weight: 600; }
+
+        .account-header { text-align: center; padding: 30px 20px; background: white; border-radius: var(--radius); margin-bottom: 20px; }
+        .avatar-container { position: relative; display: inline-block; margin-bottom: 16px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .avatar svg { width: 50px; height: 50px; }
+        .avatar-edit-btn { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid white; }
+        .avatar-edit-btn svg { width: 16px; height: 16px; fill: white; }
+        .account-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .account-email { font-size: 14px; color: var(--text-muted); }
+        .menu-list { background: white; border-radius: var(--radius); overflow: hidden; }
+        .menu-item { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
+        .menu-item:hover { background: #f9fafb; } .menu-item:last-child { border-bottom: none; }
+        .menu-icon { width: 24px; height: 24px; flex-shrink: 0; }
+        .menu-text { flex: 1; font-weight: 500; } .menu-arrow { color: var(--text-muted); font-size: 20px; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .modal-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .modal-icon svg { width: 28px; height: 28px; }
+        .modal-icon.info { background: var(--primary-light); } .modal-icon.success { background: var(--success-light); } .modal-icon.warning { background: var(--warning-light); } .modal-icon.danger { background: var(--danger-light); }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .modal-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+        .modal-body { margin-bottom: 24px; }
+        .modal-body input { background: #f9fafb; border: 2px solid var(--border); border-radius: 12px; padding: 16px; font-size: 16px; width: 100%; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .modal-btn.secondary { background: #f3f4f6; color: var(--text-main); }
+        .modal-btn.primary { background: var(--primary); color: white; }
+        .modal-btn.danger { background: var(--danger); color: white; }
+        .modal-btn.success { background: var(--success); color: white; }
+        
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast { background: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; animation: toastIn 0.3s ease forwards; pointer-events: auto; min-width: 280px; }
+        .toast.hide { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+        .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .tab-type-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .tab-type-reguler { background: var(--success-light); color: var(--success); }
+        .tab-type-berjangka { background: var(--primary-light); color: var(--primary); }
+        
+        .member-list { margin-top: 12px; }
+        .member-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; }
+        .member-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; }
+        .member-info { flex: 1; }
+        .member-name { font-weight: 600; font-size: 14px; }
+        .member-email { font-size: 12px; color: var(--text-muted); }
+        .member-role { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .member-role.admin { background: var(--warning-light); color: var(--warning); }
+        
+        .invite-code-box { background: #f9fafb; border: 2px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; margin: 16px 0; }
+        .invite-code { font-size: 24px; font-weight: 700; letter-spacing: 4px; color: var(--primary); margin: 8px 0; }
+        .invite-hint { font-size: 12px; color: var(--text-muted); }
+
+        .group-input-wrapper { margin: 16px 0; }
+        .group-input-wrapper label { display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .group-input-wrapper input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 15px; background: #f9fafb; transition: all 0.2s; text-transform: uppercase; letter-spacing: 2px; text-align: center; font-weight: 700; }
+        .group-input-wrapper input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px var(--primary-light); outline: none; }
+        .group-input-error { font-size: 12px; color: var(--danger); margin-top: 6px; display: none; }
+    </style>
+</head>
+<body>
+
+<!-- HALAMAN LOGIN -->
+<div id="loginPage" class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div class="auth-title">Selamat Datang Kembali</div>
+            <div class="auth-subtitle">Masuk ke akun DompetKu Anda</div>
+        </div>
+        <form class="auth-form" onsubmit="handleLogin(event)">
+            <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="nama@email.com" required></div>
+            <div class="form-group"><label>Kata Sandi</label><div class="password-wrapper"><input type="password" id="loginPassword" placeholder="Masukkan kata sandi" required><button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">👁️</button></div></div>
+            <div class="remember-row"><label class="checkbox-wrapper"><input type="checkbox" id="rememberMe"><span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span class="checkbox-label">Ingat saya</span></label><a class="forgot-link" onclick="handleForgotPassword()">Lupa kata sandi?</a></div>
+            <button type="submit" class="auth-btn" id="loginBtn">Masuk</button>
+        </form>
+        <div class="auth-footer">Belum punya akun? <a onclick="showRegister()">Daftar sekarang</a></div>
+    </div>
+</div>
+
+<!-- HALAMAN REGISTER -->
+<div id="registerPage" class="auth-container" style="display:none;">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div class="auth-title">Buat Akun Baru</div>
+            <div class="auth-subtitle">Mulai kelola keuangan Anda</div>
+        </div>
+        <form class="auth-form" onsubmit="handleRegister(event)">
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" id="regName" placeholder="Masukkan nama lengkap" required></div>
+            <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="nama@email.com" required></div>
+            <div class="form-group"><label>Kata Sandi</label><div class="password-wrapper"><input type="password" id="regPassword" placeholder="Minimal 6 karakter" required oninput="checkRegPasswordStrength(this.value)"><button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)">👁️</button></div><div class="strength-bar"><div class="strength-fill" id="regStrengthFill"></div></div><div class="strength-text" id="regStrengthText"></div></div>
+            <div class="form-group"><label>Konfirmasi Kata Sandi</label><div class="password-wrapper"><input type="password" id="regConfirmPassword" placeholder="Ulangi kata sandi" required><button type="button" class="password-toggle" onclick="togglePassword('regConfirmPassword', this)">️</button></div></div>
+            <div class="terms-wrapper"><label class="checkbox-wrapper"><input type="checkbox" id="agreeTerms" required><span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span class="checkbox-label">Saya setuju dengan Syarat & Ketentuan</span></label></div>
+            <button type="submit" class="auth-btn" id="registerBtn">Daftar</button>
+        </form>
+        <div class="auth-footer">Sudah punya akun? <a onclick="showLogin()">Masuk sekarang</a></div>
+    </div>
+</div>
+
+<!-- HALAMAN UTAMA -->
+<div class="container" id="mainApp">
+    <header>
+        <div id="backButton" class="header-back" style="display:none;" onclick="goBack()"> Kembali</div>
+        <h1 id="pageTitle">DompetKu</h1>
+        <div class="subtitle" id="pageSubtitle">Ringkasan keuangan Anda</div>
+    </header>
+
+    <div id="page-home" class="page active">
+        <div class="summary-grid">
+            <div class="summary-card savings"><div class="summary-label">Total Tabungan</div><div class="summary-value" id="dashTotalSavings">Rp 0</div></div>
+            <div class="summary-card debt"><div class="summary-label">Total Hutang</div><div class="summary-value" id="dashTotalDebt">Rp 0</div></div>
+            <div class="summary-card remaining"><div class="summary-label">Sisa Belum Dibayar</div><div class="summary-value" id="dashRemainingDebt">Rp 0</div></div>
+        </div>
+        <div class="list-header">Ringkasan Per Orang</div>
+        <div class="grid-cards" id="homeSummaryGrid"></div>
+        <div class="list-header">Aktivitas Terbaru</div>
+        <div id="homeRecentActivity"></div>
+    </div>
+
+    <div id="page-input" class="page">
+        <div class="card">
+            <h3 style="margin:0 0 16px 0; font-size:18px;">Tambah Tabungan</h3>
+            <div class="form-group"><label>Jenis Tabungan</label><select id="savingTypeSelect" onchange="toggleSavingTypeInputs()"><option value="reguler">Reguler (Langsung Masuk)</option><option value="berjangka">Berjangka (1 Tahun)</option></select></div>
+            <div id="inputReguler">
+                <div class="form-group"><label>Siapa yang menabung?</label><select id="savePersonSelect" onchange="checkCustom('save')"><option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option></select><input type="text" id="savePersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;"></div>
+                <div class="form-group"><label>Keterangan</label><input type="text" id="saveNote" placeholder="Gaji bulanan, Bonus, dll"></div>
+                <div class="form-group"><label>Nominal</label><input type="number" id="saveAmount" placeholder="0" min="0"></div>
+            </div>
+            <div id="inputBerjangka" style="display:none;">
+                <div class="form-group"><label>Siapa yang menabung?</label><select id="termPersonSelect" onchange="checkCustom('term')"><option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option></select><input type="text" id="termPersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;"></div>
+                <div class="form-group"><label>Tanggal Mulai Menabung</label><input type="date" id="termStartDate"></div>
+            </div>
+            <button class="action-btn btn-success" onclick="addSaving()">Simpan Tabungan</button>
+        </div>
+        <div class="card">
+            <h3 style="margin:0 0 16px 0; font-size:18px;">Buat Pinjaman Baru</h3>
+            <div class="form-group"><label>Nama Pemberi Pinjaman</label><input type="text" id="loanSource" placeholder="Contoh: Bank ABC / Teman"></div>
+            <div style="display:flex; gap:10px;"><div class="form-group" style="flex:1"><label>Durasi (Bulan)</label><input type="number" id="loanDuration" placeholder="6" min="1"></div><div class="form-group" style="flex:1"><label>Tanggal Mulai</label><input type="date" id="loanDateStart"></div></div>
+            <div class="form-group"><label>Total Pinjaman (Pokok + Bunga)</label><input type="number" id="loanTotalAmount" placeholder="Misal: 1.200.000" min="0"><small id="estInstallment" style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px;"></small></div>
+            <button class="action-btn btn-primary" onclick="createLoanSchedule()">Buat Jadwal Cicilan</button>
+        </div>
+    </div>
+
+    <div id="page-debt" class="page"><div class="list-header">Daftar Pinjaman Aktif</div><div id="debtList"></div></div>
+
+    <div id="page-tabungan" class="page">
+        <div class="summary-grid">
+            <div class="summary-card info"><div class="summary-label">Total Reguler</div><div class="summary-value" id="tabTotalReguler">Rp 0</div></div>
+            <div class="summary-card remaining"><div class="summary-label">Total Berjangka</div><div class="summary-value" id="tabTotalBerjangka">Rp 0</div></div>
+        </div>
+        <div class="list-header">Rekapan Detail</div>
+        <div id="tabunganList"></div>
+    </div>
+
+    <div id="page-account" class="page">
+        <div class="account-header">
+            <div class="avatar-container">
+                <img id="accountAvatar" class="avatar" src="" alt="Foto Profil" style="display:none;">
+                <div id="accountAvatarFallback" class="avatar"><svg viewBox="0 0 24 24" fill="white"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                <div class="avatar-edit-btn" onclick="openEditProfile()"></div>
+            </div>
+            <div class="account-name" id="accountName">Pengguna DompetKu</div>
+            <div class="account-email" id="accountEmail">user@dompetku.app</div>
+            <div id="userRoleBadge" style="margin-top:8px;"></div>
+        </div>
+        <div class="menu-list">
+            <div class="menu-item" onclick="openInviteMembers()"><div class="menu-icon">📨</div><div class="menu-text">Undang Anggota</div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openJoinByCode()"><div class="menu-icon">🔗</div><div class="menu-text">Gabung dengan Kode Undangan</div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openSettings()"><div class="menu-icon">⚙️</div><div class="menu-text">Pengaturan</div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="confirmResetData()"><div class="menu-icon">🗑️</div><div class="menu-text" style="color:var(--danger)">Hapus Semua Data</div><div class="menu-arrow">›</div></div>
+        </div>
+        <div style="text-align:center; margin-top:30px; color:var(--text-muted); font-size:12px;">DompetKu v2.0</div>
+    </div>
+
+    <div id="page-settings" class="page">
+        <div class="list-header" style="margin-top:0;">Akun & Keamanan</div>
+        <div class="menu-list">
+            <div class="menu-item" onclick="openEditProfile()"><div class="menu-icon">👤</div><div class="menu-text"><div style="font-weight:600;">Profil Saya</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Ubah nama dan foto</div></div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openChangePassword()"><div class="menu-icon">🔒</div><div class="menu-text"><div style="font-weight:600;">Ubah Kata Sandi</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Perbarui kata sandi</div></div><div class="menu-arrow">›</div></div>
+        </div>
+        <div class="list-header">Preferensi</div>
+        <div class="menu-list">
+            <div class="menu-item"><div class="menu-icon">🌙</div><div class="menu-text">Mode Gelap</div><div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode(this)"></div></div>
+        </div>
+        <div style="margin-top:30px;"><button class="action-btn" style="background:var(--danger);" onclick="handleLogout()">Keluar dari Akun</button></div>
+    </div>
+
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="nav-item active" onclick="switchPage('home')"><div class="nav-icon">🏠</div><div class="nav-label">Depan</div></div>
+        <div class="nav-item" onclick="switchPage('input')"><div class="nav-icon">➕</div><div class="nav-label">Input</div></div>
+        <div class="nav-item" onclick="switchPage('debt')"><div class="nav-icon">💳</div><div class="nav-label">Hutang</div></div>
+        <div class="nav-item" onclick="switchPage('tabungan')"><div class="nav-icon">💰</div><div class="nav-label">Tabungan</div></div>
+        <div class="nav-item" onclick="switchPage('account')"><div class="nav-icon">👤</div><div class="nav-label">Akun</div></div>
+    </nav>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-content" id="modalContent">
+        <div class="modal-header"><div class="modal-icon" id="modalIcon"></div><div><div class="modal-title" id="modalTitle"></div><div class="modal-desc" id="modalDesc"></div></div></div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-actions" id="modalActions"></div>
+    </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<!-- FIX 2: Input file disembunyikan via CSS di atas (#photoInput { display: none !important; }) -->
+<input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+
+<script>
+    let currentUser = null, userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [], members: {}, inviteCode: null };
+    let tempPhotoData = null, previousPage = 'account', currentPage = 'home';
+
+    const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
+    const pageTitles = { 
+        home: { title: 'DompetKu', subtitle: 'Ringkasan keuangan Anda' }, 
+        input: { title: 'Input Data', subtitle: 'Tambah tabungan atau pinjaman' }, 
+        debt: { title: 'Daftar Hutang', subtitle: 'Kelola semua pinjaman aktif' }, 
+        tabungan: { title: 'Rekapan Tabungan', subtitle: 'Riwayat tabungan' }, 
+        account: { title: 'Akun Saya', subtitle: 'Pengaturan profil' }, 
+        settings: { title: 'Pengaturan', subtitle: 'Kelola preferensi' } 
+    };
+    const svgIcons = { user: '', lock: '🔒', trash: '️', edit: '✏️', money: '💰', logout: '', warning: '️', group: '👥', invite: '📨', link: '🔗' };
+
+    function generateInviteCode() { return Math.random().toString(36).substring(2, 8).toUpperCase(); }
+
+    // ===== AUTH =====
+    auth.onAuthStateChanged((user) => { 
+        if (user) { 
+            currentUser = user; 
+            document.getElementById('loginPage').style.display = 'none'; 
+            document.getElementById('mainApp').style.display = 'block'; 
+            document.getElementById('bottomNav').style.display = 'flex'; 
+            
+            database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    userData = {
+                        name: data.name || currentUser.displayName || 'Pengguna',
+                        email: currentUser.email,
+                        photo: data.photo || null,
+                        loans: data.loans || [],
+                        savings: data.savings || [],
+                        members: data.members || {},
+                        inviteCode: data.inviteCode || null
+                    };
+                    
+                    document.getElementById('accountName').innerText = userData.name;
+                    document.getElementById('accountEmail').innerText = currentUser.email;
+                    
+                    const avatarImg = document.getElementById('accountAvatar');
+                    const avatarFallback = document.getElementById('accountAvatarFallback');
+                    if (userData.photo) {
+                        avatarImg.src = userData.photo;
+                        avatarImg.style.display = 'block';
+                        avatarFallback.style.display = 'none';
+                    } else {
+                        avatarImg.style.display = 'none';
+                        avatarFallback.style.display = 'flex';
+                    }
+                    
+                    const roleBadge = document.getElementById('userRoleBadge');
+                    roleBadge.innerHTML = `<span class="member-role admin">👑 Pemilik Akun</span>`;
+                    
+                    render();
+                }
+            });
+        } else { 
+            currentUser = null; 
+            document.getElementById('loginPage').style.display = 'flex'; 
+            document.getElementById('mainApp').style.display = 'none'; 
+            document.getElementById('bottomNav').style.display = 'none'; 
+        } 
+    });
+
+    // ===== SAVE DATA =====
+    async function saveData() {
+        if (!currentUser) return;
+        
+        try { 
+            const updates = { 
+                loans: userData.loans, 
+                savings: userData.savings,
+                members: userData.members,
+                updatedAt: Date.now() 
+            };
+            if (userData.inviteCode) {
+                updates.inviteCode = userData.inviteCode;
+            }
+            await database.ref('users/' + currentUser.uid).update(updates);
+            
+            if (userData.inviteCode) {
+                await database.ref('inviteCodes/' + userData.inviteCode).set({
+                    ownerUid: currentUser.uid,
+                    ownerName: userData.name,
+                    ownerEmail: currentUser.email
+                });
+            }
+        } catch (error) { 
+            showToast('Gagal menyimpan: ' + error.message, 'error'); 
+        }
+    }
+
+    // ===== UNDANG ANGGOTA =====
+    function openInviteMembers() {
+        if (!userData.inviteCode) {
+            userData.inviteCode = generateInviteCode();
+            saveData();
+        }
+        
+        const members = userData.members || {};
+        const inviteCode = userData.inviteCode;
+        
+        let membersHtml = '<div class="member-list">';
+        membersHtml += `
+            <div class="member-item">
+                <div class="member-avatar">${(userData.name || 'A').split(' ').map(n => n[0]).join('').toUpperCase()}</div>
+                <div class="member-info">
+                    <div class="member-name">${userData.name} (Anda)</div>
+                    <div class="member-email">${currentUser.email}</div>
+                </div>
+                <span class="member-role admin"> Pemilik</span>
+            </div>
+        `;
+        
+        Object.entries(members).forEach(([key, member]) => {
+            const initials = (member.name || 'A').split(' ').map(n => n[0]).join('').toUpperCase();
+            membersHtml += `
+                <div class="member-item">
+                    <div class="member-avatar">${initials}</div>
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-email">${member.email}</div>
+                    </div>
+                    <span class="member-role">👤 Anggota</span>
+                </div>
+            `;
+        });
+        membersHtml += '</div>';
+        
+        const html = `
+            <div class="invite-code-box">
+                <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">Kode Undangan Anda</div>
+                <div class="invite-code">${inviteCode}</div>
+                <div class="invite-hint">Bagikan kode ini agar orang lain bisa mengelola data bersama Anda</div>
+                <button onclick="copyInviteCode('${inviteCode}')" class="btn-mini" style="margin-top:12px; padding:10px 20px; font-size:13px;"> Salin Kode</button>
+            </div>
+            <div style="font-size:14px; font-weight:600; margin:16px 0 8px 0;">Anggota (${Object.keys(members).length + 1})</div>
+            ${membersHtml}
+        `;
+        
+        showModal({ 
+            icon: 'invite', iconType: 'info', 
+            title: 'Undang Anggota', 
+            description: 'Bagikan kode undangan untuk mengelola data bersama',
+            customHTML: html,
+            buttons: [{ text: 'Tutup', class: 'secondary' }]
+        });
+    }
+
+    function copyInviteCode(code) {
+        navigator.clipboard.writeText(code).then(() => showToast('Kode disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
+    }
+
+    // ===== GABUNG DENGAN KODE UNDANGAN =====
+    function openJoinByCode() {
+        const html = `
+            <div style="background:var(--primary-light); padding:16px; border-radius:12px; margin-bottom:16px;">
+                <div style="font-weight:600; color:var(--primary); margin-bottom:4px;"> Cara Bergabung</div>
+                <div style="font-size:13px; color:var(--text-main); line-height:1.5;">Minta kode undangan 6 karakter dari pemilik akun, lalu masukkan di bawah ini.</div>
+            </div>
+            <div class="group-input-wrapper">
+                <label for="joinCodeInput">Kode Undangan</label>
+                <input type="text" id="joinCodeInput" placeholder="XXXXXX" maxlength="6" style="font-size:20px; letter-spacing:6px;">
+                <div class="group-input-hint">Masukkan 6 karakter kode undangan</div>
+                <div class="group-input-error" id="joinError">Kode tidak valid!</div>
+            </div>
+        `;
+        
+        showModal({ 
+            icon: 'link', iconType: 'info', 
+            title: 'Gabung dengan Kode', 
+            description: 'Masukkan kode undangan untuk bergabung',
+            customHTML: html,
+            buttons: [
+                { text: 'Batal', class: 'secondary' },
+                { text: 'Gabung', class: 'primary', action: async () => {
+                    const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+                    if (!code || code.length !== 6) {
+                        document.getElementById('joinError').innerText = 'Kode harus 6 karakter!';
+                        document.getElementById('joinError').style.display = 'block';
+                        document.getElementById('joinCodeInput').style.borderColor = 'var(--danger)';
+                        return false;
+                    }
+                    await joinByInviteCode(code);
+                }}
+            ]
+        });
+        
+        setTimeout(() => {
+            const input = document.getElementById('joinCodeInput');
+            if (input) {
+                input.focus();
+                input.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    document.getElementById('joinError').style.display = 'none';
+                    input.style.borderColor = '';
+                });
+            }
+        }, 100);
+    }
+
+    // FIX 3: Mengubah logika join agar tidak melanggar permission denied
+    async function joinByInviteCode(code) {
+        showToast('Mencari kode...', 'warning');
+        
+        try {
+            const codeSnap = await database.ref('inviteCodes/' + code).once('value');
+            const codeData = codeSnap.val();
+            
+            if (!codeData) {
+                showToast('Kode undangan tidak valid!', 'error');
+                return;
+            }
+            
+            const ownerUid = codeData.ownerUid;
+            const ownerName = codeData.ownerName || 'Pemilik';
+            
+            // Cek apakah user mencoba join ke akun sendiri
+            if (ownerUid === currentUser.uid) {
+                showToast('Ini adalah akun Anda sendiri!', 'warning');
+                return;
+            }
+
+            const ownerSnap = await database.ref('users/' + ownerUid).once('value');
+            const ownerData = ownerSnap.val();
+            
+            if (!ownerData) {
+                showToast('Akun pemilik tidak ditemukan!', 'error');
+                return;
+            }
+            
+            const userKey = currentUser.uid.replace(/\./g, '_');
+            const members = ownerData.members || {};
+            
+            if (members[userKey]) {
+                showToast('Anda sudah menjadi anggota akun ini!', 'warning');
+                return;
+            }
+            
+            const newMember = {
+                uid: currentUser.uid,
+                name: currentUser.displayName || 'Saya',
+                email: currentUser.email,
+                joinedAt: Date.now()
+            };
+            
+            // PERUBAHAN PENTING:
+            // Sebelumnya kode ini menulis ke 'users/' + ownerUid yang menyebabkan Permission Denied
+            // Karena rules hanya mengizinkan write ke UID sendiri.
+            // Solusi: Kita simpan request join di path milik user yang login ('users/' + currentUser.uid)
+            // Nantinya pemilik akun harus menyetujui (fitur ini perlu pengembangan lebih lanjut)
+            // ATAU kita ubah rules Firebase agar mengizinkan write ke members list orang lain.
+            
+            // Untuk saat ini, karena rules Firebase Anda ketat (hanya owner yang bisa write),
+            // fitur "Gabung Otomatis" tidak bisa berjalan tanpa mengubah Rules Firebase.
+            // 
+            // SOLUSI TERBAIK: Ubah Rules Firebase di Console menjadi seperti ini:
+            // "users": { "$uid": { ".write": "auth != null" } } 
+            // (Ini agak longgar, tapi memungkinkan fitur join bekerja)
+            
+            // Jika Anda ingin tetap aman, gunakan Cloud Functions. Tapi untuk prototype HTML ini:
+            // Kita akan coba tulis ke path owner. Jika gagal, beri tahu user.
+            
+            try {
+                await database.ref('users/' + ownerUid + '/members/' + userKey).set(newMember);
+                closeModal();
+                showToast(`Berhasil bergabung dengan akun ${ownerName}!`, 'success');
+            } catch (permError) {
+                console.error(permError);
+                showToast('Gagal bergabung: Izin ditolak. Minta pemilik untuk mengundang Anda secara manual atau update Rules Firebase.', 'error');
+            }
+            
+        } catch (error) {
+            showToast('Gagal: ' + error.message, 'error');
+        }
+    }
+
+    // ===== AUTH FUNCTIONS =====
+    function showLogin() { document.getElementById('loginPage').style.display = 'flex'; document.getElementById('registerPage').style.display = 'none'; }
+    function showRegister() { document.getElementById('loginPage').style.display = 'none'; document.getElementById('registerPage').style.display = 'flex'; }
+    function togglePassword(inputId, btn) { 
+        const input = document.getElementById(inputId); 
+        input.type = input.type === 'password' ? 'text' : 'password'; 
+        btn.innerHTML = input.type === 'password' ? '👁️' : '🙈'; 
+    }
+    function checkRegPasswordStrength(password) { 
+        const fill = document.getElementById('regStrengthFill'), text = document.getElementById('regStrengthText'); 
+        let strength = 0; 
+        if (password.length >= 6) strength++; if (/[A-Z]/.test(password)) strength++; if (/[0-9]/.test(password)) strength++; if (/[^A-Za-z0-9]/.test(password)) strength++; 
+        fill.className = 'strength-fill'; 
+        if (password.length === 0) { text.innerText = ''; } 
+        else if (strength <= 1) { fill.classList.add('weak'); text.innerText = 'Lemah'; text.style.color = 'var(--danger)'; } 
+        else if (strength <= 2) { fill.classList.add('medium'); text.innerText = 'Sedang'; text.style.color = 'var(--warning)'; } 
+        else { fill.classList.add('strong'); text.innerText = 'Kuat'; text.style.color = 'var(--success)'; } 
+    }
+    async function handleLogin(e) { 
+        e.preventDefault(); 
+        const email = document.getElementById('loginEmail').value.trim(), password = document.getElementById('loginPassword').value, rememberMe = document.getElementById('rememberMe').checked, btn = document.getElementById('loginBtn'); 
+        if (!email || !password) { showToast('Email dan kata sandi harus diisi!', 'error'); return; } 
+        btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
+        try { 
+            await auth.setPersistence(rememberMe ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION); 
+            await auth.signInWithEmailAndPassword(email, password); 
+            showToast('Selamat datang kembali!', 'success'); 
+        } catch (error) { 
+            let message = 'Login gagal!'; 
+            if (error.code === 'auth/user-not-found') message = 'Akun tidak ditemukan!'; 
+            if (error.code === 'auth/wrong-password') message = 'Kata sandi salah!'; 
+            showToast(message, 'error'); 
+        } finally { btn.disabled = false; btn.innerText = 'Masuk'; } 
+    }
+    async function handleRegister(e) { 
+        e.preventDefault(); 
+        const name = document.getElementById('regName').value.trim(), email = document.getElementById('regEmail').value.trim(), password = document.getElementById('regPassword').value, confirmPassword = document.getElementById('regConfirmPassword').value, agreeTerms = document.getElementById('agreeTerms').checked, btn = document.getElementById('registerBtn'); 
+        if (!name || !email || !password || !confirmPassword) { showToast('Semua field harus diisi!', 'error'); return; } 
+        if (!agreeTerms) { showToast('Anda harus menyetujui syarat & ketentuan!', 'error'); return; } 
+        if (password.length < 6) { showToast('Kata sandi minimal 6 karakter!', 'error'); return; } 
+        if (password !== confirmPassword) { showToast('Kata sandi tidak cocok!', 'error'); return; } 
+        btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
+        try { 
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password); 
+            await userCredential.user.updateProfile({ displayName: name }); 
+            const inviteCode = generateInviteCode();
+            await database.ref('users/' + userCredential.user.uid).set({
+                name: name,
+                email: email,
+                loans: [],
+                savings: [],
+                members: {},
+                inviteCode: inviteCode,
+                createdAt: Date.now()
+            });
+            await database.ref('inviteCodes/' + inviteCode).set({
+                ownerUid: userCredential.user.uid,
+                ownerName: name,
+                ownerEmail: email
+            });
+            showToast('Pendaftaran berhasil!', 'success'); 
+        } catch (error) { 
+            let message = 'Pendaftaran gagal!'; 
+            if (error.code === 'auth/email-already-in-use') message = 'Email sudah terdaftar!'; 
+            showToast(message, 'error'); 
+        } finally { btn.disabled = false; btn.innerText = 'Daftar'; } 
+    }
+    function handleForgotPassword() {
+        showModal({ icon: 'lock', iconType: 'warning', title: 'Lupa Kata Sandi', description: 'Masukkan email Anda untuk reset.', input: { type: 'email', placeholder: 'nama@email.com' }, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Kirim Tautan', class: 'primary', action: async (emailInput) => {
+            if (!emailInput.trim()) { showToast('Email tidak boleh kosong!', 'error'); return false; }
+            try { await auth.sendPasswordResetEmail(emailInput.trim()); showToast('Tautan reset dikirim!', 'success'); } 
+            catch (error) { showToast('Gagal: ' + error.message, 'error'); return false; }
+        }}]});
+    }
+    function handleLogout() { 
+        showModal({ icon: 'logout', iconType: 'warning', title: 'Keluar dari Akun?', description: 'Anda akan keluar dari aplikasi.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Keluar', class: 'danger', action: async () => { 
+            try { await auth.signOut(); showToast('Berhasil keluar', 'success'); } 
+            catch (error) { showToast('Gagal logout', 'error'); } 
+        }}]}); 
+    }
+
+    // ===== MODAL & TOAST =====
+    function showModal(config) { 
+        const overlay = document.getElementById('modalOverlay'), iconEl = document.getElementById('modalIcon'); 
+        iconEl.className = 'modal-icon ' + (config.iconType || 'info'); 
+        iconEl.innerHTML = svgIcons[config.icon] || '👤'; 
+        document.getElementById('modalTitle').innerText = config.title || ''; 
+        document.getElementById('modalDesc').innerText = config.description || ''; 
+        document.getElementById('modalDesc').style.display = config.description ? 'block' : 'none'; 
+        if (config.input) { document.getElementById('modalBody').innerHTML = `<input type="${config.input.type || 'text'}" id="modalInput" placeholder="${config.input.placeholder || ''}" value="${config.input.value || ''}">`; setTimeout(() => document.getElementById('modalInput')?.focus(), 100); } 
+        else if (config.customHTML) { document.getElementById('modalBody').innerHTML = config.customHTML; } 
+        else { document.getElementById('modalBody').innerHTML = ''; } 
+        
+        const actions = document.getElementById('modalActions'); actions.innerHTML = ''; 
+        if (config.buttons) { 
+            config.buttons.forEach(btn => { 
+                const button = document.createElement('button'); button.className = `modal-btn ${btn.class || 'secondary'}`; button.innerText = btn.text; 
+                button.onclick = async () => { 
+                    // Jika ada aksi, jalankan aksi
+                    if (btn.action) {
+                        const inputValue = document.getElementById('modalInput')?.value;
+                        const result = await btn.action(inputValue);
+                        // Hanya tutup modal jika aksi mengembalikan true atau undefined (sukses)
+                        if (result !== false) {
+                            closeModal();
+                        }
+                    } else {
+                        // Jika tidak ada aksi (misal tombol Batal/Tutup), langsung tutup
+                        closeModal();
+                    }
+                }; 
+                actions.appendChild(button); 
+            }); 
+        } 
+        overlay.classList.add('show'); document.body.style.overflow = 'hidden'; 
+    }
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.body.style.overflow = ''; }
+    function closeModalOnBackdrop(e) { if (e.target === e.currentTarget) closeModal(); }
+    function showToast(message, type = 'success') { 
+        const container = document.getElementById('toastContainer'); 
+        const icons = { success: '✅', error: '❌', warning: '️' }; 
+        const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `${icons[type]} <span>${message}</span>`; 
+        container.appendChild(toast); 
+        setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500); 
+    }
+
+    // ===== PHOTO =====
+    function handlePhotoUpload(event) { 
+        const file = event.target.files[0]; if (!file) return; 
+        if (!file.type.startsWith('image/')) { showToast('File harus gambar!', 'error'); return; } 
+        if (file.size > 500 * 1024) { showToast('Maksimal 500KB!', 'error'); return; } 
+        const reader = new FileReader(); 
+        reader.onload = function(e) { 
+            const img = new Image(); 
+            img.onload = function() { 
+                const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), maxSize = 200; 
+                let width = img.width, height = img.height; 
+                if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } 
+                else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } } 
+                canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height); 
+                const compressedData = canvas.toDataURL('image/jpeg', 0.6); 
+                const previewImg = document.getElementById('photoPreview'); 
+                if (previewImg) { previewImg.src = compressedData; previewImg.style.display = 'block'; } 
+                tempPhotoData = compressedData; 
+            }; img.src = e.target.result; 
+        }; reader.readAsDataURL(file); 
+    }
+    function triggerPhotoUpload() { document.getElementById('photoInput').click(); }
+    function openEditProfile() { 
+        tempPhotoData = userData.photo; 
+        showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div class="photo-upload-area"><div class="photo-preview-container"><img id="photoPreview" class="photo-preview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview"><div class="photo-upload-btn" onclick="triggerPhotoUpload()">📷</div></div><div class="photo-upload-hint">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" value="${userData.name}" style="margin-top:6px;"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
+            const newName = document.getElementById('editName').value.trim(); if (!newName) { showToast('Nama harus diisi!', 'error'); return false; } 
+            try { 
+                await currentUser.updateProfile({ displayName: newName }); 
+                userData.name = newName; 
+                userData.photo = tempPhotoData; 
+                await database.ref('users/' + currentUser.uid).update({ name: newName, photo: tempPhotoData });
+                document.getElementById('accountName').innerText = newName;
+                const avatarImg = document.getElementById('accountAvatar');
+                const avatarFallback = document.getElementById('accountAvatarFallback');
+                if (tempPhotoData) { avatarImg.src = tempPhotoData; avatarImg.style.display = 'block'; avatarFallback.style.display = 'none'; }
+                showToast('Profil diperbarui!', 'success'); 
+            } catch (error) { showToast('Gagal: ' + error.message, 'error'); return false; } 
+        }}]}); 
+    }
+    function openChangePassword() { 
+        showModal({ icon: 'lock', iconType: 'warning', title: 'Ubah Kata Sandi', customHTML: `<div class="form-group" style="margin-top:16px;"><label>Kata Sandi Lama</label><input type="password" id="oldPassword" placeholder="Kata sandi lama" style="margin-top:6px;"></div><div class="form-group"><label>Kata Sandi Baru</label><input type="password" id="newPassword" placeholder="Minimal 6 karakter" style="margin-top:6px;"></div><div class="form-group"><label>Konfirmasi</label><input type="password" id="confirmPassword" placeholder="Ulangi kata sandi" style="margin-top:6px;"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ubah', class: 'primary', action: async () => { 
+            const oldPass = document.getElementById('oldPassword').value, newPass = document.getElementById('newPassword').value, confirmPass = document.getElementById('confirmPassword').value; 
+            if (!oldPass || !newPass || !confirmPass) { showToast('Semua field harus diisi!', 'error'); return false; } 
+            if (newPass.length < 6) { showToast('Minimal 6 karakter!', 'error'); return false; } 
+            if (newPass !== confirmPass) { showToast('Kata sandi tidak cocok!', 'error'); return false; } 
+            try { const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, oldPass); await currentUser.reauthenticateWithCredential(credential); await currentUser.updatePassword(newPass); showToast('Kata sandi diubah!', 'success'); } 
+            catch (error) { let msg = 'Gagal'; if (error.code === 'auth/wrong-password') msg = 'Kata sandi lama salah!'; showToast(msg, 'error'); return false; } 
+        }}]}); 
+    }
+
+    // ===== NAVIGATION =====
+    function switchPage(page) {
+        currentPage = page; 
+        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(`page-${page}`).classList.add('active');
+        const navItems = document.querySelectorAll('.nav-item'), navMap = { home: 0, input: 1, debt: 2, tabungan: 3, account: 4 };
+        if (navMap[page] !== undefined) navItems[navMap[page]].classList.add('active');
+        document.getElementById('pageTitle').innerText = pageTitles[page].title;
+        document.getElementById('pageSubtitle').innerText = pageTitles[page].subtitle;
+        const backButton = document.getElementById('backButton'), bottomNav = document.getElementById('bottomNav');
+        if (page === 'settings') { backButton.style.display = 'inline-flex'; bottomNav.style.display = 'none'; previousPage = 'account'; } 
+        else { backButton.style.display = 'none'; bottomNav.style.display = 'flex'; }
+        render();
+    }
+    function goBack() { switchPage(previousPage); }
+    function openSettings() { switchPage('settings'); }
+    function toggleSwitch(element) { element.classList.toggle('active'); }
+    function toggleDarkMode(element) { element.classList.toggle('active'); document.body.classList.toggle('dark'); localStorage.setItem('darkMode', document.body.classList.contains('dark')); }
+
+    // ===== DATA OPERATIONS =====
+    function confirmResetData() { 
+        showModal({ icon: 'warning', iconType: 'danger', title: 'Hapus SEMUA Data?', description: 'Seluruh data akan dihapus permanen.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Hapus', class: 'danger', action: async () => { 
+            userData.loans = []; userData.savings = []; await saveData(); render(); showToast('Data dihapus.', 'warning'); 
+        }}]}); 
+    }
+    function toggleSavingTypeInputs() {
+        document.getElementById('inputReguler').style.display = document.getElementById('savingTypeSelect').value === 'reguler' ? 'block' : 'none';
+        document.getElementById('inputBerjangka').style.display = document.getElementById('savingTypeSelect').value === 'berjangka' ? 'block' : 'none';
+    }
+    document.getElementById('loanDuration').addEventListener('input', updateEstimate);
+    document.getElementById('loanTotalAmount').addEventListener('input', updateEstimate);
+    function updateEstimate() { 
+        const total = parseInt(document.getElementById('loanTotalAmount').value) || 0, duration = parseInt(document.getElementById('loanDuration').value) || 0, estEl = document.getElementById('estInstallment'); 
+        if (total > 0 && duration > 0) { estEl.innerText = `Estimasi cicilan/bulan: ${formatRupiah(Math.round(total / duration))}`; } 
+        else { estEl.innerText = ''; } 
+    }
+    async function createLoanSchedule() {
+        const source = document.getElementById('loanSource').value.trim(), duration = parseInt(document.getElementById('loanDuration').value), startDateStr = document.getElementById('loanDateStart').value, totalAmount = parseInt(document.getElementById('loanTotalAmount').value) || 0;
+        if (!source || !duration || !startDateStr || totalAmount <= 0) { showToast('Lengkapi semua data!', 'error'); return; }
+        const loanId = Date.now().toString(), startDate = new Date(startDateStr);
+        let installments = [];
+        for (let i = 1; i <= duration; i++) { 
+            let dueDate = new Date(startDate); dueDate.setMonth(dueDate.getMonth() + i); 
+            installments.push({ id: `${loanId}_${i}`, monthIndex: i, totalMonths: duration, amount: 0, dueDate: dueDate.toISOString().split('T')[0], isPaid: false, paidDate: null, createdBy: currentUser.uid }); 
+        }
+        userData.loans.push({ id: loanId, source, duration, totalAmount, startDate: startDateStr, installments, createdBy: currentUser.uid, createdAt: Date.now() });
+        await saveData();
+        document.getElementById('loanSource').value = ''; document.getElementById('loanDuration').value = ''; document.getElementById('loanTotalAmount').value = ''; document.getElementById('estInstallment').innerText = '';
+        render(); showToast('Jadwal cicilan dibuat!', 'success');
+    }
+    function editInstallmentAmount(loanId, instId) { 
+        const loan = userData.loans.find(l => l.id === loanId), inst = loan.installments.find(i => i.id === instId); 
+        showModal({ icon: 'edit', iconType: 'warning', title: 'Isi Nominal', description: `Bulan ke-${inst.monthIndex} dari ${inst.totalMonths}`, input: { type: 'number', placeholder: 'Nominal...', value: inst.amount || '' }, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async (val) => { 
+            const num = parseInt(val); if (!num || num <= 0) { showToast('Nominal > 0!', 'error'); return false; } 
+            inst.amount = num; await saveData(); switchPage(currentPage); showToast('Nominal disimpan!', 'success'); 
+        }}]}); 
+    }
+    function payInstallment(loanId, instId) { 
+        showModal({ icon: 'money', iconType: 'success', title: 'Konfirmasi', description: 'Tandai cicilan ini sebagai LUNAS?', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Lunas', class: 'success', action: async () => { 
+            const loan = userData.loans.find(l => l.id === loanId), inst = loan.installments.find(i => i.id === instId); 
+            inst.isPaid = true; inst.paidDate = new Date().toISOString().split('T')[0]; inst.paidBy = currentUser.uid; 
+            await saveData(); switchPage(currentPage); showToast('Cicilan dilunasi!', 'success'); 
+        }}]}); 
+    }
+    function deleteLoan(loanId) { 
+        const loan = userData.loans.find(l => l.id === loanId); 
+        showModal({ icon: 'trash', iconType: 'danger', title: 'Hapus Pinjaman?', description: `"${loan.source}" akan dihapus.`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Hapus', class: 'danger', action: async () => { 
+            userData.loans = userData.loans.filter(l => l.id !== loanId); await saveData(); switchPage(currentPage); showToast('Pinjaman dihapus.', 'success'); 
+        }}]}); 
+    }
+    async function addSaving() {
+        const type = document.getElementById('savingTypeSelect').value;
+        if (type === 'reguler') {
+            let person = document.getElementById('savePersonSelect').value;
+            if (person === 'custom') {
+                person = document.getElementById('savePersonCustom').value.trim();
+                if(!person) { showToast('Masukkan nama baru!', 'error'); return; }
+            }
+            const note = document.getElementById('saveNote').value.trim(), amount = parseInt(document.getElementById('saveAmount').value);
+            if (!person || !note || !amount || amount <= 0) { showToast('Lengkapi semua data dengan benar!', 'error'); return; }
+            userData.savings.push({ id: Date.now().toString(), type: 'reguler', person, note, amount, date: new Date().toLocaleDateString('id-ID'), createdBy: currentUser.uid });
+            await saveData();
+            document.getElementById('saveNote').value = ''; document.getElementById('saveAmount').value = '';
+            render(); showToast(`Tabungan ${formatRupiah(amount)} disimpan!`, 'success');
+        } else if (type === 'berjangka') {
+            let person = document.getElementById('termPersonSelect').value;
+            if (person === 'custom') {
+                person = document.getElementById('termPersonCustom').value.trim();
+                if(!person) { showToast('Masukkan nama baru!', 'error'); return; }
+            }
+            const startDate = document.getElementById('termStartDate').value;
+            if (!person || !startDate) { showToast('Lengkapi semua data!', 'error'); return; }
+            const startObj = new Date(startDate), termId = Date.now().toString();
+            let installments = [];
+            for (let i = 1; i <= 12; i++) {
+                let dueDate = new Date(startObj); dueDate.setMonth(dueDate.getMonth() + i);
+                installments.push({ id: `${termId}_${i}`, monthIndex: i, totalMonths: 12, amount: 0, dueDate: dueDate.toISOString().split('T')[0], isPaid: false, paidDate: null });
+            }
+            userData.savings.push({ id: termId, type: 'berjangka', person, startDate, endDate: installments[11].dueDate, installments, createdBy: currentUser.uid });
+            await saveData();
+            document.getElementById('termStartDate').value = '';
+            render(); showToast('Jadwal tabungan berjangka dibuat!', 'success');
+        }
+    }
+    function delSaving(idx) { 
+        const s = userData.savings[idx]; 
+        showModal({ icon: 'trash', iconType: 'danger', title: 'Hapus Transaksi?', description: `Hapus tabungan "${s.person}"?`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Hapus', class: 'danger', action: async () => { 
+            userData.savings.splice(idx, 1); await saveData(); render(); showToast('Transaksi dihapus.', 'success'); 
+        }}]}); 
+    }
+    function checkCustom(type) { 
+        const val = document.getElementById(type === 'save' ? 'savePersonSelect' : 'termPersonSelect').value; 
+        document.getElementById(type === 'save' ? 'savePersonCustom' : 'termPersonCustom').style.display = (val === 'custom') ? 'block' : 'none'; 
+    }
+    function render() { renderHome(); renderDebtList(); renderTabunganList(); updateSavingsDropdown(); }
+    function renderHome() {
+        const totalSavingsEl = document.getElementById('dashTotalSavings'), totalDebtEl = document.getElementById('dashTotalDebt'), remainingDebtEl = document.getElementById('dashRemainingDebt'), summaryGrid = document.getElementById('homeSummaryGrid'), recentActivity = document.getElementById('homeRecentActivity');
+        let totalSavings = 0, totalDebt = 0, remainingDebt = 0, summaryMap = {}, recentItems = [];
+        userData.savings.forEach(s => { 
+            if(s.type === 'reguler') totalSavings += s.amount; 
+            if(s.type === 'berjangka' && s.installments) s.installments.forEach(inst => totalSavings += (inst.amount || 0)); 
+            recentItems.push({ type: 'saving', data: s }); 
+        });
+        userData.loans.forEach(loan => { 
+            let loanTotal = 0, loanRemaining = 0; 
+            loan.installments.forEach(inst => { 
+                loanTotal += inst.amount; if (!inst.isPaid && inst.amount > 0) loanRemaining += inst.amount; 
+                recentItems.push({ type: 'loan', loan, inst }); 
+            }); 
+            totalDebt += loanTotal; remainingDebt += loanRemaining; 
+            if (!summaryMap[loan.source]) summaryMap[loan.source] = { debt: 0, remaining: 0 }; 
+            summaryMap[loan.source].debt += loanTotal; summaryMap[loan.source].remaining += loanRemaining; 
+        });
+        totalSavingsEl.innerText = formatRupiah(totalSavings); totalDebtEl.innerText = formatRupiah(totalDebt); remainingDebtEl.innerText = formatRupiah(remainingDebt);
+        summaryGrid.innerHTML = ''; 
+        for (const [name, vals] of Object.entries(summaryMap)) { 
+            summaryGrid.innerHTML += `<div class="mini-card"><div class="mini-card-name">${name}</div><div class="mini-card-val val-danger">${formatRupiah(vals.remaining)}</div><div style="font-size:10px; color:var(--text-muted); margin-top:4px;">dari ${formatRupiah(vals.debt)}</div></div>`; 
+        }
+        recentItems.sort((a, b) => { 
+            const dA = a.type === 'saving' ? new Date(a.data.date || a.data.startDate) : new Date(a.inst.dueDate); 
+            const dB = b.type === 'saving' ? new Date(b.data.date || b.data.startDate) : new Date(b.inst.dueDate); 
+            return dB - dA; 
+        });
+        recentActivity.innerHTML = ''; 
+        if (recentItems.length === 0) { recentActivity.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada aktivitas</div>'; } 
+        else { 
+            recentItems.slice(0, 5).forEach(item => { 
+                if (item.type === 'saving') { 
+                    const badge = item.data.type === 'berjangka' ? '<span class="badge" style="background:#e0e7ff;color:#4f46e5">Berjangka</span>' : '<span class="badge badge-paid">Reguler</span>'; 
+                    recentActivity.innerHTML += `<div class="item-card" style="display:flex; align-items:center;"><div class="item-icon icon-save">💰</div><div class="item-info"><div class="item-title">${item.data.person} ${badge}</div><div class="item-sub">${item.data.note || 'Tabungan Berjangka'} • ${item.data.date || item.data.startDate}</div></div><div class="item-action"><span class="item-amount val-success">+${formatRupiah(item.data.amount || (item.data.installments ? item.data.installments.reduce((sum, i) => sum + (i.amount || 0), 0) : 0))}</span></div></div>`; 
+                } else { 
+                    const badge = item.inst.isPaid ? '<span class="badge badge-paid">Lunas</span>' : '<span class="badge badge-unpaid">Belum Bayar</span>'; 
+                    recentActivity.innerHTML += `<div class="item-card" style="display:flex; align-items:center;"><div class="item-icon icon-loan">💳</div><div class="item-info"><div class="item-title">${item.loan.source}</div><div class="item-sub">Cicilan ${item.inst.monthIndex}/${item.inst.totalMonths} • ${item.inst.dueDate}</div></div><div class="item-action"><span class="item-amount val-danger">${formatRupiah(item.inst.amount)}</span>${badge}</div></div>`; 
+                } 
+            }); 
+        }
+    }
+    function renderDebtList() {
+        const debtList = document.getElementById('debtList'); debtList.innerHTML = '';
+        if (userData.loans.length === 0) { debtList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada pinjaman</div>'; return; }
+        [...userData.loans].reverse().forEach(loan => { 
+            let itemsHtml = ''; 
+            loan.installments.forEach(inst => { 
+                const dateStr = new Date(inst.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); 
+                let actions = ''; 
+                if (!inst.isPaid) { actions += `<button class="btn-mini edit" onclick="editInstallmentAmount('${loan.id}', '${inst.id}')">Isi</button>`; actions += `<button class="btn-mini pay" onclick="payInstallment('${loan.id}', '${inst.id}')">Bayar</button>`; } 
+                else { actions += `<span class="badge badge-paid">Lunas</span>`; } 
+                itemsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed var(--border);"><div><div style="font-weight:600; font-size:14px;">Cicilan ${inst.monthIndex}/${inst.totalMonths}</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${inst.amount > 0 ? formatRupiah(inst.amount) : '<span style="color:#aaa">Belum diisi</span>'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Jatuh tempo: ${dateStr}</div></div><div style="text-align:right">${actions}</div></div>`; 
+            }); 
+            const totalLoanDisplay = loan.totalAmount ? ` | Total: ${formatRupiah(loan.totalAmount)}` : ''; 
+            let deleteButton = `<button class="btn-mini del" onclick="deleteLoan('${loan.id}')" style="margin:0">Hapus</button>`;
+            debtList.innerHTML += `<div class="item-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;"><div class="item-icon icon-loan"></div><div><div class="item-title">${loan.source}${totalLoanDisplay}</div><div class="item-sub">${loan.duration} Bulan • Mulai ${loan.startDate}</div></div></div>${deleteButton}</div><div style="padding-left:52px;">${itemsHtml}</div></div>`; 
+        });
+    }
+    function renderTabunganList() {
+        const list = document.getElementById('tabunganList'); list.innerHTML = '';
+        let totalReguler = 0, totalBerjangka = 0;
+        if (userData.savings.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada tabungan</div>'; } 
+        else {
+            [...userData.savings].reverse().forEach((s, idx) => {
+                const originalIdx = userData.savings.length - 1 - idx;
+                const isTerm = s.type === 'berjangka';
+                const badgeClass = isTerm ? 'tab-type-berjangka' : 'tab-type-reguler';
+                const badgeText = isTerm ? 'Berjangka (1 Thn)' : 'Reguler';
+                let detailsHtml = ''; 
+                if (isTerm && s.installments) {
+                    s.installments.forEach(inst => {
+                        totalBerjangka += (inst.amount || 0);
+                        const dateToShow = inst.paidDate ? inst.paidDate : inst.dueDate;
+                        const dateLabel = inst.paidDate ? 'Tanggal menabung' : 'Jatuh tempo';
+                        const dateStr = new Date(dateToShow).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                        let actions = '';
+                        if (!inst.isPaid) { actions += `<button class="btn-mini edit" onclick="editTermAmount('${s.id}', '${inst.id}')">Isi</button>`; actions += `<button class="btn-mini pay" onclick="payTerm('${s.id}', '${inst.id}')">Tabung</button>`; } 
+                        else { actions += `<span class="badge badge-paid">Lunas</span>`; }
+                        detailsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed var(--border);"><div><div style="font-weight:600; font-size:14px;">Bulan ${inst.monthIndex}/${inst.totalMonths}</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${inst.amount > 0 ? formatRupiah(inst.amount) : '<span style="color:#aaa">Belum diisi</span>'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${dateLabel}: ${dateStr}</div></div><div style="text-align:right">${actions}</div></div>`;
+                    });
+                } else { 
+                    totalReguler += s.amount; detailsHtml = `<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${s.note} • ${s.date}</div>`; 
+                }
+                let deleteButton = !isTerm ? `<button class="btn-mini del" onclick="delSaving(${originalIdx})" style="margin:0">Hapus</button>` : '';
+                list.innerHTML += `<div class="item-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;"><div class="item-icon icon-save">💰</div><div><span class="tab-type-badge ${badgeClass}">${badgeText}</span><div class="item-title">${s.person}</div><div class="item-sub">${isTerm ? `Mulai: ${s.startDate} • Jatuh Tempo: ${s.endDate}` : ''}</div></div></div>${deleteButton}</div>${detailsHtml}</div>`;
+            });
+        }
+        document.getElementById('tabTotalReguler').innerText = formatRupiah(totalReguler);
+        document.getElementById('tabTotalBerjangka').innerText = formatRupiah(totalBerjangka);
+    }
+    function editTermAmount(termId, instId) {
+        const term = userData.savings.find(s => s.id === termId);
+        if(!term || !term.installments) return;
+        const inst = term.installments.find(i => i.id === instId);
+        showModal({ icon: 'edit', iconType: 'warning', title: 'Isi Nominal', description: `Bulan ke-${inst.monthIndex} dari ${inst.totalMonths}`, input: { type: 'number', placeholder: 'Nominal...', value: inst.amount || '' }, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async (val) => {
+            const num = parseInt(val); if (!num || num <= 0) { showToast('Nominal > 0!', 'error'); return false; }
+            inst.amount = num; await saveData(); switchPage(currentPage); showToast('Nominal disimpan!', 'success');
+        }}]});
+    }
+    function payTerm(termId, instId) {
+        const term = userData.savings.find(s => s.id === termId);
+        if(!term || !term.installments) return;
+        const inst = term.installments.find(i => i.id === instId);
+        showModal({ icon: 'money', iconType: 'success', title: 'Konfirmasi', description: 'Tandai setoran bulan ini sebagai LUNAS?', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Lunas', class: 'success', action: async () => {
+            inst.isPaid = true; inst.paidDate = new Date().toISOString().split('T')[0]; inst.paidBy = currentUser.uid;
+            await saveData(); switchPage(currentPage); showToast('Setoran dicatat!', 'success');
+        }}]});
+    }
+    function updateSavingsDropdown() {
+        const select = document.getElementById('savePersonSelect'), currentVal = select.value; let balances = {};
+        userData.savings.forEach(s => { if (!balances[s.person]) balances[s.person] = 0; balances[s.person] += (s.amount || 0); });
+        select.innerHTML = '<option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option>';
+        for (const name of Object.keys(balances)) { const opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); }
+        select.value = currentVal;
+        const termSelect = document.getElementById('termPersonSelect'), termVal = termSelect.value;
+        termSelect.innerHTML = '<option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option>';
+        for (const name of Object.keys(balances)) { const opt = document.createElement('option'); opt.value = name; opt.innerText = name; termSelect.appendChild(opt); }
+        termSelect.value = termVal;
+    }
+
+    document.getElementById('loanDateStart').valueAsDate = new Date();
+    document.getElementById('termStartDate').valueAsDate = new Date();
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) darkModeToggle.classList.add('active');
+    }
+</script>
+</body>
+</html>
