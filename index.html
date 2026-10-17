@@ -43,7 +43,7 @@
         * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
         
-        /* LIQUID ANIMATION LOGIN */
+        /* LIQUID ANIMATION LOGIN - BACKGROUND ASLI */
         .auth-container { 
             min-height: 100vh; display: flex; align-items: center; justify-content: center; 
             padding: 20px; background: #0a0a0a; position: fixed; inset: 0; z-index: 1000; overflow: hidden;
@@ -147,99 +147,34 @@
         .form-group { margin-bottom: 16px; }
         label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
         
-        /* Custom Select - FIXED */
-        .custom-select-wrapper {
-            position: relative;
-            width: 100%;
-        }
+        /* Custom Select */
+        .custom-select-wrapper { position: relative; width: 100%; }
         .custom-select-trigger {
-            width: 100%;
-            padding: 14px 44px 14px 16px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-size: 15px;
-            background: var(--input-bg);
-            color: var(--text-main);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            user-select: none;
-            min-height: 48px;
+            width: 100%; padding: 14px 44px 14px 16px; border: 1px solid var(--border); border-radius: 12px;
+            font-size: 15px; background: var(--input-bg); color: var(--text-main); cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; justify-content: space-between;
+            user-select: none; min-height: 48px;
         }
-        .custom-select-trigger:hover {
-            border-color: var(--primary);
-        }
-        .custom-select-trigger.active {
-            border-color: var(--primary);
-            background: var(--card-bg);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-        .custom-select-trigger .select-text {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .custom-select-trigger:hover { border-color: var(--primary); }
+        .custom-select-trigger.active { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
+        .custom-select-trigger .select-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .custom-select-trigger .select-arrow {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: transform 0.3s;
-            color: var(--text-muted);
-            font-size: 12px;
-            pointer-events: none;
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            transition: transform 0.3s; color: var(--text-muted); font-size: 12px; pointer-events: none;
         }
-        .custom-select-trigger.active .select-arrow {
-            transform: translateY(-50%) rotate(180deg);
-        }
+        .custom-select-trigger.active .select-arrow { transform: translateY(-50%) rotate(180deg); }
         .custom-select-options {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999;
-            max-height: 220px;
-            overflow-y: auto;
-            display: none;
-            animation: dropdownIn 0.2s ease;
+            position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--card-bg);
+            border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 9999; max-height: 220px; overflow-y: auto; display: none; animation: dropdownIn 0.2s ease;
         }
-        .custom-select-options.show {
-            display: block;
-        }
-        @keyframes dropdownIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .custom-select-option {
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: background 0.15s;
-            color: var(--text-main);
-            font-size: 15px;
-            border-bottom: 1px solid var(--border);
-        }
-        .custom-select-option:last-child {
-            border-bottom: none;
-        }
-        .custom-select-option:hover {
-            background: var(--input-bg);
-        }
-        .custom-select-option.selected {
-            background: var(--primary-light);
-            color: var(--primary);
-            font-weight: 600;
-        }
-        .custom-select-option.selected::before {
-            content: '✓ ';
-            margin-right: 4px;
-        }
+        .custom-select-options.show { display: block; }
+        @keyframes dropdownIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-select-option { padding: 12px 16px; cursor: pointer; transition: background 0.15s; color: var(--text-main); font-size: 15px; border-bottom: 1px solid var(--border); }
+        .custom-select-option:last-child { border-bottom: none; }
+        .custom-select-option:hover { background: var(--input-bg); }
+        .custom-select-option.selected { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .custom-select-option.selected::before { content: '✓ '; margin-right: 4px; }
         
         input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"] { 
             width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; 
@@ -323,11 +258,25 @@
         .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .toggle-switch.active::after { transform: translateX(22px); }
         .version-badge { display: inline-block; padding: 4px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px; }
+
+        /* Notification Badge & List Styles */
+        .notif-badge {
+            position: absolute; top: 2px; right: 2px; background: var(--danger); color: white;
+            font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px;
+            display: none; align-items: center; justify-content: center; padding: 0 4px;
+            border: 2px solid var(--primary); animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .notif-item {
+            background: var(--card-bg); border-left: 4px solid var(--warning); padding: 16px;
+            border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .notif-item.overdue { border-left-color: var(--danger); }
     </style>
 </head>
 <body>
 
-<!-- HALAMAN LOGIN -->
+<!-- HALAMAN LOGIN DENGAN BACKGROUND LIQUID ANIMATION -->
 <div id="loginPage" class="auth-container">
     <div class="liquid-blob blob-1"></div>
     <div class="liquid-blob blob-2"></div>
@@ -411,8 +360,16 @@
 <div class="container" id="mainApp">
     <header>
         <div id="backButton" class="header-back" style="display:none;" onclick="goBack()">← Kembali</div>
-        <h1 id="pageTitle">DompetKu</h1>
-        <div class="subtitle" id="pageSubtitle">Ringkasan keuangan Anda</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1 id="pageTitle">DompetKu</h1>
+                <div class="subtitle" id="pageSubtitle">Ringkasan keuangan Anda</div>
+            </div>
+            <div style="position:relative; cursor:pointer; padding:8px;" onclick="openNotificationModal()" title="Notifikasi">
+                <span style="font-size:26px;">🔔</span>
+                <span id="notifBadge" class="notif-badge">0</span>
+            </div>
+        </div>
     </header>
 
     <div id="page-home" class="page active">
@@ -511,7 +468,7 @@
             <div class="account-email" id="accountEmail">user@dompetku.app</div>
         </div>
         <div class="menu-list">
-            <div class="menu-item" onclick="openSettings()"><div class="menu-icon">️⚙️</div><div class="menu-text">Pengaturan</div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openSettings()"><div class="menu-icon">⚙️</div><div class="menu-text">Pengaturan</div><div class="menu-arrow">›</div></div>
             <div class="menu-item" onclick="confirmResetData()"><div class="menu-icon">🗑️</div><div class="menu-text" style="color:var(--danger)">Hapus Semua Data</div><div class="menu-arrow">›</div></div>
         </div>
         <div style="text-align:center; margin-top:30px;">
@@ -545,6 +502,24 @@
     </nav>
 </div>
 
+<!-- NOTIFICATION MODAL -->
+<div class="modal-overlay" id="notifModalOverlay" onclick="closeNotifModal(event)">
+    <div class="modal-content" style="transform: translateY(0); max-height: 80vh;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0; font-size:20px;"> Pusat Notifikasi</h3>
+            <button onclick="closeNotifModal()" style="background:none; border:none; font-size:28px; cursor:pointer; color:var(--text-muted); line-height:1;">&times;</button>
+        </div>
+        <div id="notifList" style="max-height: 60vh; overflow-y: auto;">
+            <!-- Dynamic content -->
+        </div>
+        <div style="margin-top:20px; text-align:center;">
+            <button class="action-btn btn-primary" onclick="requestNotificationPermission()" style="font-size:14px; padding:12px;">
+                📱 Aktifkan Notifikasi Browser
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBackdrop(event)">
     <div class="modal-content" id="modalContent">
         <div class="modal-header"><div class="modal-icon" id="modalIcon"></div><div><div class="modal-title" id="modalTitle"></div><div class="modal-desc" id="modalDesc"></div></div></div>
@@ -560,6 +535,7 @@
     let currentUser = null, userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [] };
     let tempPhotoData = null, previousPage = 'account', currentPage = 'home';
     let selectedValues = { savingType: 'reguler', savePerson: '', termPerson: '' };
+    window.hasShownDueNotification = false;
 
     const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
     const pageTitles = { 
@@ -572,63 +548,136 @@
     };
     const svgIcons = { user: '', lock: '🔒', trash: '️', edit: '✏️', money: '💰', logout: '', warning: '️' };
 
-    // ===== CUSTOM SELECT - FIXED =====
+    // ===== NOTIFICATION SYSTEM =====
+    function checkNotifications() {
+        const today = new Date().toISOString().split('T')[0];
+        let dueLoans = [];
+        let notificationCount = 0;
+
+        if (userData.loans) {
+            userData.loans.forEach(loan => {
+                loan.installments.forEach(inst => {
+                    if (!inst.isPaid && inst.dueDate <= today) {
+                        dueLoans.push({ 
+                            loan: loan.source, 
+                            date: inst.dueDate, 
+                            amount: inst.amount, 
+                            month: inst.monthIndex,
+                            loanId: loan.id,
+                            instId: inst.id
+                        });
+                        notificationCount++;
+                    }
+                });
+            });
+        }
+
+        const badge = document.getElementById('notifBadge');
+        if (badge) {
+            badge.innerText = notificationCount;
+            badge.style.display = notificationCount > 0 ? 'flex' : 'none';
+        }
+
+        window.currentNotifications = { dueLoans, count: notificationCount };
+
+        // Trigger browser notification only once per session
+        if (notificationCount > 0 && Notification.permission === 'granted' && !window.hasShownDueNotification) {
+            new Notification('DompetKu - Pengingat Tagihan! 🔔', {
+                body: `Anda memiliki ${notificationCount} cicilan yang jatuh tempo. Segera lakukan pembayaran.`,
+                icon: 'https://cdn-icons-png.flaticon.com/512/2933/2933245.png'
+            });
+            window.hasShownDueNotification = true;
+        }
+    }
+
+    function requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            showToast("Browser ini tidak mendukung notifikasi.", "error");
+            return;
+        }
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                showToast("Notifikasi browser berhasil diaktifkan!", "success");
+                new Notification("DompetKu", { body: "Notifikasi berhasil diaktifkan! Kami akan mengingatkan Anda tentang jatuh tempo." });
+            } else {
+                showToast("Izin notifikasi ditolak.", "warning");
+            }
+        });
+    }
+
+    function openNotificationModal() {
+        checkNotifications();
+        const modal = document.getElementById('notifModalOverlay');
+        const list = document.getElementById('notifList');
+        const notifs = window.currentNotifications;
+
+        if (notifs.count === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:40px 0; color:var(--text-muted);">🎉 Tidak ada notifikasi baru. Keuangan Anda aman!</div>';
+        } else {
+            let html = '';
+            notifs.dueLoans.forEach(item => {
+                const isOverdue = item.date < new Date().toISOString().split('T')[0];
+                const statusColor = isOverdue ? 'var(--danger)' : 'var(--warning)';
+                const statusText = isOverdue ? 'TERLAMBAT' : 'JATUH TEMPO HARI INI';
+                html += `
+                    <div class="notif-item ${isOverdue ? 'overdue' : ''}">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <div>
+                                <div style="font-weight:700; color:var(--text-main); margin-bottom:4px;">${item.loan} - Bulan ${item.month}</div>
+                                <div style="font-size:13px; color:var(--text-muted);">Jatuh tempo: ${new Date(item.date).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:700; color:${statusColor};">${formatRupiah(item.amount)}</div>
+                                <div style="font-size:10px; font-weight:700; color:${statusColor}; background:${statusColor}20; padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block;">${statusText}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+        modal.classList.add('show');
+    }
+
+    function closeNotifModal(e) {
+        if (!e || e.target.id === 'notifModalOverlay' || e.target.tagName === 'BUTTON') {
+            document.getElementById('notifModalOverlay').classList.remove('show');
+        }
+    }
+
+    // ===== CUSTOM SELECT =====
     function toggleDropdown(name) {
         const trigger = document.getElementById(name + 'Trigger');
         const options = document.getElementById(name + 'Options');
         const isShowing = options.classList.contains('show');
-        
-        // Close all dropdowns first
         closeAllDropdowns();
-        
-        // Toggle current
         if (!isShowing) {
             trigger.classList.add('active');
             options.classList.add('show');
         }
     }
-
     function closeAllDropdowns() {
         document.querySelectorAll('.custom-select-trigger').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.custom-select-options').forEach(o => o.classList.remove('show'));
     }
-
     function selectOption(name, value, text, event) {
         if (event) event.stopPropagation();
-        
         const trigger = document.getElementById(name + 'Trigger');
         const options = document.getElementById(name + 'Options');
         const textEl = document.getElementById(name + 'Text');
-        
-        // Update text
         textEl.textContent = text;
         selectedValues[name] = value;
-        
-        // Update selected state
         options.querySelectorAll('.custom-select-option').forEach(opt => {
             opt.classList.remove('selected');
-            if (opt.dataset.value === value) {
-                opt.classList.add('selected');
-            }
+            if (opt.dataset.value === value) opt.classList.add('selected');
         });
-        
-        // Close dropdown
         trigger.classList.remove('active');
         options.classList.remove('show');
-        
-        // Trigger change handlers
-        if (name === 'savingType') {
-            toggleSavingTypeInputs();
-        } else if (name === 'savePerson' || name === 'termPerson') {
-            checkCustom(name === 'savePerson' ? 'save' : 'term');
-        }
+        if (name === 'savingType') toggleSavingTypeInputs();
+        else if (name === 'savePerson' || name === 'termPerson') checkCustom(name === 'savePerson' ? 'save' : 'term');
     }
-
-    // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.custom-select-wrapper')) {
-            closeAllDropdowns();
-        }
+        if (!e.target.closest('.custom-select-wrapper')) closeAllDropdowns();
     });
 
     // ===== VERSION MANAGEMENT =====
@@ -764,6 +813,7 @@
     }
     function handleLogout() { 
         clearSavedCredentials();
+        window.hasShownDueNotification = false;
         showModal({ icon: 'logout', iconType: 'warning', title: 'Keluar dari Akun?', description: 'Anda akan keluar dari aplikasi.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Keluar', class: 'danger', action: async () => { 
             try { await auth.signOut(); showToast('Berhasil keluar', 'success'); } 
             catch (error) { showToast('Gagal logout', 'error'); } 
@@ -876,7 +926,7 @@
         const isDark = document.body.classList.contains('dark');
         localStorage.setItem('darkMode', isDark);
         const iconDiv = element.parentElement.querySelector('.menu-icon');
-        if(iconDiv) iconDiv.innerText = isDark ? '️' : '🌙';
+        if(iconDiv) iconDiv.innerText = isDark ? '☀️' : '🌙';
     }
 
     function confirmResetData() { 
@@ -974,7 +1024,13 @@
         const val = selectedValues[type === 'save' ? 'savePerson' : 'termPerson'] || '';
         document.getElementById(type === 'save' ? 'savePersonCustom' : 'termPersonCustom').style.display = (val === 'custom') ? 'block' : 'none'; 
     }
-    function render() { renderHome(); renderDebtList(); renderTabunganList(); updateSavingsDropdown(); }
+    function render() { 
+        renderHome(); 
+        renderDebtList(); 
+        renderTabunganList(); 
+        updateSavingsDropdown(); 
+        checkNotifications();
+    }
     function renderHome() {
         const totalSavingsEl = document.getElementById('dashTotalSavings'), totalDebtEl = document.getElementById('dashTotalDebt'), remainingDebtEl = document.getElementById('dashRemainingDebt'), summaryGrid = document.getElementById('homeSummaryGrid'), recentActivity = document.getElementById('homeRecentActivity');
         let totalSavings = 0, totalDebt = 0, remainingDebt = 0, summaryMap = {}, recentItems = [];
