@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DompetKu</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -36,7 +35,7 @@
         .dark { 
             --bg: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --text-muted: #94a3b8; 
             --border: #334155; --input-bg: #334155;
-            --primary-light: rgba(79, 70, 229, 0.2); /* Adjusted for dark mode transparency */
+            --primary-light: rgba(79, 70, 229, 0.2);
             --danger-light: rgba(239, 68, 68, 0.2);
             --success-light: rgba(16, 185, 129, 0.2);
             --warning-light: rgba(245, 158, 11, 0.2);
@@ -44,41 +43,81 @@
         * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
         
-        /* Auth Styles */
-        .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; inset: 0; z-index: 1000; }
-        .auth-card { background: white; border-radius: 24px; padding: 40px 30px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: slideUp 0.4s ease; max-height: 90vh; overflow-y: auto; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .auth-header { text-align: center; margin-bottom: 30px; }
-        .auth-logo { width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; }
-        .auth-logo svg { width: 32px; height: 32px; fill: white; }
-        .auth-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 4px; }
-        .auth-subtitle { font-size: 14px; color: #6b7280; }
-        .auth-form .form-group { margin-bottom: 16px; }
-        .auth-form label { display: block; font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 6px; }
-        .auth-form input { width: 100%; padding: 14px 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; background: white; transition: all 0.2s; }
-        .auth-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); }
+        /* LIQUID ANIMATION LOGIN */
+        .auth-container { 
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
+            padding: 20px; background: #0a0a0a; position: fixed; inset: 0; z-index: 1000; overflow: hidden;
+        }
+        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: float 20s infinite ease-in-out; }
+        .blob-1 { width: 400px; height: 400px; background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); top: -100px; left: -100px; }
+        .blob-2 { width: 350px; height: 350px; background: linear-gradient(135deg, #00ff87 0%, #60efff 100%); bottom: -50px; right: -50px; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(20px, 30px) scale(1.05); }
+        }
+        .auth-card { 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 50px 40px; 
+            width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            animation: slideUp 0.6s ease; max-height: 90vh; overflow-y: auto; position: relative; z-index: 10;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        .auth-header { text-align: center; margin-bottom: 40px; }
+        .auth-logo { 
+            width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            margin: 0 auto 24px auto; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            font-size: 32px; font-weight: 800; color: white; letter-spacing: 2px;
+        }
+        .auth-title { font-size: 32px; font-weight: 800; color: #ffffff; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .auth-subtitle { font-size: 15px; color: rgba(255, 255, 255, 0.7); font-weight: 400; }
+        .auth-form .form-group { margin-bottom: 24px; }
+        .auth-form label { display: block; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .auth-form input { 
+            width: 100%; padding: 16px 20px; border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 16px; 
+            font-size: 15px; background: rgba(255, 255, 255, 0.05); color: white; transition: all 0.3s;
+        }
+        .auth-form input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .auth-form input:focus { border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2); background: rgba(255, 255, 255, 0.1); }
         .password-wrapper { position: relative; }
-        .password-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #6b7280; }
-        .remember-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .password-toggle { 
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
+            background: rgba(255, 255, 255, 0.15); border: none; cursor: pointer; 
+            color: rgba(255, 255, 255, 0.9); font-size: 18px; width: 40px; height: 40px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; z-index: 2;
+        }
+        .password-toggle:hover { background: rgba(255, 255, 255, 0.25); }
+        .remember-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .checkbox-wrapper input[type="checkbox"] { display: none; }
-        .checkmark { width: 20px; height: 20px; border: 2px solid #e5e7eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .checkbox-wrapper input:checked + .checkmark { background: var(--primary); border-color: var(--primary); }
-        .checkmark svg { width: 12px; height: 12px; fill: white; opacity: 0; }
+        .checkmark { width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .checkbox-wrapper input:checked + .checkmark { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #667eea; }
+        .checkmark svg { width: 14px; height: 14px; fill: white; opacity: 0; }
         .checkbox-wrapper input:checked + .checkmark svg { opacity: 1; }
-        .checkbox-label { font-size: 13px; color: #111827; }
-        .forgot-link { font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
-        .auth-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+        .checkbox-label { font-size: 14px; color: rgba(255, 255, 255, 0.8); }
+        .forgot-link { font-size: 14px; color: #667eea; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.3s; }
+        .forgot-link:hover { color: #764ba2; }
+        .auth-btn { 
+            width: 100%; padding: 18px; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5); }
         .auth-btn:active { transform: scale(0.98); }
         .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; color: #6b7280; }
-        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
-        .strength-bar { height: 4px; background: #e5e7eb; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+        .auth-footer { text-align: center; margin-top: 30px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
+        .auth-footer a { color: #667eea; text-decoration: none; font-weight: 700; cursor: pointer; transition: color 0.3s; }
+        .auth-footer a:hover { color: #764ba2; }
+        .strength-bar { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; margin-top: 8px; overflow: hidden; }
         .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s; width: 0%; }
-        .strength-fill.weak { width: 33%; background: var(--danger); }
-        .strength-fill.medium { width: 66%; background: var(--warning); }
-        .strength-fill.strong { width: 100%; background: var(--success); }
-        .strength-text { font-size: 11px; margin-top: 4px; color: var(--text-muted); }
+        .strength-fill.weak { width: 33%; background: #ef4444; }
+        .strength-fill.medium { width: 66%; background: #f59e0b; }
+        .strength-fill.strong { width: 100%; background: #10b981; }
+        .strength-text { font-size: 11px; margin-top: 4px; color: rgba(255, 255, 255, 0.6); }
 
         /* App Styles */
         .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; display: none; }
@@ -86,11 +125,9 @@
         h1 { font-size: 22px; font-weight: 700; }
         .subtitle { font-size: 13px; opacity: 0.8; margin-top: 4px; }
         .header-back { display: inline-flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 12px; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.15); }
-        
         .page { padding: 24px 20px; display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .summary-grid { display: grid; gap: 12px; margin-bottom: 24px; }
         .summary-card { padding: 20px; border-radius: var(--radius); color: white; position: relative; overflow: hidden; }
@@ -101,7 +138,6 @@
         .summary-card.info { background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); }
         .summary-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; opacity: 0.9; position: relative; z-index: 1; }
         .summary-value { font-size: 28px; font-weight: 800; margin: 8px 0 0 0; letter-spacing: -1px; position: relative; z-index: 1; }
-        
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
         .mini-card { background: var(--card-bg); padding: 16px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); text-align: center; }
         .mini-card-name { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
@@ -110,8 +146,106 @@
         
         .form-group { margin-bottom: 16px; }
         label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-        input, select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; }
-        input:focus, select:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
+        
+        /* Custom Select - FIXED */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .custom-select-trigger {
+            width: 100%;
+            padding: 14px 44px 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--input-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            min-height: 48px;
+        }
+        .custom-select-trigger:hover {
+            border-color: var(--primary);
+        }
+        .custom-select-trigger.active {
+            border-color: var(--primary);
+            background: var(--card-bg);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .custom-select-trigger .select-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .custom-select-trigger .select-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+            color: var(--text-muted);
+            font-size: 12px;
+            pointer-events: none;
+        }
+        .custom-select-trigger.active .select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 9999;
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
+            animation: dropdownIn 0.2s ease;
+        }
+        .custom-select-options.show {
+            display: block;
+        }
+        @keyframes dropdownIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .custom-select-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            color: var(--text-main);
+            font-size: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        .custom-select-option:last-child {
+            border-bottom: none;
+        }
+        .custom-select-option:hover {
+            background: var(--input-bg);
+        }
+        .custom-select-option.selected {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .custom-select-option.selected::before {
+            content: '✓ ';
+            margin-right: 4px;
+        }
+        
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"] { 
+            width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; 
+            font-size: 15px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; 
+        }
+        input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
         
         button.action-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
         button.action-btn:active { transform: scale(0.98); }
@@ -139,7 +273,6 @@
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; padding: 4px; }
         .nav-item.active { color: var(--primary); } .nav-item:not(.active) { color: var(--text-muted); }
         .nav-icon { width: 22px; height: 22px; } .nav-label { font-size: 10px; font-weight: 600; }
-
         .account-header { text-align: center; padding: 30px 20px; background: var(--card-bg); border-radius: var(--radius); margin-bottom: 20px; }
         .avatar-container { position: relative; display: inline-block; margin-bottom: 16px; }
         .avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; object-fit: cover; border: 4px solid var(--card-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
@@ -180,94 +313,104 @@
         @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
         .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
         .tab-type-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .tab-type-reguler { background: var(--success-light); color: var(--success); }
         .tab-type-berjangka { background: var(--primary-light); color: var(--primary); }
-        
-        .member-list { margin-top: 12px; }
-        .member-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--input-bg); border-radius: 8px; margin-bottom: 8px; }
-        .member-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; }
-        .member-info { flex: 1; }
-        .member-name { font-weight: 600; font-size: 14px; }
-        .member-email { font-size: 12px; color: var(--text-muted); }
-        .member-role { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--primary-light); color: var(--primary); font-weight: 600; }
-        .member-role.admin { background: var(--warning-light); color: var(--warning); }
-        
-        .invite-code-box { background: var(--input-bg); border: 2px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; margin: 16px 0; }
-        .invite-code { font-size: 24px; font-weight: 700; letter-spacing: 4px; color: var(--primary); margin: 8px 0; }
-        .invite-hint { font-size: 12px; color: var(--text-muted); }
-
-        .group-input-wrapper { margin: 16px 0; }
-        .group-input-wrapper label { display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
-        .group-input-wrapper input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); transition: all 0.2s; text-transform: uppercase; letter-spacing: 2px; text-align: center; font-weight: 700; color: var(--text-main); }
-        .group-input-wrapper input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 4px var(--primary-light); outline: none; }
-        .group-input-error { font-size: 12px; color: var(--danger); margin-top: 6px; display: none; }
-
-        /* Hidden file input */
-        #photoInput {
-            display: none !important;
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Toggle Switch Style (Added) */
-        .toggle-switch {
-            width: 50px; height: 28px; background: #cbd5e1; border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s;
-        }
+        #photoInput { display: none !important; position: absolute; opacity: 0; pointer-events: none; }
+        .toggle-switch { width: 50px; height: 28px; background: #cbd5e1; border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; }
         .dark .toggle-switch { background: #475569; }
         .toggle-switch.active { background: var(--primary); }
-        .toggle-switch::after {
-            content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .toggle-switch.active::after { transform: translateX(22px); }
+        .version-badge { display: inline-block; padding: 4px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px; }
     </style>
 </head>
 <body>
 
 <!-- HALAMAN LOGIN -->
 <div id="loginPage" class="auth-container">
+    <div class="liquid-blob blob-1"></div>
+    <div class="liquid-blob blob-2"></div>
+    <div class="liquid-blob blob-3"></div>
     <div class="auth-card">
         <div class="auth-header">
-            <div class="auth-logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-            <div class="auth-title">Selamat Datang Kembali</div>
-            <div class="auth-subtitle">Masuk ke akun DompetKu Anda</div>
+            <div class="auth-logo">DK</div>
+            <div class="auth-title">Welcome Back</div>
+            <div class="auth-subtitle">Login to continue your journey</div>
         </div>
         <form class="auth-form" onsubmit="handleLogin(event)">
-            <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="nama@email.com" required></div>
-            <div class="form-group"><label>Kata Sandi</label><div class="password-wrapper"><input type="password" id="loginPassword" placeholder="Masukkan kata sandi" required><button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">👁️</button></div></div>
-            <div class="remember-row"><label class="checkbox-wrapper"><input type="checkbox" id="rememberMe"><span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span class="checkbox-label">Ingat saya</span></label><a class="forgot-link" onclick="handleForgotPassword()">Lupa kata sandi?</a></div>
-            <button type="submit" class="auth-btn" id="loginBtn">Masuk</button>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="nama@email.com" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="loginPassword" placeholder="Password" required style="padding-right: 60px;">
+                    <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">👁️</button>
+                </div>
+            </div>
+            <div class="remember-row">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="rememberMe">
+                    <span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="checkbox-label">Remember me</span>
+                </label>
+                <a class="forgot-link" onclick="handleForgotPassword()">Forgot Password?</a>
+            </div>
+            <button type="submit" class="auth-btn" id="loginBtn">LOGIN</button>
         </form>
-        <div class="auth-footer">Belum punya akun? <a onclick="showRegister()">Daftar sekarang</a></div>
+        <div class="auth-footer">Don't have an account? <a onclick="showRegister()">Create Account</a></div>
     </div>
 </div>
 
 <!-- HALAMAN REGISTER -->
 <div id="registerPage" class="auth-container" style="display:none;">
+    <div class="liquid-blob blob-1"></div>
+    <div class="liquid-blob blob-2"></div>
+    <div class="liquid-blob blob-3"></div>
     <div class="auth-card">
         <div class="auth-header">
-            <div class="auth-logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-            <div class="auth-title">Buat Akun Baru</div>
-            <div class="auth-subtitle">Mulai kelola keuangan Anda</div>
+            <div class="auth-logo">DK</div>
+            <div class="auth-title">Create Account</div>
+            <div class="auth-subtitle">Start your journey with us</div>
         </div>
         <form class="auth-form" onsubmit="handleRegister(event)">
-            <div class="form-group"><label>Nama Lengkap</label><input type="text" id="regName" placeholder="Masukkan nama lengkap" required></div>
-            <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="nama@email.com" required></div>
-            <div class="form-group"><label>Kata Sandi</label><div class="password-wrapper"><input type="password" id="regPassword" placeholder="Minimal 6 karakter" required oninput="checkRegPasswordStrength(this.value)"><button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)">👁️</button></div><div class="strength-bar"><div class="strength-fill" id="regStrengthFill"></div></div><div class="strength-text" id="regStrengthText"></div></div>
-            <div class="form-group"><label>Konfirmasi Kata Sandi</label><div class="password-wrapper"><input type="password" id="regConfirmPassword" placeholder="Ulangi kata sandi" required><button type="button" class="password-toggle" onclick="togglePassword('regConfirmPassword', this)">️</button></div></div>
-            <div class="terms-wrapper"><label class="checkbox-wrapper"><input type="checkbox" id="agreeTerms" required><span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span class="checkbox-label">Saya setuju dengan Syarat & Ketentuan</span></label></div>
-            <button type="submit" class="auth-btn" id="registerBtn">Daftar</button>
+            <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Enter your full name" required></div>
+            <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" placeholder="name@email.com" required></div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="regPassword" placeholder="Minimum 6 characters" required oninput="checkRegPasswordStrength(this.value)" style="padding-right: 60px;">
+                    <button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)">👁️</button>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="regStrengthFill"></div></div>
+                <div class="strength-text" id="regStrengthText"></div>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="regConfirmPassword" placeholder="Repeat password" required style="padding-right: 60px;">
+                    <button type="button" class="password-toggle" onclick="togglePassword('regConfirmPassword', this)">👁️</button>
+                </div>
+            </div>
+            <div class="terms-wrapper">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="agreeTerms" required>
+                    <span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="checkbox-label">I agree to Terms & Conditions</span>
+                </label>
+            </div>
+            <button type="submit" class="auth-btn" id="registerBtn">SIGN UP</button>
         </form>
-        <div class="auth-footer">Sudah punya akun? <a onclick="showLogin()">Masuk sekarang</a></div>
+        <div class="auth-footer">Already have an account? <a onclick="showLogin()">Login now</a></div>
     </div>
 </div>
 
 <!-- HALAMAN UTAMA -->
 <div class="container" id="mainApp">
     <header>
-        <div id="backButton" class="header-back" style="display:none;" onclick="goBack()"> Kembali</div>
+        <div id="backButton" class="header-back" style="display:none;" onclick="goBack()">← Kembali</div>
         <h1 id="pageTitle">DompetKu</h1>
         <div class="subtitle" id="pageSubtitle">Ringkasan keuangan Anda</div>
     </header>
@@ -287,14 +430,52 @@
     <div id="page-input" class="page">
         <div class="card">
             <h3 style="margin:0 0 16px 0; font-size:18px;">Tambah Tabungan</h3>
-            <div class="form-group"><label>Jenis Tabungan</label><select id="savingTypeSelect" onchange="toggleSavingTypeInputs()"><option value="reguler">Reguler (Langsung Masuk)</option><option value="berjangka">Berjangka (1 Tahun)</option></select></div>
+            <div class="form-group">
+                <label>Jenis Tabungan</label>
+                <div class="custom-select-wrapper" id="savingTypeWrapper">
+                    <div class="custom-select-trigger" id="savingTypeTrigger" onclick="toggleDropdown('savingType')">
+                        <span class="select-text" id="savingTypeText">Reguler (Langsung Masuk)</span>
+                        <span class="select-arrow">▼</span>
+                    </div>
+                    <div class="custom-select-options" id="savingTypeOptions">
+                        <div class="custom-select-option selected" data-value="reguler" onclick="selectOption('savingType', 'reguler', 'Reguler (Langsung Masuk)', event)">Reguler (Langsung Masuk)</div>
+                        <div class="custom-select-option" data-value="berjangka" onclick="selectOption('savingType', 'berjangka', 'Berjangka (1 Tahun)', event)">Berjangka (1 Tahun)</div>
+                    </div>
+                </div>
+            </div>
             <div id="inputReguler">
-                <div class="form-group"><label>Siapa yang menabung?</label><select id="savePersonSelect" onchange="checkCustom('save')"><option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option></select><input type="text" id="savePersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;"></div>
+                <div class="form-group">
+                    <label>Siapa yang menabung?</label>
+                    <div class="custom-select-wrapper" id="savePersonWrapper">
+                        <div class="custom-select-trigger" id="savePersonTrigger" onclick="toggleDropdown('savePerson')">
+                            <span class="select-text" id="savePersonText">Pilih Nama...</span>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                        <div class="custom-select-options" id="savePersonOptions">
+                            <div class="custom-select-option selected" data-value="" onclick="selectOption('savePerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
+                            <div class="custom-select-option" data-value="custom" onclick="selectOption('savePerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
+                        </div>
+                    </div>
+                    <input type="text" id="savePersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;">
+                </div>
                 <div class="form-group"><label>Keterangan</label><input type="text" id="saveNote" placeholder="Gaji bulanan, Bonus, dll"></div>
                 <div class="form-group"><label>Nominal</label><input type="number" id="saveAmount" placeholder="0" min="0"></div>
             </div>
             <div id="inputBerjangka" style="display:none;">
-                <div class="form-group"><label>Siapa yang menabung?</label><select id="termPersonSelect" onchange="checkCustom('term')"><option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option></select><input type="text" id="termPersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;"></div>
+                <div class="form-group">
+                    <label>Siapa yang menabung?</label>
+                    <div class="custom-select-wrapper" id="termPersonWrapper">
+                        <div class="custom-select-trigger" id="termPersonTrigger" onclick="toggleDropdown('termPerson')">
+                            <span class="select-text" id="termPersonText">Pilih Nama...</span>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                        <div class="custom-select-options" id="termPersonOptions">
+                            <div class="custom-select-option selected" data-value="" onclick="selectOption('termPerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
+                            <div class="custom-select-option" data-value="custom" onclick="selectOption('termPerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
+                        </div>
+                    </div>
+                    <input type="text" id="termPersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;">
+                </div>
                 <div class="form-group"><label>Tanggal Mulai Menabung</label><input type="date" id="termStartDate"></div>
             </div>
             <button class="action-btn btn-success" onclick="addSaving()">Simpan Tabungan</button>
@@ -328,21 +509,20 @@
             </div>
             <div class="account-name" id="accountName">Pengguna DompetKu</div>
             <div class="account-email" id="accountEmail">user@dompetku.app</div>
-            <div id="userRoleBadge" style="margin-top:8px;"></div>
         </div>
         <div class="menu-list">
-            <div class="menu-item" onclick="openInviteMembers()"><div class="menu-icon">📨</div><div class="menu-text">Undang Anggota</div><div class="menu-arrow">›</div></div>
-            <div class="menu-item" onclick="openJoinByCode()"><div class="menu-icon">🔗</div><div class="menu-text">Gabung dengan Kode Undangan</div><div class="menu-arrow">›</div></div>
-            <div class="menu-item" onclick="openSettings()"><div class="menu-icon">⚙️</div><div class="menu-text">Pengaturan</div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openSettings()"><div class="menu-icon">️</div><div class="menu-text">Pengaturan</div><div class="menu-arrow">›</div></div>
             <div class="menu-item" onclick="confirmResetData()"><div class="menu-icon">🗑️</div><div class="menu-text" style="color:var(--danger)">Hapus Semua Data</div><div class="menu-arrow">›</div></div>
         </div>
-        <div style="text-align:center; margin-top:30px; color:var(--text-muted); font-size:12px;">DompetKu v2.0</div>
+        <div style="text-align:center; margin-top:30px;">
+            <div class="version-badge" id="versionBadge">DompetKu v1.0</div>
+        </div>
     </div>
 
     <div id="page-settings" class="page">
         <div class="list-header" style="margin-top:0;">Akun & Keamanan</div>
         <div class="menu-list">
-            <div class="menu-item" onclick="openEditProfile()"><div class="menu-icon">👤</div><div class="menu-text"><div style="font-weight:600;">Profil Saya</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Ubah nama dan foto</div></div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openEditProfile()"><div class="menu-icon"></div><div class="menu-text"><div style="font-weight:600;">Profil Saya</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Ubah nama dan foto</div></div><div class="menu-arrow">›</div></div>
             <div class="menu-item" onclick="openChangePassword()"><div class="menu-icon">🔒</div><div class="menu-text"><div style="font-weight:600;">Ubah Kata Sandi</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Perbarui kata sandi</div></div><div class="menu-arrow">›</div></div>
         </div>
         <div class="list-header">Preferensi</div>
@@ -357,7 +537,7 @@
     </div>
 
     <nav class="bottom-nav" id="bottomNav">
-        <div class="nav-item active" onclick="switchPage('home')"><div class="nav-icon">🏠</div><div class="nav-label">Depan</div></div>
+        <div class="nav-item active" onclick="switchPage('home')"><div class="nav-icon"></div><div class="nav-label">Depan</div></div>
         <div class="nav-item" onclick="switchPage('input')"><div class="nav-icon">➕</div><div class="nav-label">Input</div></div>
         <div class="nav-item" onclick="switchPage('debt')"><div class="nav-icon">💳</div><div class="nav-label">Hutang</div></div>
         <div class="nav-item" onclick="switchPage('tabungan')"><div class="nav-icon">💰</div><div class="nav-label">Tabungan</div></div>
@@ -372,12 +552,14 @@
         <div class="modal-actions" id="modalActions"></div>
     </div>
 </div>
+
 <div class="toast-container" id="toastContainer"></div>
 <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none;">
 
 <script>
-    let currentUser = null, userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [], members: {}, inviteCode: null };
+    let currentUser = null, userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [] };
     let tempPhotoData = null, previousPage = 'account', currentPage = 'home';
+    let selectedValues = { savingType: 'reguler', savePerson: '', termPerson: '' };
 
     const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
     const pageTitles = { 
@@ -388,9 +570,86 @@
         account: { title: 'Akun Saya', subtitle: 'Pengaturan profil' }, 
         settings: { title: 'Pengaturan', subtitle: 'Kelola preferensi' } 
     };
-    const svgIcons = { user: '', lock: '🔒', trash: '🗑️', edit: '✏️', money: '💰', logout: '', warning: '⚠️', group: '👥', invite: '📨', link: '🔗' };
+    const svgIcons = { user: '', lock: '🔒', trash: '️', edit: '✏️', money: '💰', logout: '', warning: '️' };
 
-    function generateInviteCode() { return Math.random().toString(36).substring(2, 8).toUpperCase(); }
+    // ===== CUSTOM SELECT - FIXED =====
+    function toggleDropdown(name) {
+        const trigger = document.getElementById(name + 'Trigger');
+        const options = document.getElementById(name + 'Options');
+        const isShowing = options.classList.contains('show');
+        
+        // Close all dropdowns first
+        closeAllDropdowns();
+        
+        // Toggle current
+        if (!isShowing) {
+            trigger.classList.add('active');
+            options.classList.add('show');
+        }
+    }
+
+    function closeAllDropdowns() {
+        document.querySelectorAll('.custom-select-trigger').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.custom-select-options').forEach(o => o.classList.remove('show'));
+    }
+
+    function selectOption(name, value, text, event) {
+        if (event) event.stopPropagation();
+        
+        const trigger = document.getElementById(name + 'Trigger');
+        const options = document.getElementById(name + 'Options');
+        const textEl = document.getElementById(name + 'Text');
+        
+        // Update text
+        textEl.textContent = text;
+        selectedValues[name] = value;
+        
+        // Update selected state
+        options.querySelectorAll('.custom-select-option').forEach(opt => {
+            opt.classList.remove('selected');
+            if (opt.dataset.value === value) {
+                opt.classList.add('selected');
+            }
+        });
+        
+        // Close dropdown
+        trigger.classList.remove('active');
+        options.classList.remove('show');
+        
+        // Trigger change handlers
+        if (name === 'savingType') {
+            toggleSavingTypeInputs();
+        } else if (name === 'savePerson' || name === 'termPerson') {
+            checkCustom(name === 'savePerson' ? 'save' : 'term');
+        }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.custom-select-wrapper')) {
+            closeAllDropdowns();
+        }
+    });
+
+    // ===== VERSION MANAGEMENT =====
+    function getAppVersion() {
+        let version = localStorage.getItem('appVersion');
+        if (!version) { version = '1.0'; localStorage.setItem('appVersion', version); }
+        return version;
+    }
+    function incrementVersion() {
+        let version = localStorage.getItem('appVersion');
+        if (!version) { version = '1.0'; } 
+        else { const parts = version.split('.'); version = `${parts[0]}.${parseInt(parts[1]) + 1}`; }
+        localStorage.setItem('appVersion', version);
+        return version;
+    }
+    function updateVersionDisplay() {
+        const version = getAppVersion();
+        const versionBadge = document.getElementById('versionBadge');
+        if (versionBadge) versionBadge.textContent = `DompetKu v${version}`;
+    }
+    incrementVersion();
 
     // ===== AUTH =====
     auth.onAuthStateChanged((user) => { 
@@ -399,37 +658,16 @@
             document.getElementById('loginPage').style.display = 'none'; 
             document.getElementById('mainApp').style.display = 'block'; 
             document.getElementById('bottomNav').style.display = 'flex'; 
-            
             database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    userData = {
-                        name: data.name || currentUser.displayName || 'Pengguna',
-                        email: currentUser.email,
-                        photo: data.photo || null,
-                        loans: data.loans || [],
-                        savings: data.savings || [],
-                        members: data.members || {},
-                        inviteCode: data.inviteCode || null
-                    };
-                    
+                    userData = { name: data.name || currentUser.displayName || 'Pengguna', email: currentUser.email, photo: data.photo || null, loans: data.loans || [], savings: data.savings || [] };
                     document.getElementById('accountName').innerText = userData.name;
                     document.getElementById('accountEmail').innerText = currentUser.email;
-                    
                     const avatarImg = document.getElementById('accountAvatar');
                     const avatarFallback = document.getElementById('accountAvatarFallback');
-                    if (userData.photo) {
-                        avatarImg.src = userData.photo;
-                        avatarImg.style.display = 'block';
-                        avatarFallback.style.display = 'none';
-                    } else {
-                        avatarImg.style.display = 'none';
-                        avatarFallback.style.display = 'flex';
-                    }
-                    
-                    const roleBadge = document.getElementById('userRoleBadge');
-                    roleBadge.innerHTML = `<span class="member-role admin">👑 Pemilik Akun</span>`;
-                    
+                    if (userData.photo) { avatarImg.src = userData.photo; avatarImg.style.display = 'block'; avatarFallback.style.display = 'none'; } 
+                    else { avatarImg.style.display = 'none'; avatarFallback.style.display = 'flex'; }
                     render();
                 }
             });
@@ -437,196 +675,33 @@
             currentUser = null; 
             document.getElementById('loginPage').style.display = 'flex'; 
             document.getElementById('mainApp').style.display = 'none'; 
-            document.getElementById('bottomNav').style.display = 'none'; 
+            document.getElementById('bottomNav').style.display = 'none';
+            loadSavedCredentials();
         } 
     });
 
-    // ===== SAVE DATA =====
+    function loadSavedCredentials() {
+        const savedEmail = localStorage.getItem('rememberEmail');
+        const savedPassword = localStorage.getItem('rememberPassword');
+        if (savedEmail) { document.getElementById('loginEmail').value = savedEmail; document.getElementById('rememberMe').checked = true; }
+        if (savedPassword) { document.getElementById('loginPassword').value = savedPassword; }
+    }
+    function saveCredentials() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        if (rememberMe) { localStorage.setItem('rememberEmail', email); localStorage.setItem('rememberPassword', password); } 
+        else { clearSavedCredentials(); }
+    }
+    function clearSavedCredentials() { localStorage.removeItem('rememberEmail'); localStorage.removeItem('rememberPassword'); }
+
     async function saveData() {
         if (!currentUser) return;
-        
         try { 
-            const updates = { 
-                loans: userData.loans, 
-                savings: userData.savings,
-                members: userData.members,
-                updatedAt: Date.now() 
-            };
-            if (userData.inviteCode) {
-                updates.inviteCode = userData.inviteCode;
-            }
-            await database.ref('users/' + currentUser.uid).update(updates);
-            
-            if (userData.inviteCode) {
-                await database.ref('inviteCodes/' + userData.inviteCode).set({
-                    ownerUid: currentUser.uid,
-                    ownerName: userData.name,
-                    ownerEmail: currentUser.email
-                });
-            }
-        } catch (error) { 
-            showToast('Gagal menyimpan: ' + error.message, 'error'); 
-        }
+            await database.ref('users/' + currentUser.uid).update({ loans: userData.loans, savings: userData.savings, updatedAt: Date.now() });
+        } catch (error) { showToast('Gagal menyimpan: ' + error.message, 'error'); }
     }
 
-    // ===== UNDANG ANGGOTA =====
-    function openInviteMembers() {
-        if (!userData.inviteCode) {
-            userData.inviteCode = generateInviteCode();
-            saveData();
-        }
-        
-        const members = userData.members || {};
-        const inviteCode = userData.inviteCode;
-        
-        let membersHtml = '<div class="member-list">';
-        membersHtml += `
-            <div class="member-item">
-                <div class="member-avatar">${(userData.name || 'A').split(' ').map(n => n[0]).join('').toUpperCase()}</div>
-                <div class="member-info">
-                    <div class="member-name">${userData.name} (Anda)</div>
-                    <div class="member-email">${currentUser.email}</div>
-                </div>
-                <span class="member-role admin"> Pemilik</span>
-            </div>
-        `;
-        
-        Object.entries(members).forEach(([key, member]) => {
-            const initials = (member.name || 'A').split(' ').map(n => n[0]).join('').toUpperCase();
-            membersHtml += `
-                <div class="member-item">
-                    <div class="member-avatar">${initials}</div>
-                    <div class="member-info">
-                        <div class="member-name">${member.name}</div>
-                        <div class="member-email">${member.email}</div>
-                    </div>
-                    <span class="member-role">👤 Anggota</span>
-                </div>
-            `;
-        });
-        membersHtml += '</div>';
-        
-        const html = `
-            <div class="invite-code-box">
-                <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">Kode Undangan Anda</div>
-                <div class="invite-code">${inviteCode}</div>
-                <div class="invite-hint">Bagikan kode ini agar orang lain bisa mengelola data bersama Anda</div>
-                <button onclick="copyInviteCode('${inviteCode}')" class="btn-mini" style="margin-top:12px; padding:10px 20px; font-size:13px;"> Salin Kode</button>
-            </div>
-            <div style="font-size:14px; font-weight:600; margin:16px 0 8px 0;">Anggota (${Object.keys(members).length + 1})</div>
-            ${membersHtml}
-        `;
-        
-        showModal({ 
-            icon: 'invite', iconType: 'info', 
-            title: 'Undang Anggota', 
-            description: 'Bagikan kode undangan untuk mengelola data bersama',
-            customHTML: html,
-            buttons: [{ text: 'Tutup', class: 'secondary' }]
-        });
-    }
-
-    function copyInviteCode(code) {
-        navigator.clipboard.writeText(code).then(() => showToast('Kode disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
-    }
-
-    // ===== GABUNG DENGAN KODE UNDANGAN =====
-    function openJoinByCode() {
-        const html = `
-            <div style="background:var(--primary-light); padding:16px; border-radius:12px; margin-bottom:16px;">
-                <div style="font-weight:600; color:var(--primary); margin-bottom:4px;"> Cara Bergabung</div>
-                <div style="font-size:13px; color:var(--text-main); line-height:1.5;">Minta kode undangan 6 karakter dari pemilik akun, lalu masukkan di bawah ini.</div>
-            </div>
-            <div class="group-input-wrapper">
-                <label for="joinCodeInput">Kode Undangan</label>
-                <input type="text" id="joinCodeInput" placeholder="XXXXXX" maxlength="6" style="font-size:20px; letter-spacing:6px;">
-                <div class="group-input-hint">Masukkan 6 karakter kode undangan</div>
-                <div class="group-input-error" id="joinError">Kode tidak valid!</div>
-            </div>
-        `;
-        
-        showModal({ 
-            icon: 'link', iconType: 'info', 
-            title: 'Gabung dengan Kode', 
-            description: 'Masukkan kode undangan untuk bergabung',
-            customHTML: html,
-            buttons: [
-                { text: 'Batal', class: 'secondary' },
-                { text: 'Gabung', class: 'primary', action: async () => {
-                    const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-                    if (!code || code.length !== 6) {
-                        document.getElementById('joinError').innerText = 'Kode harus 6 karakter!';
-                        document.getElementById('joinError').style.display = 'block';
-                        document.getElementById('joinCodeInput').style.borderColor = 'var(--danger)';
-                        return false;
-                    }
-                    await joinByInviteCode(code);
-                }}
-            ]
-        });
-        
-        setTimeout(() => {
-            const input = document.getElementById('joinCodeInput');
-            if (input) {
-                input.focus();
-                input.addEventListener('input', (e) => {
-                    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                    document.getElementById('joinError').style.display = 'none';
-                    input.style.borderColor = '';
-                });
-            }
-        }, 100);
-    }
-
-    async function joinByInviteCode(code) {
-        showToast('Mencari kode...', 'warning');
-        
-        try {
-            const codeSnap = await database.ref('inviteCodes/' + code).once('value');
-            const codeData = codeSnap.val();
-            
-            if (!codeData) {
-                showToast('Kode undangan tidak valid!', 'error');
-                return;
-            }
-            
-            const ownerUid = codeData.ownerUid;
-            const ownerName = codeData.ownerName || 'Pemilik';
-            
-            const ownerSnap = await database.ref('users/' + ownerUid).once('value');
-            const ownerData = ownerSnap.val();
-            
-            if (!ownerData) {
-                showToast('Akun pemilik tidak ditemukan!', 'error');
-                return;
-            }
-            
-            const userKey = currentUser.uid.replace(/\./g, '_');
-            const members = ownerData.members || {};
-            
-            if (members[userKey]) {
-                showToast('Anda sudah menjadi anggota akun ini!', 'warning');
-                return;
-            }
-            
-            const newMember = {
-                uid: currentUser.uid,
-                name: currentUser.displayName || 'Saya',
-                email: currentUser.email,
-                joinedAt: Date.now()
-            };
-            
-            await database.ref('users/' + ownerUid + '/members/' + userKey).set(newMember);
-            
-            closeModal();
-            showToast(`Berhasil bergabung dengan akun ${ownerName}!`, 'success');
-            
-        } catch (error) {
-            showToast('Gagal: ' + error.message, 'error');
-        }
-    }
-
-    // ===== AUTH FUNCTIONS =====
     function showLogin() { document.getElementById('loginPage').style.display = 'flex'; document.getElementById('registerPage').style.display = 'none'; }
     function showRegister() { document.getElementById('loginPage').style.display = 'none'; document.getElementById('registerPage').style.display = 'flex'; }
     function togglePassword(inputId, btn) { 
@@ -640,17 +715,18 @@
         if (password.length >= 6) strength++; if (/[A-Z]/.test(password)) strength++; if (/[0-9]/.test(password)) strength++; if (/[^A-Za-z0-9]/.test(password)) strength++; 
         fill.className = 'strength-fill'; 
         if (password.length === 0) { text.innerText = ''; } 
-        else if (strength <= 1) { fill.classList.add('weak'); text.innerText = 'Lemah'; text.style.color = 'var(--danger)'; } 
-        else if (strength <= 2) { fill.classList.add('medium'); text.innerText = 'Sedang'; text.style.color = 'var(--warning)'; } 
-        else { fill.classList.add('strong'); text.innerText = 'Kuat'; text.style.color = 'var(--success)'; } 
+        else if (strength <= 1) { fill.classList.add('weak'); text.innerText = 'Lemah'; text.style.color = '#ef4444'; } 
+        else if (strength <= 2) { fill.classList.add('medium'); text.innerText = 'Sedang'; text.style.color = '#f59e0b'; } 
+        else { fill.classList.add('strong'); text.innerText = 'Kuat'; text.style.color = '#10b981'; } 
     }
     async function handleLogin(e) { 
         e.preventDefault(); 
-        const email = document.getElementById('loginEmail').value.trim(), password = document.getElementById('loginPassword').value, rememberMe = document.getElementById('rememberMe').checked, btn = document.getElementById('loginBtn'); 
+        const email = document.getElementById('loginEmail').value.trim(), password = document.getElementById('loginPassword').value, btn = document.getElementById('loginBtn'); 
         if (!email || !password) { showToast('Email dan kata sandi harus diisi!', 'error'); return; } 
+        saveCredentials();
         btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
         try { 
-            await auth.setPersistence(rememberMe ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION); 
+            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); 
             await auth.signInWithEmailAndPassword(email, password); 
             showToast('Selamat datang kembali!', 'success'); 
         } catch (error) { 
@@ -658,7 +734,7 @@
             if (error.code === 'auth/user-not-found') message = 'Akun tidak ditemukan!'; 
             if (error.code === 'auth/wrong-password') message = 'Kata sandi salah!'; 
             showToast(message, 'error'); 
-        } finally { btn.disabled = false; btn.innerText = 'Masuk'; } 
+        } finally { btn.disabled = false; btn.innerText = 'LOGIN'; } 
     }
     async function handleRegister(e) { 
         e.preventDefault(); 
@@ -671,27 +747,13 @@
         try { 
             const userCredential = await auth.createUserWithEmailAndPassword(email, password); 
             await userCredential.user.updateProfile({ displayName: name }); 
-            const inviteCode = generateInviteCode();
-            await database.ref('users/' + userCredential.user.uid).set({
-                name: name,
-                email: email,
-                loans: [],
-                savings: [],
-                members: {},
-                inviteCode: inviteCode,
-                createdAt: Date.now()
-            });
-            await database.ref('inviteCodes/' + inviteCode).set({
-                ownerUid: userCredential.user.uid,
-                ownerName: name,
-                ownerEmail: email
-            });
+            await database.ref('users/' + userCredential.user.uid).set({ name: name, email: email, loans: [], savings: [], createdAt: Date.now() });
             showToast('Pendaftaran berhasil!', 'success'); 
         } catch (error) { 
             let message = 'Pendaftaran gagal!'; 
             if (error.code === 'auth/email-already-in-use') message = 'Email sudah terdaftar!'; 
             showToast(message, 'error'); 
-        } finally { btn.disabled = false; btn.innerText = 'Daftar'; } 
+        } finally { btn.disabled = false; btn.innerText = 'SIGN UP'; } 
     }
     function handleForgotPassword() {
         showModal({ icon: 'lock', iconType: 'warning', title: 'Lupa Kata Sandi', description: 'Masukkan email Anda untuk reset.', input: { type: 'email', placeholder: 'nama@email.com' }, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Kirim Tautan', class: 'primary', action: async (emailInput) => {
@@ -701,13 +763,13 @@
         }}]});
     }
     function handleLogout() { 
+        clearSavedCredentials();
         showModal({ icon: 'logout', iconType: 'warning', title: 'Keluar dari Akun?', description: 'Anda akan keluar dari aplikasi.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Keluar', class: 'danger', action: async () => { 
             try { await auth.signOut(); showToast('Berhasil keluar', 'success'); } 
             catch (error) { showToast('Gagal logout', 'error'); } 
         }}]}); 
     }
 
-    // ===== MODAL & TOAST =====
     function showModal(config) { 
         const overlay = document.getElementById('modalOverlay'), iconEl = document.getElementById('modalIcon'); 
         iconEl.className = 'modal-icon ' + (config.iconType || 'info'); 
@@ -718,24 +780,16 @@
         if (config.input) { document.getElementById('modalBody').innerHTML = `<input type="${config.input.type || 'text'}" id="modalInput" placeholder="${config.input.placeholder || ''}" value="${config.input.value || ''}">`; setTimeout(() => document.getElementById('modalInput')?.focus(), 100); } 
         else if (config.customHTML) { document.getElementById('modalBody').innerHTML = config.customHTML; } 
         else { document.getElementById('modalBody').innerHTML = ''; } 
-        
         const actions = document.getElementById('modalActions'); actions.innerHTML = ''; 
         if (config.buttons) { 
             config.buttons.forEach(btn => { 
                 const button = document.createElement('button'); button.className = `modal-btn ${btn.class || 'secondary'}`; button.innerText = btn.text; 
                 button.onclick = async () => { 
-                    // Jika ada aksi, jalankan aksi
                     if (btn.action) {
                         const inputValue = document.getElementById('modalInput')?.value;
                         const result = await btn.action(inputValue);
-                        // Hanya tutup modal jika aksi mengembalikan true atau undefined (sukses)
-                        if (result !== false) {
-                            closeModal();
-                        }
-                    } else {
-                        // Jika tidak ada aksi (misal tombol Batal/Tutup), langsung tutup
-                        closeModal();
-                    }
+                        if (result !== false) closeModal();
+                    } else { closeModal(); }
                 }; 
                 actions.appendChild(button); 
             }); 
@@ -746,13 +800,12 @@
     function closeModalOnBackdrop(e) { if (e.target === e.currentTarget) closeModal(); }
     function showToast(message, type = 'success') { 
         const container = document.getElementById('toastContainer'); 
-        const icons = { success: '✅', error: '❌', warning: '️' }; 
+        const icons = { success: '✅', error: '❌', warning: '⚠️' }; 
         const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `${icons[type]} <span>${message}</span>`; 
         container.appendChild(toast); 
         setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500); 
     }
 
-    // ===== PHOTO =====
     function handlePhotoUpload(event) { 
         const file = event.target.files[0]; if (!file) return; 
         if (!file.type.startsWith('image/')) { showToast('File harus gambar!', 'error'); return; } 
@@ -776,12 +829,11 @@
     function triggerPhotoUpload() { document.getElementById('photoInput').click(); }
     function openEditProfile() { 
         tempPhotoData = userData.photo; 
-        showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div class="photo-upload-area"><div class="photo-preview-container"><img id="photoPreview" class="photo-preview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview"><div class="photo-upload-btn" onclick="triggerPhotoUpload()">📷</div></div><div class="photo-upload-hint">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" value="${userData.name}" style="margin-top:6px;"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
+        showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div style="text-align:center; margin-bottom:20px;"><img id="photoPreview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview" class="avatar" style="margin:0 auto 10px auto;"><button class="btn-mini" onclick="triggerPhotoUpload()">📷 Ganti Foto</button><div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" value="${userData.name}"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
             const newName = document.getElementById('editName').value.trim(); if (!newName) { showToast('Nama harus diisi!', 'error'); return false; } 
             try { 
                 await currentUser.updateProfile({ displayName: newName }); 
-                userData.name = newName; 
-                userData.photo = tempPhotoData; 
+                userData.name = newName; userData.photo = tempPhotoData; 
                 await database.ref('users/' + currentUser.uid).update({ name: newName, photo: tempPhotoData });
                 document.getElementById('accountName').innerText = newName;
                 const avatarImg = document.getElementById('accountAvatar');
@@ -792,7 +844,7 @@
         }}]}); 
     }
     function openChangePassword() { 
-        showModal({ icon: 'lock', iconType: 'warning', title: 'Ubah Kata Sandi', customHTML: `<div class="form-group" style="margin-top:16px;"><label>Kata Sandi Lama</label><input type="password" id="oldPassword" placeholder="Kata sandi lama" style="margin-top:6px;"></div><div class="form-group"><label>Kata Sandi Baru</label><input type="password" id="newPassword" placeholder="Minimal 6 karakter" style="margin-top:6px;"></div><div class="form-group"><label>Konfirmasi</label><input type="password" id="confirmPassword" placeholder="Ulangi kata sandi" style="margin-top:6px;"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ubah', class: 'primary', action: async () => { 
+        showModal({ icon: 'lock', iconType: 'warning', title: 'Ubah Kata Sandi', customHTML: `<div class="form-group" style="margin-top:16px;"><label>Kata Sandi Lama</label><input type="password" id="oldPassword" placeholder="Kata sandi lama"></div><div class="form-group"><label>Kata Sandi Baru</label><input type="password" id="newPassword" placeholder="Minimal 6 karakter"></div><div class="form-group"><label>Konfirmasi</label><input type="password" id="confirmPassword" placeholder="Ulangi kata sandi"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ubah', class: 'primary', action: async () => { 
             const oldPass = document.getElementById('oldPassword').value, newPass = document.getElementById('newPassword').value, confirmPass = document.getElementById('confirmPassword').value; 
             if (!oldPass || !newPass || !confirmPass) { showToast('Semua field harus diisi!', 'error'); return false; } 
             if (newPass.length < 6) { showToast('Minimal 6 karakter!', 'error'); return false; } 
@@ -802,7 +854,6 @@
         }}]}); 
     }
 
-    // ===== NAVIGATION =====
     function switchPage(page) {
         currentPage = page; 
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
@@ -819,31 +870,24 @@
     }
     function goBack() { switchPage(previousPage); }
     function openSettings() { switchPage('settings'); }
-    function toggleSwitch(element) { element.classList.toggle('active'); }
-    
-    // Dark Mode Function Updated
     function toggleDarkMode(element) { 
         element.classList.toggle('active'); 
         document.body.classList.toggle('dark'); 
         const isDark = document.body.classList.contains('dark');
         localStorage.setItem('darkMode', isDark);
-        
-        // Update Icon
         const iconDiv = element.parentElement.querySelector('.menu-icon');
-        if(iconDiv) {
-            iconDiv.innerText = isDark ? '☀️' : '🌙';
-        }
+        if(iconDiv) iconDiv.innerText = isDark ? '️' : '🌙';
     }
 
-    // ===== DATA OPERATIONS =====
     function confirmResetData() { 
         showModal({ icon: 'warning', iconType: 'danger', title: 'Hapus SEMUA Data?', description: 'Seluruh data akan dihapus permanen.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Hapus', class: 'danger', action: async () => { 
             userData.loans = []; userData.savings = []; await saveData(); render(); showToast('Data dihapus.', 'warning'); 
         }}]}); 
     }
     function toggleSavingTypeInputs() {
-        document.getElementById('inputReguler').style.display = document.getElementById('savingTypeSelect').value === 'reguler' ? 'block' : 'none';
-        document.getElementById('inputBerjangka').style.display = document.getElementById('savingTypeSelect').value === 'berjangka' ? 'block' : 'none';
+        const type = selectedValues.savingType || 'reguler';
+        document.getElementById('inputReguler').style.display = type === 'reguler' ? 'block' : 'none';
+        document.getElementById('inputBerjangka').style.display = type === 'berjangka' ? 'block' : 'none';
     }
     document.getElementById('loanDuration').addEventListener('input', updateEstimate);
     document.getElementById('loanTotalAmount').addEventListener('input', updateEstimate);
@@ -887,9 +931,9 @@
         }}]}); 
     }
     async function addSaving() {
-        const type = document.getElementById('savingTypeSelect').value;
+        const type = selectedValues.savingType || 'reguler';
         if (type === 'reguler') {
-            let person = document.getElementById('savePersonSelect').value;
+            let person = selectedValues.savePerson || '';
             if (person === 'custom') {
                 person = document.getElementById('savePersonCustom').value.trim();
                 if(!person) { showToast('Masukkan nama baru!', 'error'); return; }
@@ -901,7 +945,7 @@
             document.getElementById('saveNote').value = ''; document.getElementById('saveAmount').value = '';
             render(); showToast(`Tabungan ${formatRupiah(amount)} disimpan!`, 'success');
         } else if (type === 'berjangka') {
-            let person = document.getElementById('termPersonSelect').value;
+            let person = selectedValues.termPerson || '';
             if (person === 'custom') {
                 person = document.getElementById('termPersonCustom').value.trim();
                 if(!person) { showToast('Masukkan nama baru!', 'error'); return; }
@@ -927,7 +971,7 @@
         }}]}); 
     }
     function checkCustom(type) { 
-        const val = document.getElementById(type === 'save' ? 'savePersonSelect' : 'termPersonSelect').value; 
+        const val = selectedValues[type === 'save' ? 'savePerson' : 'termPerson'] || '';
         document.getElementById(type === 'save' ? 'savePersonCustom' : 'termPersonCustom').style.display = (val === 'custom') ? 'block' : 'none'; 
     }
     function render() { renderHome(); renderDebtList(); renderTabunganList(); updateSavingsDropdown(); }
@@ -1041,21 +1085,33 @@
         }}]});
     }
     function updateSavingsDropdown() {
-        const select = document.getElementById('savePersonSelect'), currentVal = select.value; let balances = {};
+        let balances = {};
         userData.savings.forEach(s => { if (!balances[s.person]) balances[s.person] = 0; balances[s.person] += (s.amount || 0); });
-        select.innerHTML = '<option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option>';
-        for (const name of Object.keys(balances)) { const opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); }
-        select.value = currentVal;
-        const termSelect = document.getElementById('termPersonSelect'), termVal = termSelect.value;
-        termSelect.innerHTML = '<option value="">Pilih Nama...</option><option value="custom">+ Tambah Nama Baru</option>';
-        for (const name of Object.keys(balances)) { const opt = document.createElement('option'); opt.value = name; opt.innerText = name; termSelect.appendChild(opt); }
-        termSelect.value = termVal;
+        
+        const saveDropdown = document.getElementById('savePersonOptions');
+        const saveVal = selectedValues.savePerson || '';
+        saveDropdown.innerHTML = `
+            <div class="custom-select-option ${saveVal === '' ? 'selected' : ''}" data-value="" onclick="selectOption('savePerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
+            <div class="custom-select-option ${saveVal === 'custom' ? 'selected' : ''}" data-value="custom" onclick="selectOption('savePerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
+        `;
+        for (const name of Object.keys(balances)) {
+            saveDropdown.innerHTML += `<div class="custom-select-option ${saveVal === name ? 'selected' : ''}" data-value="${name}" onclick="selectOption('savePerson', '${name}', '${name}', event)">${name}</div>`;
+        }
+        
+        const termDropdown = document.getElementById('termPersonOptions');
+        const termVal = selectedValues.termPerson || '';
+        termDropdown.innerHTML = `
+            <div class="custom-select-option ${termVal === '' ? 'selected' : ''}" data-value="" onclick="selectOption('termPerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
+            <div class="custom-select-option ${termVal === 'custom' ? 'selected' : ''}" data-value="custom" onclick="selectOption('termPerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
+        `;
+        for (const name of Object.keys(balances)) {
+            termDropdown.innerHTML += `<div class="custom-select-option ${termVal === name ? 'selected' : ''}" data-value="${name}" onclick="selectOption('termPerson', '${name}', '${name}', event)">${name}</div>`;
+        }
     }
 
     document.getElementById('loanDateStart').valueAsDate = new Date();
     document.getElementById('termStartDate').valueAsDate = new Date();
     
-    // Initialize Dark Mode from LocalStorage
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark');
         const darkModeToggle = document.getElementById('darkModeToggle');
@@ -1065,6 +1121,8 @@
             if(iconDiv) iconDiv.innerText = '☀️';
         }
     }
+
+    updateVersionDisplay();
 </script>
 </body>
 </html>
