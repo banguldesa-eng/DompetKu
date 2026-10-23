@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DompetKu</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyBSW2L2tWVCX5rmQvW6WitlWAUEnesSzWI",
@@ -18,120 +21,158 @@
           messagingSenderId: "10579592697",
           appId: "1:10579592697:web:e6e16d2705e28ea1c6a928"
         };
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
     </script>
+
     <style>
         :root {
             --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #e0e7ff;
             --danger: #ef4444; --danger-light: #fee2e2; --success: #10b981; --success-light: #d1fae5;
             --warning: #f59e0b; --warning-light: #fef3c7; --bg: #f3f4f6; --card-bg: #ffffff;
-            --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; --radius: 16px;
-            --input-bg: #f9fafb;
+            --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; --radius: 16px; --input-bg: #f9fafb;
         }
         .dark { 
             --bg: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --text-muted: #94a3b8; 
-            --border: #334155; --input-bg: #334155;
-            --primary-light: rgba(79, 70, 229, 0.2);
-            --danger-light: rgba(239, 68, 68, 0.2);
-            --success-light: rgba(16, 185, 129, 0.2);
-            --warning-light: rgba(245, 158, 11, 0.2);
+            --border: #334155; --input-bg: #334155; --primary-light: rgba(79, 70, 229, 0.2);
+            --danger-light: rgba(239, 68, 68, 0.2); --success-light: rgba(16, 185, 129, 0.2); --warning-light: rgba(245, 158, 11, 0.2);
         }
         * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
-        
-        /* LIQUID ANIMATION LOGIN - BACKGROUND ASLI */
-        .auth-container { 
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
-            padding: 20px; background: #0a0a0a; position: fixed; inset: 0; z-index: 1000; overflow: hidden;
-        }
-        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: float 20s infinite ease-in-out; }
-        .blob-1 { width: 400px; height: 400px; background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); top: -100px; left: -100px; }
-        .blob-2 { width: 350px; height: 350px; background: linear-gradient(135deg, #00ff87 0%, #60efff 100%); bottom: -50px; right: -50px; animation-delay: -5s; }
-        .blob-3 { width: 300px; height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(30px, -30px) scale(1.1); }
-            50% { transform: translate(-20px, 20px) scale(0.9); }
-            75% { transform: translate(20px, 30px) scale(1.05); }
-        }
-        .auth-card { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 50px 40px; 
-            width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
-            animation: slideUp 0.6s ease; max-height: 90vh; overflow-y: auto; position: relative; z-index: 10;
-        }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
-        .auth-header { text-align: center; margin-bottom: 40px; }
-        .auth-logo { 
-            width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            margin: 0 auto 24px auto; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            font-size: 32px; font-weight: 800; color: white; letter-spacing: 2px;
-        }
-        .auth-title { font-size: 32px; font-weight: 800; color: #ffffff; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .auth-subtitle { font-size: 15px; color: rgba(255, 255, 255, 0.7); font-weight: 400; }
-        .auth-form .form-group { margin-bottom: 24px; }
-        .auth-form label { display: block; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .auth-form input { 
-            width: 100%; padding: 16px 20px; border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 16px; 
-            font-size: 15px; background: rgba(255, 255, 255, 0.05); color: white; transition: all 0.3s;
-        }
-        .auth-form input::placeholder { color: rgba(255, 255, 255, 0.4); }
-        .auth-form input:focus { border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2); background: rgba(255, 255, 255, 0.1); }
-        .password-wrapper { position: relative; }
-        .password-toggle { 
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
-            background: rgba(255, 255, 255, 0.15); border: none; cursor: pointer; 
-            color: rgba(255, 255, 255, 0.9); font-size: 18px; width: 40px; height: 40px;
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s; z-index: 2;
-        }
-        .password-toggle:hover { background: rgba(255, 255, 255, 0.25); }
-        .remember-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .checkbox-wrapper input[type="checkbox"] { display: none; }
-        .checkmark { width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-        .checkbox-wrapper input:checked + .checkmark { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #667eea; }
-        .checkmark svg { width: 14px; height: 14px; fill: white; opacity: 0; }
-        .checkbox-wrapper input:checked + .checkmark svg { opacity: 1; }
-        .checkbox-label { font-size: 14px; color: rgba(255, 255, 255, 0.8); }
-        .forgot-link { font-size: 14px; color: #667eea; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.3s; }
-        .forgot-link:hover { color: #764ba2; }
-        .auth-btn { 
-            width: 100%; padding: 18px; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5); }
-        .auth-btn:active { transform: scale(0.98); }
-        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .auth-footer { text-align: center; margin-top: 30px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
-        .auth-footer a { color: #667eea; text-decoration: none; font-weight: 700; cursor: pointer; transition: color 0.3s; }
-        .auth-footer a:hover { color: #764ba2; }
-        .strength-bar { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; margin-top: 8px; overflow: hidden; }
-        .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s; width: 0%; }
-        .strength-fill.weak { width: 33%; background: #ef4444; }
-        .strength-fill.medium { width: 66%; background: #f59e0b; }
-        .strength-fill.strong { width: 100%; background: #10b981; }
-        .strength-text { font-size: 11px; margin-top: 4px; color: rgba(255, 255, 255, 0.6); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); transition: background 0.3s, color 0.3s; }
 
-        /* App Styles */
+        /* --- ROBOT VOLT STYLES (UPDATED FOR THEME) --- */
+        .auth-container { 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            /* UPDATED: Use theme variable instead of fixed dark blue */
+            background: var(--bg); 
+            position: fixed; inset: 0; z-index: 1000; overflow: hidden; 
+        }
+        .scene { 
+            position: relative; width: 420px; height: 680px; 
+            /* UPDATED: Use card background variable */
+            background: var(--card-bg); 
+            border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
+        .bubble { 
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%); 
+            /* UPDATED: Use card background and text main */
+            background: var(--card-bg); 
+            border: 2.5px solid var(--text-main); 
+            border-radius: 16px; padding: 10px 18px; font-size: 12px; font-weight: 600; 
+            color: var(--text-main); 
+            text-align: center; z-index: 100; white-space: nowrap; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+        }
+        .bubble::after { 
+            content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; 
+            border-left: 10px solid transparent; border-right: 10px solid transparent; 
+            /* UPDATED: Border top matches text color */
+            border-top: 10px solid var(--text-main); 
+        }
+        .bubble::before { 
+            content: ''; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); width: 0; height: 0; 
+            border-left: 8px solid transparent; border-right: 8px solid transparent; 
+            border-top: 8px solid var(--card-bg); z-index: 1; 
+        }
+        .antenna { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 5; }
+        .antenna-rod { display: block; width: 3px; height: 20px; background: var(--text-main); margin: 0 auto; }
+        .antenna-tip { display: block; width: 12px; height: 12px; background: #e07a5f; border-radius: 50%; margin: 0 auto; border: 2px solid var(--text-main); transition: background 0.3s ease; }
+        
+        .head3d { position: absolute; top: 90px; left: 50%; transform: translateX(-50%); z-index: 10; transition: transform 0.6s ease; }
+        .head3d.turned { transform: translateX(-50%) rotateY(180deg); }
+        .head { 
+            width: 90px; height: 75px; 
+            /* UPDATED: Use variables */
+            background: var(--card-bg); 
+            border: 3px solid var(--text-main); 
+            border-radius: 18px; position: relative; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; 
+        }
+        .face { width: 60px; height: 40px; background: var(--text-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; transition: all 0.3s ease; }
+        .eye { width: 14px; height: 16px; background: #fff; border-radius: 50%; transition: all 0.3s ease; position: relative; }
+        .eye.blink { height: 3px; border-radius: 2px; }
+        .pupil { width: 6px; height: 6px; background: var(--text-main); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.15s ease; }
+        
+        .back-face { position: absolute; width: 60px; height: 40px; background: var(--text-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 4px; backface-visibility: hidden; transform: rotateY(180deg); }
+        .back-indicator { width: 10px; height: 10px; background: #555; border-radius: 3px; transition: background 0.3s ease; }
+        .back-indicator.red { background: #e74c3c; } .back-indicator.orange { background: #f39c12; } .back-indicator.green { background: #2ecc71; }
+        .back-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 8px; font-weight: 700; color: #fff; letter-spacing: 1px; white-space: nowrap; }
+        
+        .ear { position: absolute; width: 14px; height: 20px; background: var(--card-bg); border: 2.5px solid var(--text-main); border-radius: 4px; top: 50%; transform: translateY(-50%); }
+        .ear--l { left: -16px; } .ear--r { right: -16px; }
+        
+        .robot-body { position: absolute; top: 170px; left: 50%; transform: translateX(-50%); width: 280px; z-index: 8; }
+        .form-card { 
+            background: var(--card-bg); 
+            border: 3px solid var(--text-main); 
+            border-radius: 20px; padding: 30px 25px 25px; position: relative; 
+        }
+        .form-title { text-align: center; font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; }
+        
+        .input-group { position: relative; margin-bottom: 10px; }
+        .input-group .icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #999; z-index: 2; pointer-events: none; }
+        .input-group input { 
+            width: 100%; padding: 12px 45px 12px 45px; 
+            border: 2.5px solid var(--border); border-radius: 12px; font-size: 14px; font-family: 'Inter', sans-serif; 
+            background: var(--input-bg); color: var(--text-main); outline: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+        }
+        .input-group input:focus { border-color: #e07a5f; box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.15); }
+        .input-group input::placeholder { color: var(--text-muted); opacity: 0.7; }
+        
+        .toggle-password { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; color: var(--text-muted); z-index: 3; transition: color 0.3s; padding: 4px; }
+        .toggle-password:hover { color: var(--text-main); }
+        
+        .submit-btn { width: 100%; padding: 13px; background: #e07a5f; color: #fff; border: 2.5px solid var(--text-main); border-radius: 12px; font-size: 14px; font-weight: 800; letter-spacing: 1.5px; cursor: pointer; margin-top: 6px; transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
+        .submit-btn:hover { background: #d4694f; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(224, 122, 95, 0.4); }
+        .submit-btn:active { transform: translateY(0); }
+        
+        .form-toggle { display: flex; justify-content: center; gap: 0; margin-bottom: 18px; border: 2.5px solid var(--text-main); border-radius: 12px; overflow: hidden; }
+        .toggle-btn { flex: 1; padding: 10px; background: var(--input-bg); border: none; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; color: var(--text-muted); transition: all 0.3s ease; }
+        .toggle-btn.active { background: var(--text-main); color: var(--card-bg); }
+        .toggle-btn:not(.active):hover { background: var(--border); color: var(--text-main); }
+        
+        .form-panel { display: none; animation: fadeSlide 0.4s ease; }
+        .form-panel.active { display: block; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .hand { position: absolute; width: 28px; height: 22px; background: var(--card-bg); border: 2.5px solid var(--text-main); border-radius: 8px; top: 175px; z-index: 12; }
+        .hand--l { left: 52px; transform: rotate(-10deg); } .hand--r { right: 52px; transform: rotate(10deg); }
+        .foot { position: absolute; width: 36px; height: 18px; background: var(--card-bg); border: 2.5px solid var(--text-main); border-radius: 8px; bottom: 30px; z-index: 5; }
+        .foot--l { left: 110px; } .foot--r { right: 110px; }
+        .leg { position: absolute; width: 16px; height: 30px; background: var(--card-bg); border: 2.5px solid var(--text-main); bottom: 42px; z-index: 4; }
+        .leg--l { left: 155px; } .leg--r { right: 155px; }
+        
+        .strength-bar-container { display: flex; gap: 4px; margin-top: 4px; margin-bottom: 2px; }
+        .strength-bar { flex: 1; height: 4px; background: #ddd; border-radius: 2px; transition: background 0.3s ease; }
+        .strength-bar.weak { background: #e74c3c; } .strength-bar.medium { background: #f39c12; } .strength-bar.strong { background: #2ecc71; }
+        .strength-text { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: right; margin-bottom: 4px; transition: color 0.3s ease; }
+        
+        @keyframes float { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-5px); } }
+        .head3d:not(.turned) { animation: float 3s ease-in-out infinite; }
+        @keyframes shake { 0%, 100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-50%) rotate(-3deg); } 75% { transform: translateX(-50%) rotate(3deg); } }
+        .head3d.shake { animation: shake 0.4s ease; }
+        @keyframes successPulse { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); } }
+        .head3d.success { animation: successPulse 0.5s ease; }
+        @media (max-width: 460px) { .scene { width: 100%; height: 100vh; border-radius: 0; } }
+
+        /* --- MAIN APP STYLES --- */
         .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; display: none; }
         header { background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); padding: 24px 20px 30px 20px; color: white; position: sticky; top: 0; z-index: 10; }
-        h1 { font-size: 22px; font-weight: 700; }
-        .subtitle { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+        h1 { font-size: 22px; font-weight: 700; } .subtitle { font-size: 13px; opacity: 0.8; margin-top: 4px; }
         .header-back { display: inline-flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 12px; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.15); }
-        .page { padding: 24px 20px; display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
+        
+        .header-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .header-left { flex: 1; min-width: 0; }
+        .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        
+        .page { padding: 24px 20px; display: none; animation: fadeIn 0.3s ease; } .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .summary-grid { display: grid; gap: 12px; margin-bottom: 24px; }
         .summary-card { padding: 20px; border-radius: var(--radius); color: white; position: relative; overflow: hidden; }
-        .summary-card::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); }
         .summary-card.savings { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .summary-card.debt { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
         .summary-card.remaining { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
@@ -143,67 +184,39 @@
         .mini-card-name { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
         .mini-card-val { font-size: 16px; font-weight: 700; }
         .val-danger { color: var(--danger); } .val-success { color: var(--success); } .val-primary { color: var(--primary); }
-        
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-        
-        /* Custom Select */
+        .form-group { margin-bottom: 16px; } label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
         .custom-select-wrapper { position: relative; width: 100%; }
-        .custom-select-trigger {
-            width: 100%; padding: 14px 44px 14px 16px; border: 1px solid var(--border); border-radius: 12px;
-            font-size: 15px; background: var(--input-bg); color: var(--text-main); cursor: pointer;
-            transition: all 0.2s; display: flex; align-items: center; justify-content: space-between;
-            user-select: none; min-height: 48px;
-        }
+        .custom-select-trigger { width: 100%; padding: 14px 44px 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); color: var(--text-main); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; user-select: none; min-height: 48px; }
         .custom-select-trigger:hover { border-color: var(--primary); }
         .custom-select-trigger.active { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
         .custom-select-trigger .select-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .custom-select-trigger .select-arrow {
-            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-            transition: transform 0.3s; color: var(--text-muted); font-size: 12px; pointer-events: none;
-        }
+        .custom-select-trigger .select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); transition: transform 0.3s; color: var(--text-muted); font-size: 12px; pointer-events: none; }
         .custom-select-trigger.active .select-arrow { transform: translateY(-50%) rotate(180deg); }
-        .custom-select-options {
-            position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--card-bg);
-            border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999; max-height: 220px; overflow-y: auto; display: none; animation: dropdownIn 0.2s ease;
-        }
+        .custom-select-options { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; max-height: 220px; overflow-y: auto; display: none; animation: dropdownIn 0.2s ease; }
         .custom-select-options.show { display: block; }
         @keyframes dropdownIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
         .custom-select-option { padding: 12px 16px; cursor: pointer; transition: background 0.15s; color: var(--text-main); font-size: 15px; border-bottom: 1px solid var(--border); }
-        .custom-select-option:last-child { border-bottom: none; }
-        .custom-select-option:hover { background: var(--input-bg); }
+        .custom-select-option:last-child { border-bottom: none; } .custom-select-option:hover { background: var(--input-bg); }
         .custom-select-option.selected { background: var(--primary-light); color: var(--primary); font-weight: 600; }
         .custom-select-option.selected::before { content: '✓ '; margin-right: 4px; }
-        
-        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"] { 
-            width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; 
-            font-size: 15px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; 
-        }
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"] { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; }
         input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
-        
         button.action-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
         button.action-btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--primary); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
         .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-        .btn-warning { background: var(--warning); box-shadow: 0 4px 12px rgba(245,158,11,0.3); }
-        
         .list-header { font-size: 16px; font-weight: 700; margin: 30px 0 16px 0; color: var(--text-main); }
         .item-card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border); }
         .item-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
         .icon-loan { background: var(--danger-light); } .icon-save { background: var(--success-light); }
-        .item-info { flex: 1; }
-        .item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
-        .item-sub { font-size: 12px; color: var(--text-muted); }
-        .item-action { text-align: right; }
-        .item-amount { font-weight: 700; font-size: 15px; margin-bottom: 6px; display: block; }
+        .item-info { flex: 1; } .item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; } .item-sub { font-size: 12px; color: var(--text-muted); }
+        .item-action { text-align: right; } .item-amount { font-weight: 700; font-size: 15px; margin-bottom: 6px; display: block; }
         .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .badge-unpaid { background: var(--danger-light); color: var(--danger); } .badge-paid { background: var(--success-light); color: var(--success); }
         .btn-mini { background: transparent; border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 6px; color: var(--text-muted); }
         .btn-mini.pay { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
         .btn-mini.edit { border-color: var(--warning); color: var(--warning); background: var(--warning-light); }
         .btn-mini.del { border-color: var(--danger); color: var(--danger); background: var(--danger-light); margin-left: 4px; }
-        
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; padding: 4px; }
         .nav-item.active { color: var(--primary); } .nav-item:not(.active) { color: var(--text-muted); }
@@ -214,33 +227,25 @@
         .avatar svg { width: 50px; height: 50px; }
         .avatar-edit-btn { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--card-bg); }
         .avatar-edit-btn svg { width: 16px; height: 16px; fill: white; }
-        .account-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .account-email { font-size: 14px; color: var(--text-muted); }
+        .account-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; } .account-email { font-size: 14px; color: var(--text-muted); }
         .menu-list { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; }
         .menu-item { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
         .menu-item:hover { background: var(--input-bg); } .menu-item:last-child { border-bottom: none; }
-        .menu-icon { width: 24px; height: 24px; flex-shrink: 0; }
-        .menu-text { flex: 1; font-weight: 500; } .menu-arrow { color: var(--text-muted); font-size: 20px; }
-        
+        .menu-icon { width: 24px; height: 24px; flex-shrink: 0; } .menu-text { flex: 1; font-weight: 500; } .menu-arrow { color: var(--text-muted); font-size: 20px; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-overlay.show { opacity: 1; visibility: visible; } .modal-overlay.show .modal-content { transform: translateY(0); }
         .modal-content { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
         .modal-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .modal-icon svg { width: 28px; height: 28px; }
         .modal-icon.info { background: var(--primary-light); } .modal-icon.success { background: var(--success-light); } .modal-icon.warning { background: var(--warning-light); } .modal-icon.danger { background: var(--danger-light); }
-        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-        .modal-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; } .modal-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
         .modal-body { margin-bottom: 24px; }
         .modal-body input { background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; padding: 16px; font-size: 16px; width: 100%; color: var(--text-main); }
         .modal-actions { display: flex; gap: 12px; }
         .modal-btn { flex: 1; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .modal-btn.secondary { background: var(--input-bg); color: var(--text-main); }
-        .modal-btn.primary { background: var(--primary); color: white; }
-        .modal-btn.danger { background: var(--danger); color: white; }
-        .modal-btn.success { background: var(--success); color: white; }
-        
+        .modal-btn.secondary { background: var(--input-bg); color: var(--text-main); } .modal-btn.primary { background: var(--primary); color: white; }
+        .modal-btn.danger { background: var(--danger); color: white; } .modal-btn.success { background: var(--success); color: white; }
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
         .toast { background: var(--card-bg); padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; animation: toastIn 0.3s ease forwards; pointer-events: auto; min-width: 280px; color: var(--text-main); border: 1px solid var(--border); }
         .toast.hide { animation: toastOut 0.3s ease forwards; }
@@ -249,125 +254,108 @@
         .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .tab-type-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-        .tab-type-reguler { background: var(--success-light); color: var(--success); }
-        .tab-type-berjangka { background: var(--primary-light); color: var(--primary); }
+        .tab-type-reguler { background: var(--success-light); color: var(--success); } .tab-type-berjangka { background: var(--primary-light); color: var(--primary); }
         #photoInput { display: none !important; position: absolute; opacity: 0; pointer-events: none; }
         .toggle-switch { width: 50px; height: 28px; background: #cbd5e1; border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; }
-        .dark .toggle-switch { background: #475569; }
-        .toggle-switch.active { background: var(--primary); }
+        .dark .toggle-switch { background: #475569; } .toggle-switch.active { background: var(--primary); }
         .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .toggle-switch.active::after { transform: translateX(22px); }
         .version-badge { display: inline-block; padding: 4px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px; }
-
-        /* Notification Badge & List Styles */
-        .notif-badge {
-            position: absolute; top: 2px; right: 2px; background: var(--danger); color: white;
-            font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px;
-            display: none; align-items: center; justify-content: center; padding: 0 4px;
-            border: 2px solid var(--primary); animation: pulse 2s infinite;
-        }
+        .notif-badge { position: absolute; top: 0px; right: 0px; background: var(--danger); color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: none; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--card-bg); animation: pulse 2s infinite; line-height: 1; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .notif-item {
-            background: var(--card-bg); border-left: 4px solid var(--warning); padding: 16px;
-            border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+        .notif-item { background: var(--card-bg); border-left: 4px solid var(--warning); padding: 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .notif-item.overdue { border-left-color: var(--danger); }
+        .header-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .header-btn:hover { background: rgba(255,255,255,0.3); }
+        
+        .search-wrapper { position: relative; display: flex; align-items: center; margin-right: 1px; }
+        .search-icon-btn { padding-left: 5; margin-left: 1px; background: none; border: 0px solid rgba(255,255,255,0.3); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
+        .search-icon-btn:hover { background: none; margin-left: 1px; padding-left: 5; }
+        .header-search-input { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; width: 0; opacity: 0; outline: none; transition: all 0.3s cubic-bezier(0.3, 0, 0.2, 1); margin-right: 3px; pointer-events: none; }
+        .header-search-input.active { width: 130px; opacity: 1; pointer-events: auto; }
+        .header-search-input::placeholder { color: rgba(255,255,255,0.7); }
+        .header-search-input:focus { background: rgba(255,255,255,0.35); border-color: white; }
+        
+        .notif-container { position: relative; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notif-container span { font-size: 26px; line-height: 1; }
     </style>
 </head>
 <body>
 
-<!-- HALAMAN LOGIN DENGAN BACKGROUND LIQUID ANIMATION -->
+<!-- HALAMAN LOGIN & REGISTER (ROBOT VOLT) -->
 <div id="loginPage" class="auth-container">
-    <div class="liquid-blob blob-1"></div>
-    <div class="liquid-blob blob-2"></div>
-    <div class="liquid-blob blob-3"></div>
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="auth-logo">DK</div>
-            <div class="auth-title">Welcome Back</div>
-            <div class="auth-subtitle">Login to continue your journey</div>
-        </div>
-        <form class="auth-form" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="loginEmail" placeholder="nama@email.com" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="loginPassword" placeholder="Password" required style="padding-right: 60px;">
-                    <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">👁️</button>
+    <div class="scene">
+        <div class="bubble" id="bubble" role="status" aria-live="polite"><span id="bubbleText">Hai. Ini DompetKu. Saya yang menjaga formulir ini..</span></div>
+        <div class="antenna" aria-hidden="true"><span class="antenna-rod"></span><span class="antenna-tip" id="antennaTip"></span></div>
+        <div class="head3d" id="head3d" aria-hidden="true">
+            <div class="head" id="head">
+                <span class="ear ear--l"></span><span class="ear ear--r"></span>
+                <div class="face" id="face">
+                    <div class="eye" id="eyeL"><div class="pupil" id="pupilL"></div></div>
+                    <div class="eye" id="eyeR"><div class="pupil" id="pupilR"></div></div>
+                </div>
+                <div class="back-face" id="backFace">
+                    <div class="back-indicator" id="ind1"></div><div class="back-indicator" id="ind2"></div>
+                    <div class="back-indicator" id="ind3"></div><div class="back-indicator" id="ind4"></div>
+                    <span class="back-label" id="backLabel">NOT LOOKING</span>
                 </div>
             </div>
-            <div class="remember-row">
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" id="rememberMe">
-                    <span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-                    <span class="checkbox-label">Remember me</span>
-                </label>
-                <a class="forgot-link" onclick="handleForgotPassword()">Forgot Password?</a>
+        </div>
+        <div class="hand hand--l" aria-hidden="true"></div><div class="hand hand--r" aria-hidden="true"></div>
+        <div class="robot-body">
+            <div class="form-card">
+                <div class="form-toggle">
+                    <button class="toggle-btn active" id="btnLogin" onclick="switchForm('login')">LOGIN</button>
+                    <button class="toggle-btn" id="btnRegister" onclick="switchForm('register')">REGISTER</button>
+                </div>
+                <div class="form-panel active" id="loginPanel">
+                    <div class="form-title">Beep boop. Selamat Datang Kembali</div>
+                    <div class="input-group"><span class="icon"></span><input type="email" id="loginEmail" placeholder="Email" autocomplete="off"></div>
+                    <div class="input-group"><span class="icon"></span><input type="password" id="loginPassword" placeholder="password" autocomplete="off"><button class="toggle-password" id="toggleLoginPwd" type="button">👁️</button></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:11px;">
+                         <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text-main);"><input type="checkbox" id="rememberMe"> Remember me</label>
+                         <a onclick="handleForgotPassword()" style="color:#e07a5f; cursor:pointer; font-weight:600;">Lupa Kata sandi?</a>
+                    </div>
+                    <button class="submit-btn" id="loginBtn" onclick="handleLogin(event)">LOGIN</button>
+                </div>
+                <div class="form-panel" id="registerPanel">
+                    <div class="form-title">Beep boop. Selamat Bergabung!</div>
+                    <div class="input-group"><span class="icon"></span><input type="text" id="regName" placeholder="Masukkan username" autocomplete="off"></div>
+                    <div class="input-group"><span class="icon"></span><input type="email" id="regEmail" placeholder="Masukkan Emailmu" autocomplete="off"></div>
+                    <div class="input-group"><span class="icon"></span><input type="password" id="regPassword" placeholder="Buat Kata Sandi" autocomplete="off" oninput="checkRegPasswordStrength(this.value)"><button class="toggle-password" id="toggleRegPwd" type="button">️</button></div>
+                    <div class="strength-bar-container" id="strengthBars">
+                        <div class="strength-bar" id="bar1"></div><div class="strength-bar" id="bar2"></div>
+                        <div class="strength-bar" id="bar3"></div><div class="strength-bar" id="bar4"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText"></div>
+                    <div class="input-group"><span class="icon"></span><input type="password" id="regConfirmPassword" placeholder="Konfirmasi Sandi" autocomplete="off"><button class="toggle-password" id="toggleRegConfirmPwd" type="button">️</button></div>
+                    <div class="terms-wrapper" style="margin-bottom:10px; font-size:11px;">
+                        <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text-main);"><input type="checkbox" id="agreeTerms"> Saya Setuju</label>
+                    </div>
+                    <button class="submit-btn" id="registerBtn" style="background: var(--text-main);" onclick="handleRegister(event)">Buat Akun</button>
+                </div>
             </div>
-            <button type="submit" class="auth-btn" id="loginBtn">LOGIN</button>
-        </form>
-        <div class="auth-footer">Don't have an account? <a onclick="showRegister()">Create Account</a></div>
+        </div>
+        <div class="leg leg--l" aria-hidden="true"></div><div class="leg leg--r" aria-hidden="true"></div>
+        <div class="foot foot--l" aria-hidden="true"></div><div class="foot foot--r" aria-hidden="true"></div>
     </div>
 </div>
 
-<!-- HALAMAN REGISTER -->
-<div id="registerPage" class="auth-container" style="display:none;">
-    <div class="liquid-blob blob-1"></div>
-    <div class="liquid-blob blob-2"></div>
-    <div class="liquid-blob blob-3"></div>
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="auth-logo">DK</div>
-            <div class="auth-title">Create Account</div>
-            <div class="auth-subtitle">Start your journey with us</div>
-        </div>
-        <form class="auth-form" onsubmit="handleRegister(event)">
-            <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Enter your full name" required></div>
-            <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" placeholder="name@email.com" required></div>
-            <div class="form-group">
-                <label>Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="regPassword" placeholder="Minimum 6 characters" required oninput="checkRegPasswordStrength(this.value)" style="padding-right: 60px;">
-                    <button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)">👁️</button>
-                </div>
-                <div class="strength-bar"><div class="strength-fill" id="regStrengthFill"></div></div>
-                <div class="strength-text" id="regStrengthText"></div>
-            </div>
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="regConfirmPassword" placeholder="Repeat password" required style="padding-right: 60px;">
-                    <button type="button" class="password-toggle" onclick="togglePassword('regConfirmPassword', this)">👁️</button>
-                </div>
-            </div>
-            <div class="terms-wrapper">
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" id="agreeTerms" required>
-                    <span class="checkmark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-                    <span class="checkbox-label">I agree to Terms & Conditions</span>
-                </label>
-            </div>
-            <button type="submit" class="auth-btn" id="registerBtn">SIGN UP</button>
-        </form>
-        <div class="auth-footer">Already have an account? <a onclick="showLogin()">Login now</a></div>
-    </div>
-</div>
-
-<!-- HALAMAN UTAMA -->
+<!-- HALAMAN UTAMA APLIKASI -->
 <div class="container" id="mainApp">
     <header>
         <div id="backButton" class="header-back" style="display:none;" onclick="goBack()">← Kembali</div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
+        <div class="header-content">
+            <div class="header-left">
                 <h1 id="pageTitle">DompetKu</h1>
                 <div class="subtitle" id="pageSubtitle">Ringkasan keuangan Anda</div>
             </div>
-            <div style="position:relative; cursor:pointer; padding:8px;" onclick="openNotificationModal()" title="Notifikasi">
-                <span style="font-size:26px;">🔔</span>
-                <span id="notifBadge" class="notif-badge">0</span>
+            <div class="header-right">
+                <div id="headerExtraAction"></div>
+                <div class="notif-container" onclick="openNotificationModal()" title="Notifikasi">
+                    <span>🔔</span>
+                    <span id="notifBadge" class="notif-badge">0</span>
+                </div>
             </div>
         </div>
     </header>
@@ -378,10 +366,8 @@
             <div class="summary-card debt"><div class="summary-label">Total Hutang</div><div class="summary-value" id="dashTotalDebt">Rp 0</div></div>
             <div class="summary-card remaining"><div class="summary-label">Sisa Belum Dibayar</div><div class="summary-value" id="dashRemainingDebt">Rp 0</div></div>
         </div>
-        <div class="list-header">Ringkasan Per Orang</div>
-        <div class="grid-cards" id="homeSummaryGrid"></div>
-        <div class="list-header">Aktivitas Terbaru</div>
-        <div id="homeRecentActivity"></div>
+        <div class="list-header">Ringkasan Per Orang</div><div class="grid-cards" id="homeSummaryGrid"></div>
+        <div class="list-header">Aktivitas Terbaru</div><div id="homeRecentActivity"></div>
     </div>
 
     <div id="page-input" class="page">
@@ -390,10 +376,7 @@
             <div class="form-group">
                 <label>Jenis Tabungan</label>
                 <div class="custom-select-wrapper" id="savingTypeWrapper">
-                    <div class="custom-select-trigger" id="savingTypeTrigger" onclick="toggleDropdown('savingType')">
-                        <span class="select-text" id="savingTypeText">Reguler (Langsung Masuk)</span>
-                        <span class="select-arrow">▼</span>
-                    </div>
+                    <div class="custom-select-trigger" id="savingTypeTrigger" onclick="toggleDropdown('savingType')"><span class="select-text" id="savingTypeText">Reguler (Langsung Masuk)</span><span class="select-arrow">▼</span></div>
                     <div class="custom-select-options" id="savingTypeOptions">
                         <div class="custom-select-option selected" data-value="reguler" onclick="selectOption('savingType', 'reguler', 'Reguler (Langsung Masuk)', event)">Reguler (Langsung Masuk)</div>
                         <div class="custom-select-option" data-value="berjangka" onclick="selectOption('savingType', 'berjangka', 'Berjangka (1 Tahun)', event)">Berjangka (1 Tahun)</div>
@@ -404,10 +387,7 @@
                 <div class="form-group">
                     <label>Siapa yang menabung?</label>
                     <div class="custom-select-wrapper" id="savePersonWrapper">
-                        <div class="custom-select-trigger" id="savePersonTrigger" onclick="toggleDropdown('savePerson')">
-                            <span class="select-text" id="savePersonText">Pilih Nama...</span>
-                            <span class="select-arrow">▼</span>
-                        </div>
+                        <div class="custom-select-trigger" id="savePersonTrigger" onclick="toggleDropdown('savePerson')"><span class="select-text" id="savePersonText">Pilih Nama...</span><span class="select-arrow">▼</span></div>
                         <div class="custom-select-options" id="savePersonOptions">
                             <div class="custom-select-option selected" data-value="" onclick="selectOption('savePerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
                             <div class="custom-select-option" data-value="custom" onclick="selectOption('savePerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
@@ -422,10 +402,7 @@
                 <div class="form-group">
                     <label>Siapa yang menabung?</label>
                     <div class="custom-select-wrapper" id="termPersonWrapper">
-                        <div class="custom-select-trigger" id="termPersonTrigger" onclick="toggleDropdown('termPerson')">
-                            <span class="select-text" id="termPersonText">Pilih Nama...</span>
-                            <span class="select-arrow">▼</span>
-                        </div>
+                        <div class="custom-select-trigger" id="termPersonTrigger" onclick="toggleDropdown('termPerson')"><span class="select-text" id="termPersonText">Pilih Nama...</span><span class="select-arrow">▼</span></div>
                         <div class="custom-select-options" id="termPersonOptions">
                             <div class="custom-select-option selected" data-value="" onclick="selectOption('termPerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
                             <div class="custom-select-option" data-value="custom" onclick="selectOption('termPerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
@@ -440,23 +417,28 @@
         <div class="card">
             <h3 style="margin:0 0 16px 0; font-size:18px;">Buat Pinjaman Baru</h3>
             <div class="form-group"><label>Nama Pemberi Pinjaman</label><input type="text" id="loanSource" placeholder="Contoh: Bank ABC / Teman"></div>
-            <div style="display:flex; gap:10px;"><div class="form-group" style="flex:1"><label>Durasi (Bulan)</label><input type="number" id="loanDuration" placeholder="6" min="1"></div><div class="form-group" style="flex:1"><label>Tanggal Mulai</label><input type="date" id="loanDateStart"></div></div>
-            <div class="form-group"><label>Total Pinjaman (Pokok + Bunga)</label><input type="number" id="loanTotalAmount" placeholder="Misal: 1.200.000" min="0"><small id="estInstallment" style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px;"></small></div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1"><label>Durasi (Bulan)</label><input type="number" id="loanDuration" placeholder="6" min="1"></div>
+                <div class="form-group" style="flex:1"><label>Tanggal Mulai</label><input type="date" id="loanDateStart"></div>
+            </div>
+            <div class="form-group">
+                <label>Total Pinjaman (Pokok + Bunga)</label>
+                <input type="number" id="loanTotalAmount" placeholder="Misal: 1.200.000" min="0">
+                <small id="estInstallment" style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px;"></small>
+            </div>
             <button class="action-btn btn-primary" onclick="createLoanSchedule()">Buat Jadwal Cicilan</button>
         </div>
     </div>
 
     <div id="page-debt" class="page"><div class="list-header">Daftar Pinjaman Aktif</div><div id="debtList"></div></div>
-
+    <div id="page-history" class="page"><div class="list-header">Riwayat Pembayaran Hutang</div><div id="historyList"></div></div>
     <div id="page-tabungan" class="page">
         <div class="summary-grid">
             <div class="summary-card info"><div class="summary-label">Total Reguler</div><div class="summary-value" id="tabTotalReguler">Rp 0</div></div>
             <div class="summary-card remaining"><div class="summary-label">Total Berjangka</div><div class="summary-value" id="tabTotalBerjangka">Rp 0</div></div>
         </div>
-        <div class="list-header">Rekapan Detail</div>
-        <div id="tabunganList"></div>
+        <div class="list-header">Rekapan Detail</div><div id="tabunganList"></div>
     </div>
-
     <div id="page-account" class="page">
         <div class="account-header">
             <div class="avatar-container">
@@ -471,11 +453,8 @@
             <div class="menu-item" onclick="openSettings()"><div class="menu-icon">⚙️</div><div class="menu-text">Pengaturan</div><div class="menu-arrow">›</div></div>
             <div class="menu-item" onclick="confirmResetData()"><div class="menu-icon">🗑️</div><div class="menu-text" style="color:var(--danger)">Hapus Semua Data</div><div class="menu-arrow">›</div></div>
         </div>
-        <div style="text-align:center; margin-top:30px;">
-            <div class="version-badge" id="versionBadge">DompetKu v1.0</div>
-        </div>
+        <div style="text-align:center; margin-top:30px;"><div class="version-badge" id="versionBadge">DompetKu v1.0</div></div>
     </div>
-
     <div id="page-settings" class="page">
         <div class="list-header" style="margin-top:0;">Akun & Keamanan</div>
         <div class="menu-list">
@@ -485,8 +464,7 @@
         <div class="list-header">Preferensi</div>
         <div class="menu-list">
             <div class="menu-item">
-                <div class="menu-icon">🌙</div>
-                <div class="menu-text">Mode Gelap</div>
+                <div class="menu-icon">🌙</div><div class="menu-text">Mode Gelap</div>
                 <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode(this)"></div>
             </div>
         </div>
@@ -502,24 +480,19 @@
     </nav>
 </div>
 
-<!-- NOTIFICATION MODAL -->
+<!-- MODAL & POPUP -->
 <div class="modal-overlay" id="notifModalOverlay" onclick="closeNotifModal(event)">
     <div class="modal-content" style="transform: translateY(0); max-height: 80vh;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0; font-size:20px;"> Pusat Notifikasi</h3>
+            <h3 style="margin:0; font-size:20px;">Pusat Notifikasi</h3>
             <button onclick="closeNotifModal()" style="background:none; border:none; font-size:28px; cursor:pointer; color:var(--text-muted); line-height:1;">&times;</button>
         </div>
-        <div id="notifList" style="max-height: 60vh; overflow-y: auto;">
-            <!-- Dynamic content -->
-        </div>
+        <div id="notifList" style="max-height: 60vh; overflow-y: auto;"></div>
         <div style="margin-top:20px; text-align:center;">
-            <button class="action-btn btn-primary" onclick="requestNotificationPermission()" style="font-size:14px; padding:12px;">
-                📱 Aktifkan Notifikasi Browser
-            </button>
+            <button class="action-btn btn-primary" onclick="requestNotificationPermission()" style="font-size:14px; padding:12px;"> Aktifkan Notifikasi Browser</button>
         </div>
     </div>
 </div>
-
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBackdrop(event)">
     <div class="modal-content" id="modalContent">
         <div class="modal-header"><div class="modal-icon" id="modalIcon"></div><div><div class="modal-title" id="modalTitle"></div><div class="modal-desc" id="modalDesc"></div></div></div>
@@ -527,134 +500,70 @@
         <div class="modal-actions" id="modalActions"></div>
     </div>
 </div>
-
 <div class="toast-container" id="toastContainer"></div>
 <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none;">
 
+<!-- JAVASCRIPT LOGIC -->
 <script>
-    let currentUser = null, userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [] };
+    let currentUser = null;
+    let userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [] };
     let tempPhotoData = null, previousPage = 'account', currentPage = 'home';
     let selectedValues = { savingType: 'reguler', savePerson: '', termPerson: '' };
     window.hasShownDueNotification = false;
 
     const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
-    const pageTitles = { 
-        home: { title: 'DompetKu', subtitle: 'Ringkasan keuangan Anda' }, 
-        input: { title: 'Input Data', subtitle: 'Tambah tabungan atau pinjaman' }, 
-        debt: { title: 'Daftar Hutang', subtitle: 'Kelola semua pinjaman aktif' }, 
-        tabungan: { title: 'Rekapan Tabungan', subtitle: 'Riwayat tabungan' }, 
-        account: { title: 'Akun Saya', subtitle: 'Pengaturan profil' }, 
-        settings: { title: 'Pengaturan', subtitle: 'Kelola preferensi' } 
-    };
-    const svgIcons = { user: '', lock: '🔒', trash: '️', edit: '✏️', money: '💰', logout: '', warning: '️' };
+    const pageTitles = { home: { title: 'DompetKu', subtitle: 'Ringkasan keuangan Anda' }, input: { title: 'Input Data', subtitle: 'Tambah tabungan atau pinjaman' }, debt: { title: 'Daftar Hutang', subtitle: 'Kelola semua pinjaman aktif' }, history: { title: 'Riwayat Hutang', subtitle: 'Catatan pembayaran cicilan' }, tabungan: { title: 'Rekapan Tabungan', subtitle: 'Riwayat tabungan' }, account: { title: 'Akun Saya', subtitle: 'Pengaturan profil' }, settings: { title: 'Pengaturan', subtitle: 'Kelola preferensi' } };
+    const svgIcons = { user: '', lock: '🔒', trash: '🗑️', edit: '✏️', money: '💰', logout: '🚪', warning: '⚠️' };
 
-    // ===== NOTIFICATION SYSTEM =====
     function checkNotifications() {
         const today = new Date().toISOString().split('T')[0];
-        let dueLoans = [];
-        let notificationCount = 0;
-
+        let dueLoans = [], notificationCount = 0;
         if (userData.loans) {
             userData.loans.forEach(loan => {
                 loan.installments.forEach(inst => {
                     if (!inst.isPaid && inst.dueDate <= today) {
-                        dueLoans.push({ 
-                            loan: loan.source, 
-                            date: inst.dueDate, 
-                            amount: inst.amount, 
-                            month: inst.monthIndex,
-                            loanId: loan.id,
-                            instId: inst.id
-                        });
+                        dueLoans.push({ loan: loan.source, date: inst.dueDate, amount: inst.amount, month: inst.monthIndex, loanId: loan.id, instId: inst.id });
                         notificationCount++;
                     }
                 });
             });
         }
-
         const badge = document.getElementById('notifBadge');
-        if (badge) {
-            badge.innerText = notificationCount;
-            badge.style.display = notificationCount > 0 ? 'flex' : 'none';
-        }
-
+        if (badge) { badge.innerText = notificationCount; badge.style.display = notificationCount > 0 ? 'flex' : 'none'; }
         window.currentNotifications = { dueLoans, count: notificationCount };
-
-        // Trigger browser notification only once per session
         if (notificationCount > 0 && Notification.permission === 'granted' && !window.hasShownDueNotification) {
-            new Notification('DompetKu - Pengingat Tagihan! 🔔', {
-                body: `Anda memiliki ${notificationCount} cicilan yang jatuh tempo. Segera lakukan pembayaran.`,
-                icon: 'https://cdn-icons-png.flaticon.com/512/2933/2933245.png'
-            });
+            new Notification('DompetKu - Pengingat Tagihan! 🔔', { body: `Anda memiliki ${notificationCount} cicilan yang jatuh tempo.`, icon: 'https://cdn-icons-png.flaticon.com/512/2933/2933245.png' });
             window.hasShownDueNotification = true;
         }
     }
-
     function requestNotificationPermission() {
-        if (!("Notification" in window)) {
-            showToast("Browser ini tidak mendukung notifikasi.", "error");
-            return;
-        }
+        if (!("Notification" in window)) { showToast("Browser tidak mendukung notifikasi.", "error"); return; }
         Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                showToast("Notifikasi browser berhasil diaktifkan!", "success");
-                new Notification("DompetKu", { body: "Notifikasi berhasil diaktifkan! Kami akan mengingatkan Anda tentang jatuh tempo." });
-            } else {
-                showToast("Izin notifikasi ditolak.", "warning");
-            }
+            if (permission === "granted") { showToast("Notifikasi diaktifkan!", "success"); new Notification("DompetKu", { body: "Notifikasi berhasil diaktifkan!" }); }
+            else { showToast("Izin notifikasi ditolak.", "warning"); }
         });
     }
-
     function openNotificationModal() {
         checkNotifications();
-        const modal = document.getElementById('notifModalOverlay');
-        const list = document.getElementById('notifList');
-        const notifs = window.currentNotifications;
-
-        if (notifs.count === 0) {
-            list.innerHTML = '<div style="text-align:center; padding:40px 0; color:var(--text-muted);">🎉 Tidak ada notifikasi baru. Keuangan Anda aman!</div>';
-        } else {
+        const modal = document.getElementById('notifModalOverlay'), list = document.getElementById('notifList'), notifs = window.currentNotifications;
+        if (notifs.count === 0) list.innerHTML = '<div style="text-align:center; padding:40px 0; color:var(--text-muted);"> Tidak ada notifikasi baru.</div>';
+        else {
             let html = '';
             notifs.dueLoans.forEach(item => {
                 const isOverdue = item.date < new Date().toISOString().split('T')[0];
                 const statusColor = isOverdue ? 'var(--danger)' : 'var(--warning)';
-                const statusText = isOverdue ? 'TERLAMBAT' : 'JATUH TEMPO HARI INI';
-                html += `
-                    <div class="notif-item ${isOverdue ? 'overdue' : ''}">
-                        <div style="display:flex; justify-content:space-between; align-items:start;">
-                            <div>
-                                <div style="font-weight:700; color:var(--text-main); margin-bottom:4px;">${item.loan} - Bulan ${item.month}</div>
-                                <div style="font-size:13px; color:var(--text-muted);">Jatuh tempo: ${new Date(item.date).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="font-weight:700; color:${statusColor};">${formatRupiah(item.amount)}</div>
-                                <div style="font-size:10px; font-weight:700; color:${statusColor}; background:${statusColor}20; padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block;">${statusText}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="notif-item ${isOverdue ? 'overdue' : ''}"><div style="display:flex; justify-content:space-between; align-items:start;"><div><div style="font-weight:700; color:var(--text-main); margin-bottom:4px;">${item.loan} - Bulan ${item.month}</div><div style="font-size:13px; color:var(--text-muted);">Jatuh tempo: ${new Date(item.date).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</div></div><div style="text-align:right;"><div style="font-weight:700; color:${statusColor};">${formatRupiah(item.amount)}</div><div style="font-size:10px; font-weight:700; color:${statusColor}; background:${statusColor}20; padding:2px 6px; border-radius:4px; margin-top:4px; display:inline-block;">${isOverdue ? 'TERLAMBAT' : 'JATUH TEMPO'}</div></div></div></div>`;
             });
             list.innerHTML = html;
         }
         modal.classList.add('show');
     }
+    function closeNotifModal(e) { if (!e || e.target.id === 'notifModalOverlay' || e.target.tagName === 'BUTTON') document.getElementById('notifModalOverlay').classList.remove('show'); }
 
-    function closeNotifModal(e) {
-        if (!e || e.target.id === 'notifModalOverlay' || e.target.tagName === 'BUTTON') {
-            document.getElementById('notifModalOverlay').classList.remove('show');
-        }
-    }
-
-    // ===== CUSTOM SELECT =====
     function toggleDropdown(name) {
-        const trigger = document.getElementById(name + 'Trigger');
-        const options = document.getElementById(name + 'Options');
-        const isShowing = options.classList.contains('show');
-        closeAllDropdowns();
-        if (!isShowing) {
-            trigger.classList.add('active');
-            options.classList.add('show');
-        }
+        const trigger = document.getElementById(name + 'Trigger'), options = document.getElementById(name + 'Options');
+        const isShowing = options.classList.contains('show'); closeAllDropdowns();
+        if (!isShowing) { trigger.classList.add('active'); options.classList.add('show'); }
     }
     function closeAllDropdowns() {
         document.querySelectorAll('.custom-select-trigger').forEach(t => t.classList.remove('active'));
@@ -662,45 +571,22 @@
     }
     function selectOption(name, value, text, event) {
         if (event) event.stopPropagation();
-        const trigger = document.getElementById(name + 'Trigger');
-        const options = document.getElementById(name + 'Options');
-        const textEl = document.getElementById(name + 'Text');
-        textEl.textContent = text;
+        document.getElementById(name + 'Text').textContent = text;
         selectedValues[name] = value;
-        options.querySelectorAll('.custom-select-option').forEach(opt => {
-            opt.classList.remove('selected');
-            if (opt.dataset.value === value) opt.classList.add('selected');
+        document.getElementById(name + 'Options').querySelectorAll('.custom-select-option').forEach(opt => {
+            opt.classList.remove('selected'); if (opt.dataset.value === value) opt.classList.add('selected');
         });
-        trigger.classList.remove('active');
-        options.classList.remove('show');
+        closeAllDropdowns();
         if (name === 'savingType') toggleSavingTypeInputs();
         else if (name === 'savePerson' || name === 'termPerson') checkCustom(name === 'savePerson' ? 'save' : 'term');
     }
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.custom-select-wrapper')) closeAllDropdowns();
-    });
+    document.addEventListener('click', function(e) { if (!e.target.closest('.custom-select-wrapper')) closeAllDropdowns(); });
 
-    // ===== VERSION MANAGEMENT =====
-    function getAppVersion() {
-        let version = localStorage.getItem('appVersion');
-        if (!version) { version = '1.0'; localStorage.setItem('appVersion', version); }
-        return version;
-    }
-    function incrementVersion() {
-        let version = localStorage.getItem('appVersion');
-        if (!version) { version = '1.0'; } 
-        else { const parts = version.split('.'); version = `${parts[0]}.${parseInt(parts[1]) + 1}`; }
-        localStorage.setItem('appVersion', version);
-        return version;
-    }
-    function updateVersionDisplay() {
-        const version = getAppVersion();
-        const versionBadge = document.getElementById('versionBadge');
-        if (versionBadge) versionBadge.textContent = `DompetKu v${version}`;
-    }
+    function getAppVersion() { let v = localStorage.getItem('appVersion'); if (!v) { v = '1.0'; localStorage.setItem('appVersion', v); } return v; }
+    function incrementVersion() { let v = localStorage.getItem('appVersion'); if (!v) v = '1.0'; else { const p = v.split('.'); v = `${p[0]}.${parseInt(p[1]) + 1}`; } localStorage.setItem('appVersion', v); return v; }
+    function updateVersionDisplay() { const v = getAppVersion(); const b = document.getElementById('versionBadge'); if (b) b.textContent = `DompetKu v${v}`; }
     incrementVersion();
 
-    // ===== AUTH =====
     auth.onAuthStateChanged((user) => { 
         if (user) { 
             currentUser = user; 
@@ -713,8 +599,7 @@
                     userData = { name: data.name || currentUser.displayName || 'Pengguna', email: currentUser.email, photo: data.photo || null, loans: data.loans || [], savings: data.savings || [] };
                     document.getElementById('accountName').innerText = userData.name;
                     document.getElementById('accountEmail').innerText = currentUser.email;
-                    const avatarImg = document.getElementById('accountAvatar');
-                    const avatarFallback = document.getElementById('accountAvatarFallback');
+                    const avatarImg = document.getElementById('accountAvatar'), avatarFallback = document.getElementById('accountAvatarFallback');
                     if (userData.photo) { avatarImg.src = userData.photo; avatarImg.style.display = 'block'; avatarFallback.style.display = 'none'; } 
                     else { avatarImg.style.display = 'none'; avatarFallback.style.display = 'flex'; }
                     render();
@@ -730,80 +615,76 @@
     });
 
     function loadSavedCredentials() {
-        const savedEmail = localStorage.getItem('rememberEmail');
-        const savedPassword = localStorage.getItem('rememberPassword');
+        const savedEmail = localStorage.getItem('rememberEmail'), savedPassword = localStorage.getItem('rememberPassword');
         if (savedEmail) { document.getElementById('loginEmail').value = savedEmail; document.getElementById('rememberMe').checked = true; }
         if (savedPassword) { document.getElementById('loginPassword').value = savedPassword; }
     }
     function saveCredentials() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const rememberMe = document.getElementById('rememberMe').checked;
+        const email = document.getElementById('loginEmail').value.trim(), password = document.getElementById('loginPassword').value, rememberMe = document.getElementById('rememberMe').checked;
         if (rememberMe) { localStorage.setItem('rememberEmail', email); localStorage.setItem('rememberPassword', password); } 
-        else { clearSavedCredentials(); }
+        else { localStorage.removeItem('rememberEmail'); localStorage.removeItem('rememberPassword'); }
     }
-    function clearSavedCredentials() { localStorage.removeItem('rememberEmail'); localStorage.removeItem('rememberPassword'); }
-
     async function saveData() {
         if (!currentUser) return;
-        try { 
-            await database.ref('users/' + currentUser.uid).update({ loans: userData.loans, savings: userData.savings, updatedAt: Date.now() });
-        } catch (error) { showToast('Gagal menyimpan: ' + error.message, 'error'); }
+        try { await database.ref('users/' + currentUser.uid).update({ loans: userData.loans, savings: userData.savings, updatedAt: Date.now() }); } 
+        catch (error) { showToast('Gagal menyimpan: ' + error.message, 'error'); }
     }
 
-    function showLogin() { document.getElementById('loginPage').style.display = 'flex'; document.getElementById('registerPage').style.display = 'none'; }
-    function showRegister() { document.getElementById('loginPage').style.display = 'none'; document.getElementById('registerPage').style.display = 'flex'; }
-    function togglePassword(inputId, btn) { 
-        const input = document.getElementById(inputId); 
-        input.type = input.type === 'password' ? 'text' : 'password'; 
-        btn.innerHTML = input.type === 'password' ? '👁️' : '🙈'; 
-    }
+    function showLogin() { switchForm('login'); }
+    function showRegister() { switchForm('register'); }
+    
     function checkRegPasswordStrength(password) { 
-        const fill = document.getElementById('regStrengthFill'), text = document.getElementById('regStrengthText'); 
+        const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
+        const strengthText = document.getElementById('strengthText');
+        const indicators = [document.getElementById('ind1'), document.getElementById('ind2'), document.getElementById('ind3'), document.getElementById('ind4')];
+        const backLabel = document.getElementById('backLabel');
         let strength = 0; 
         if (password.length >= 6) strength++; if (/[A-Z]/.test(password)) strength++; if (/[0-9]/.test(password)) strength++; if (/[^A-Za-z0-9]/.test(password)) strength++; 
-        fill.className = 'strength-fill'; 
-        if (password.length === 0) { text.innerText = ''; } 
-        else if (strength <= 1) { fill.classList.add('weak'); text.innerText = 'Lemah'; text.style.color = '#ef4444'; } 
-        else if (strength <= 2) { fill.classList.add('medium'); text.innerText = 'Sedang'; text.style.color = '#f59e0b'; } 
-        else { fill.classList.add('strong'); text.innerText = 'Kuat'; text.style.color = '#10b981'; } 
+        bars.forEach(b => b.className = 'strength-bar'); indicators.forEach(i => i.className = 'back-indicator');
+        if (password.length === 0) { strengthText.innerText = ''; backLabel.textContent = 'NOT LOOKING'; } 
+        else if (strength <= 1) { bars[0].classList.add('weak'); indicators[0].classList.add('red'); strengthText.innerText = 'Too short!'; strengthText.style.color = '#e74c3c'; backLabel.textContent = 'TOO SHORT'; } 
+        else if (strength <= 2) { bars[0].classList.add('medium'); bars[1].classList.add('medium'); indicators[0].classList.add('orange'); indicators[1].classList.add('orange'); strengthText.innerText = 'Weak password'; strengthText.style.color = '#f39c12'; backLabel.textContent = 'WEAK'; } 
+        else { bars.forEach(b => b.classList.add('strong')); indicators.forEach(i => i.classList.add('green')); strengthText.innerText = 'Strong password'; strengthText.style.color = '#2ecc71'; backLabel.textContent = 'FORT KNOX'; } 
     }
+    
     async function handleLogin(e) { 
-        e.preventDefault(); 
+        if(e) e.preventDefault(); 
         const email = document.getElementById('loginEmail').value.trim(), password = document.getElementById('loginPassword').value, btn = document.getElementById('loginBtn'); 
-        if (!email || !password) { showToast('Email dan kata sandi harus diisi!', 'error'); return; } 
-        saveCredentials();
-        btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
+        if (!email || !password) { setBubble('Hey! I need credentials first!'); shakeRobot(); return; } 
+        saveCredentials(); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
         try { 
             await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); 
             await auth.signInWithEmailAndPassword(email, password); 
-            showToast('Selamat datang kembali!', 'success'); 
+            setBubble(`Welcome back! Access granted!`); document.getElementById('antennaTip').style.background = '#2ecc71'; successAnimation();
+            setTimeout(() => { document.getElementById('antennaTip').style.background = '#e07a5f'; }, 2500);
         } catch (error) { 
-            let message = 'Login gagal!'; 
-            if (error.code === 'auth/user-not-found') message = 'Akun tidak ditemukan!'; 
-            if (error.code === 'auth/wrong-password') message = 'Kata sandi salah!'; 
-            showToast(message, 'error'); 
-        } finally { btn.disabled = false; btn.innerText = 'LOGIN'; } 
+            let message = 'Login failed!'; 
+            if (error.code === 'auth/user-not-found') message = 'Account not found!'; 
+            if (error.code === 'auth/wrong-password') message = 'Wrong password!'; 
+            setBubble(message); shakeRobot();
+        } finally { btn.disabled = false; btn.innerText = 'LOG ME IN'; } 
     }
+    
     async function handleRegister(e) { 
-        e.preventDefault(); 
+        if(e) e.preventDefault(); 
         const name = document.getElementById('regName').value.trim(), email = document.getElementById('regEmail').value.trim(), password = document.getElementById('regPassword').value, confirmPassword = document.getElementById('regConfirmPassword').value, agreeTerms = document.getElementById('agreeTerms').checked, btn = document.getElementById('registerBtn'); 
-        if (!name || !email || !password || !confirmPassword) { showToast('Semua field harus diisi!', 'error'); return; } 
-        if (!agreeTerms) { showToast('Anda harus menyetujui syarat & ketentuan!', 'error'); return; } 
-        if (password.length < 6) { showToast('Kata sandi minimal 6 karakter!', 'error'); return; } 
-        if (password !== confirmPassword) { showToast('Kata sandi tidak cocok!', 'error'); return; } 
+        if (!name || !email || !password || !confirmPassword) { setBubble('Fill all fields!'); shakeRobot(); return; } 
+        if (!agreeTerms) { setBubble('Agree to terms first!'); shakeRobot(); return; } 
+        if (password.length < 6) { setBubble('Password too short!'); shakeRobot(); return; } 
+        if (password !== confirmPassword) { setBubble('Passwords don\'t match!'); shakeRobot(); return; } 
         btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
         try { 
             const userCredential = await auth.createUserWithEmailAndPassword(email, password); 
             await userCredential.user.updateProfile({ displayName: name }); 
             await database.ref('users/' + userCredential.user.uid).set({ name: name, email: email, loans: [], savings: [], createdAt: Date.now() });
-            showToast('Pendaftaran berhasil!', 'success'); 
+            setBubble(`Welcome to the squad, ${name}!`); document.getElementById('antennaTip').style.background = '#2ecc71'; successAnimation();
         } catch (error) { 
-            let message = 'Pendaftaran gagal!'; 
-            if (error.code === 'auth/email-already-in-use') message = 'Email sudah terdaftar!'; 
-            showToast(message, 'error'); 
-        } finally { btn.disabled = false; btn.innerText = 'SIGN UP'; } 
+            let message = 'Registration failed!'; 
+            if (error.code === 'auth/email-already-in-use') message = 'Email already used!'; 
+            setBubble(message); shakeRobot();
+        } finally { btn.disabled = false; btn.innerText = 'CREATE ACCOUNT'; } 
     }
+    
     function handleForgotPassword() {
         showModal({ icon: 'lock', iconType: 'warning', title: 'Lupa Kata Sandi', description: 'Masukkan email Anda untuk reset.', input: { type: 'email', placeholder: 'nama@email.com' }, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Kirim Tautan', class: 'primary', action: async (emailInput) => {
             if (!emailInput.trim()) { showToast('Email tidak boleh kosong!', 'error'); return false; }
@@ -811,21 +692,18 @@
             catch (error) { showToast('Gagal: ' + error.message, 'error'); return false; }
         }}]});
     }
+    
     function handleLogout() { 
-        clearSavedCredentials();
-        window.hasShownDueNotification = false;
+        localStorage.removeItem('rememberEmail'); localStorage.removeItem('rememberPassword'); window.hasShownDueNotification = false;
         showModal({ icon: 'logout', iconType: 'warning', title: 'Keluar dari Akun?', description: 'Anda akan keluar dari aplikasi.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Keluar', class: 'danger', action: async () => { 
-            try { await auth.signOut(); showToast('Berhasil keluar', 'success'); } 
-            catch (error) { showToast('Gagal logout', 'error'); } 
+            try { await auth.signOut(); showToast('Berhasil keluar', 'success'); } catch (error) { showToast('Gagal logout', 'error'); } 
         }}]}); 
     }
 
     function showModal(config) { 
         const overlay = document.getElementById('modalOverlay'), iconEl = document.getElementById('modalIcon'); 
-        iconEl.className = 'modal-icon ' + (config.iconType || 'info'); 
-        iconEl.innerHTML = svgIcons[config.icon] || ''; 
-        document.getElementById('modalTitle').innerText = config.title || ''; 
-        document.getElementById('modalDesc').innerText = config.description || ''; 
+        iconEl.className = 'modal-icon ' + (config.iconType || 'info'); iconEl.innerHTML = svgIcons[config.icon] || ''; 
+        document.getElementById('modalTitle').innerText = config.title || ''; document.getElementById('modalDesc').innerText = config.description || ''; 
         document.getElementById('modalDesc').style.display = config.description ? 'block' : 'none'; 
         if (config.input) { document.getElementById('modalBody').innerHTML = `<input type="${config.input.type || 'text'}" id="modalInput" placeholder="${config.input.placeholder || ''}" value="${config.input.value || ''}">`; setTimeout(() => document.getElementById('modalInput')?.focus(), 100); } 
         else if (config.customHTML) { document.getElementById('modalBody').innerHTML = config.customHTML; } 
@@ -835,25 +713,20 @@
             config.buttons.forEach(btn => { 
                 const button = document.createElement('button'); button.className = `modal-btn ${btn.class || 'secondary'}`; button.innerText = btn.text; 
                 button.onclick = async () => { 
-                    if (btn.action) {
-                        const inputValue = document.getElementById('modalInput')?.value;
-                        const result = await btn.action(inputValue);
-                        if (result !== false) closeModal();
-                    } else { closeModal(); }
-                }; 
-                actions.appendChild(button); 
+                    if (btn.action) { const inputValue = document.getElementById('modalInput')?.value; const result = await btn.action(inputValue); if (result !== false) closeModal(); } 
+                    else { closeModal(); }
+                }; actions.appendChild(button); 
             }); 
         } 
         overlay.classList.add('show'); document.body.style.overflow = 'hidden'; 
     }
     function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.body.style.overflow = ''; }
     function closeModalOnBackdrop(e) { if (e.target === e.currentTarget) closeModal(); }
+    
     function showToast(message, type = 'success') { 
-        const container = document.getElementById('toastContainer'); 
-        const icons = { success: '✅', error: '❌', warning: '⚠️' }; 
+        const container = document.getElementById('toastContainer'), icons = { success: '✅', error: '❌', warning: '⚠️' }; 
         const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `${icons[type]} <span>${message}</span>`; 
-        container.appendChild(toast); 
-        setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500); 
+        container.appendChild(toast); setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500); 
     }
 
     function handlePhotoUpload(event) { 
@@ -877,6 +750,7 @@
         }; reader.readAsDataURL(file); 
     }
     function triggerPhotoUpload() { document.getElementById('photoInput').click(); }
+    
     function openEditProfile() { 
         tempPhotoData = userData.photo; 
         showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div style="text-align:center; margin-bottom:20px;"><img id="photoPreview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview" class="avatar" style="margin:0 auto 10px auto;"><button class="btn-mini" onclick="triggerPhotoUpload()">📷 Ganti Foto</button><div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" value="${userData.name}"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
@@ -886,21 +760,28 @@
                 userData.name = newName; userData.photo = tempPhotoData; 
                 await database.ref('users/' + currentUser.uid).update({ name: newName, photo: tempPhotoData });
                 document.getElementById('accountName').innerText = newName;
-                const avatarImg = document.getElementById('accountAvatar');
-                const avatarFallback = document.getElementById('accountAvatarFallback');
+                const avatarImg = document.getElementById('accountAvatar'), avatarFallback = document.getElementById('accountAvatarFallback');
                 if (tempPhotoData) { avatarImg.src = tempPhotoData; avatarImg.style.display = 'block'; avatarFallback.style.display = 'none'; }
                 showToast('Profil diperbarui!', 'success'); 
             } catch (error) { showToast('Gagal: ' + error.message, 'error'); return false; } 
         }}]}); 
     }
+    
     function openChangePassword() { 
         showModal({ icon: 'lock', iconType: 'warning', title: 'Ubah Kata Sandi', customHTML: `<div class="form-group" style="margin-top:16px;"><label>Kata Sandi Lama</label><input type="password" id="oldPassword" placeholder="Kata sandi lama"></div><div class="form-group"><label>Kata Sandi Baru</label><input type="password" id="newPassword" placeholder="Minimal 6 karakter"></div><div class="form-group"><label>Konfirmasi</label><input type="password" id="confirmPassword" placeholder="Ulangi kata sandi"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ubah', class: 'primary', action: async () => { 
             const oldPass = document.getElementById('oldPassword').value, newPass = document.getElementById('newPassword').value, confirmPass = document.getElementById('confirmPassword').value; 
             if (!oldPass || !newPass || !confirmPass) { showToast('Semua field harus diisi!', 'error'); return false; } 
             if (newPass.length < 6) { showToast('Minimal 6 karakter!', 'error'); return false; } 
             if (newPass !== confirmPass) { showToast('Kata sandi tidak cocok!', 'error'); return false; } 
-            try { const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, oldPass); await currentUser.reauthenticateWithCredential(credential); await currentUser.updatePassword(newPass); showToast('Kata sandi diubah!', 'success'); } 
-            catch (error) { let msg = 'Gagal'; if (error.code === 'auth/wrong-password') msg = 'Kata sandi lama salah!'; showToast(msg, 'error'); return false; } 
+            try { 
+                const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, oldPass); 
+                await currentUser.reauthenticateWithCredential(credential); 
+                await currentUser.updatePassword(newPass); 
+                showToast('Kata sandi diubah!', 'success'); 
+            } catch (error) { 
+                let msg = 'Gagal'; if (error.code === 'auth/wrong-password') msg = 'Kata sandi lama salah!'; 
+                showToast(msg, 'error'); return false; 
+            } 
         }}]}); 
     }
 
@@ -913,27 +794,34 @@
         if (navMap[page] !== undefined) navItems[navMap[page]].classList.add('active');
         document.getElementById('pageTitle').innerText = pageTitles[page].title;
         document.getElementById('pageSubtitle').innerText = pageTitles[page].subtitle;
+        const headerExtra = document.getElementById('headerExtraAction'); headerExtra.innerHTML = '';
+        if (page === 'debt') headerExtra.innerHTML = `<button class="header-btn" onclick="switchPage('history')">📋 Riwayat</button>`;
+        else if (page === 'tabungan') headerExtra.innerHTML = `<div class="search-wrapper"><input type="text" class="header-search-input" id="searchTabunganHeader" placeholder="Cari nama/ket..." onkeyup="filterTabungan(this.value)"><div class="search-icon-btn" onclick="toggleSearchInput()">🔍</div></div>`;
         const backButton = document.getElementById('backButton'), bottomNav = document.getElementById('bottomNav');
-        if (page === 'settings') { backButton.style.display = 'inline-flex'; bottomNav.style.display = 'none'; previousPage = 'account'; } 
-        else { backButton.style.display = 'none'; bottomNav.style.display = 'flex'; }
+        if (page === 'settings' || page === 'history') { 
+            backButton.style.display = 'inline-flex'; 
+            if(page === 'settings') bottomNav.style.display = 'none'; else bottomNav.style.display = 'flex';
+            previousPage = page === 'history' ? 'debt' : 'account'; 
+        } else { backButton.style.display = 'none'; bottomNav.style.display = 'flex'; }
         render();
     }
-    function goBack() { switchPage(previousPage); }
+    function toggleSearchInput() {
+        const input = document.getElementById('searchTabunganHeader');
+        if (input) { input.classList.toggle('active'); if (input.classList.contains('active')) input.focus(); else { input.value = ''; filterTabungan(''); } }
+    }
+    function goBack() { if (currentPage === 'history') switchPage('debt'); else switchPage(previousPage); }
     function openSettings() { switchPage('settings'); }
     function toggleDarkMode(element) { 
-        element.classList.toggle('active'); 
-        document.body.classList.toggle('dark'); 
-        const isDark = document.body.classList.contains('dark');
-        localStorage.setItem('darkMode', isDark);
-        const iconDiv = element.parentElement.querySelector('.menu-icon');
-        if(iconDiv) iconDiv.innerText = isDark ? '☀️' : '🌙';
+        element.classList.toggle('active'); document.body.classList.toggle('dark'); 
+        const isDark = document.body.classList.contains('dark'); localStorage.setItem('darkMode', isDark);
+        const iconDiv = element.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = isDark ? '☀️' : '🌙';
     }
-
     function confirmResetData() { 
         showModal({ icon: 'warning', iconType: 'danger', title: 'Hapus SEMUA Data?', description: 'Seluruh data akan dihapus permanen.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Hapus', class: 'danger', action: async () => { 
             userData.loans = []; userData.savings = []; await saveData(); render(); showToast('Data dihapus.', 'warning'); 
         }}]}); 
     }
+
     function toggleSavingTypeInputs() {
         const type = selectedValues.savingType || 'reguler';
         document.getElementById('inputReguler').style.display = type === 'reguler' ? 'block' : 'none';
@@ -949,8 +837,7 @@
     async function createLoanSchedule() {
         const source = document.getElementById('loanSource').value.trim(), duration = parseInt(document.getElementById('loanDuration').value), startDateStr = document.getElementById('loanDateStart').value, totalAmount = parseInt(document.getElementById('loanTotalAmount').value) || 0;
         if (!source || !duration || !startDateStr || totalAmount <= 0) { showToast('Lengkapi semua data!', 'error'); return; }
-        const loanId = Date.now().toString(), startDate = new Date(startDateStr);
-        let installments = [];
+        const loanId = Date.now().toString(), startDate = new Date(startDateStr); let installments = [];
         for (let i = 1; i <= duration; i++) { 
             let dueDate = new Date(startDate); dueDate.setMonth(dueDate.getMonth() + i); 
             installments.push({ id: `${loanId}_${i}`, monthIndex: i, totalMonths: duration, amount: 0, dueDate: dueDate.toISOString().split('T')[0], isPaid: false, paidDate: null, createdBy: currentUser.uid }); 
@@ -984,33 +871,21 @@
         const type = selectedValues.savingType || 'reguler';
         if (type === 'reguler') {
             let person = selectedValues.savePerson || '';
-            if (person === 'custom') {
-                person = document.getElementById('savePersonCustom').value.trim();
-                if(!person) { showToast('Masukkan nama baru!', 'error'); return; }
-            }
+            if (person === 'custom') { person = document.getElementById('savePersonCustom').value.trim(); if(!person) { showToast('Masukkan nama baru!', 'error'); return; } }
             const note = document.getElementById('saveNote').value.trim(), amount = parseInt(document.getElementById('saveAmount').value);
             if (!person || !note || !amount || amount <= 0) { showToast('Lengkapi semua data dengan benar!', 'error'); return; }
             userData.savings.push({ id: Date.now().toString(), type: 'reguler', person, note, amount, date: new Date().toLocaleDateString('id-ID'), createdBy: currentUser.uid });
-            await saveData();
-            document.getElementById('saveNote').value = ''; document.getElementById('saveAmount').value = '';
+            await saveData(); document.getElementById('saveNote').value = ''; document.getElementById('saveAmount').value = '';
             render(); showToast(`Tabungan ${formatRupiah(amount)} disimpan!`, 'success');
         } else if (type === 'berjangka') {
             let person = selectedValues.termPerson || '';
-            if (person === 'custom') {
-                person = document.getElementById('termPersonCustom').value.trim();
-                if(!person) { showToast('Masukkan nama baru!', 'error'); return; }
-            }
+            if (person === 'custom') { person = document.getElementById('termPersonCustom').value.trim(); if(!person) { showToast('Masukkan nama baru!', 'error'); return; } }
             const startDate = document.getElementById('termStartDate').value;
             if (!person || !startDate) { showToast('Lengkapi semua data!', 'error'); return; }
-            const startObj = new Date(startDate), termId = Date.now().toString();
-            let installments = [];
-            for (let i = 1; i <= 12; i++) {
-                let dueDate = new Date(startObj); dueDate.setMonth(dueDate.getMonth() + i);
-                installments.push({ id: `${termId}_${i}`, monthIndex: i, totalMonths: 12, amount: 0, dueDate: dueDate.toISOString().split('T')[0], isPaid: false, paidDate: null });
-            }
+            const startObj = new Date(startDate), termId = Date.now().toString(); let installments = [];
+            for (let i = 1; i <= 12; i++) { let dueDate = new Date(startObj); dueDate.setMonth(dueDate.getMonth() + i); installments.push({ id: `${termId}_${i}`, monthIndex: i, totalMonths: 12, amount: 0, dueDate: dueDate.toISOString().split('T')[0], isPaid: false, paidDate: null }); }
             userData.savings.push({ id: termId, type: 'berjangka', person, startDate, endDate: installments[11].dueDate, installments, createdBy: currentUser.uid });
-            await saveData();
-            document.getElementById('termStartDate').value = '';
+            await saveData(); document.getElementById('termStartDate').value = '';
             render(); showToast('Jadwal tabungan berjangka dibuat!', 'success');
         }
     }
@@ -1024,13 +899,9 @@
         const val = selectedValues[type === 'save' ? 'savePerson' : 'termPerson'] || '';
         document.getElementById(type === 'save' ? 'savePersonCustom' : 'termPersonCustom').style.display = (val === 'custom') ? 'block' : 'none'; 
     }
-    function render() { 
-        renderHome(); 
-        renderDebtList(); 
-        renderTabunganList(); 
-        updateSavingsDropdown(); 
-        checkNotifications();
-    }
+
+    function render() { renderHome(); renderDebtList(); renderHistoryList(); renderTabunganList(); updateSavingsDropdown(); checkNotifications(); }
+    
     function renderHome() {
         const totalSavingsEl = document.getElementById('dashTotalSavings'), totalDebtEl = document.getElementById('dashTotalDebt'), remainingDebtEl = document.getElementById('dashRemainingDebt'), summaryGrid = document.getElementById('homeSummaryGrid'), recentActivity = document.getElementById('homeRecentActivity');
         let totalSavings = 0, totalDebt = 0, remainingDebt = 0, summaryMap = {}, recentItems = [];
@@ -1073,6 +944,7 @@
             }); 
         }
     }
+    
     function renderDebtList() {
         const debtList = document.getElementById('debtList'); debtList.innerHTML = '';
         if (userData.loans.length === 0) { debtList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada pinjaman</div>'; return; }
@@ -1086,10 +958,33 @@
                 itemsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed var(--border);"><div><div style="font-weight:600; font-size:14px;">Cicilan ${inst.monthIndex}/${inst.totalMonths}</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${inst.amount > 0 ? formatRupiah(inst.amount) : '<span style="color:#aaa">Belum diisi</span>'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Jatuh tempo: ${dateStr}</div></div><div style="text-align:right">${actions}</div></div>`; 
             }); 
             const totalLoanDisplay = loan.totalAmount ? ` | Total: ${formatRupiah(loan.totalAmount)}` : ''; 
-            let deleteButton = `<button class="btn-mini del" onclick="deleteLoan('${loan.id}')" style="margin:0">Hapus</button>`;
-            debtList.innerHTML += `<div class="item-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;"><div class="item-icon icon-loan"></div><div><div class="item-title">${loan.source}${totalLoanDisplay}</div><div class="item-sub">${loan.duration} Bulan • Mulai ${loan.startDate}</div></div></div>${deleteButton}</div><div style="padding-left:52px;">${itemsHtml}</div></div>`; 
+            debtList.innerHTML += `<div class="item-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;"><div class="item-icon icon-loan"></div><div><div class="item-title">${loan.source}${totalLoanDisplay}</div><div class="item-sub">${loan.duration} Bulan • Mulai ${loan.startDate}</div></div></div><button class="btn-mini del" onclick="deleteLoan('${loan.id}')" style="margin:0">Hapus</button></div><div style="padding-left:52px;">${itemsHtml}</div></div>`; 
         });
     }
+
+    function renderHistoryList() {
+        const historyList = document.getElementById('historyList'); historyList.innerHTML = '';
+        let allPayments = [];
+        userData.loans.forEach(loan => { loan.installments.forEach(inst => { if (inst.isPaid) allPayments.push({ loanSource: loan.source, monthIndex: inst.monthIndex, totalMonths: inst.totalMonths, amount: inst.amount, dueDate: inst.dueDate, paidDate: inst.paidDate || inst.dueDate, type: 'hutang' }); }); });
+        allPayments.sort((a, b) => new Date(b.paidDate) - new Date(a.paidDate));
+        if (allPayments.length === 0) { historyList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada riwayat pembayaran lunas.</div>'; return; }
+        allPayments.forEach(p => {
+            const dateStr = new Date(p.paidDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            historyList.innerHTML += `<div class="item-card" style="display:flex; align-items:center;"><div class="item-icon icon-loan">💳</div><div class="item-info"><div class="item-title">${p.loanSource}</div><div class="item-sub">Cicilan ke-${p.monthIndex} • ${dateStr}</div></div><div class="item-action"><span class="item-amount val-success">-${formatRupiah(p.amount)}</span><span class="badge badge-paid">Lunas</span></div></div>`;
+        });
+    }
+
+    function filterTabungan(query) {
+        if (query === undefined) { const input = document.getElementById('searchTabunganHeader'); if (input) query = input.value.toLowerCase(); else return; } else { query = query.toLowerCase(); }
+        const container = document.getElementById('tabunganList'); if (!container) return;
+        const cards = container.getElementsByClassName('item-card');
+        for (let i = 0; i < cards.length; i++) {
+            const title = cards[i].querySelector('.item-title'), sub = cards[i].querySelector('.item-sub');
+            const txtValue = (title ? title.textContent : '') + " " + (sub ? sub.textContent : '');
+            cards[i].style.display = txtValue.toLowerCase().indexOf(query) > -1 ? "" : "none";
+        }
+    }
+
     function renderTabunganList() {
         const list = document.getElementById('tabunganList'); list.innerHTML = '';
         let totalReguler = 0, totalBerjangka = 0;
@@ -1112,9 +1007,7 @@
                         else { actions += `<span class="badge badge-paid">Lunas</span>`; }
                         detailsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed var(--border);"><div><div style="font-weight:600; font-size:14px;">Bulan ${inst.monthIndex}/${inst.totalMonths}</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${inst.amount > 0 ? formatRupiah(inst.amount) : '<span style="color:#aaa">Belum diisi</span>'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${dateLabel}: ${dateStr}</div></div><div style="text-align:right">${actions}</div></div>`;
                     });
-                } else { 
-                    totalReguler += s.amount; detailsHtml = `<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${s.note} • ${s.date}</div>`; 
-                }
+                } else { totalReguler += s.amount; detailsHtml = `<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${s.note} • ${s.date}</div>`; }
                 let deleteButton = !isTerm ? `<button class="btn-mini del" onclick="delSaving(${originalIdx})" style="margin:0">Hapus</button>` : '';
                 list.innerHTML += `<div class="item-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;"><div class="item-icon icon-save">💰</div><div><span class="tab-type-badge ${badgeClass}">${badgeText}</span><div class="item-title">${s.person}</div><div class="item-sub">${isTerm ? `Mulai: ${s.startDate} • Jatuh Tempo: ${s.endDate}` : ''}</div></div></div>${deleteButton}</div>${detailsHtml}</div>`;
             });
@@ -1122,9 +1015,9 @@
         document.getElementById('tabTotalReguler').innerText = formatRupiah(totalReguler);
         document.getElementById('tabTotalBerjangka').innerText = formatRupiah(totalBerjangka);
     }
+    
     function editTermAmount(termId, instId) {
-        const term = userData.savings.find(s => s.id === termId);
-        if(!term || !term.installments) return;
+        const term = userData.savings.find(s => s.id === termId); if(!term || !term.installments) return;
         const inst = term.installments.find(i => i.id === instId);
         showModal({ icon: 'edit', iconType: 'warning', title: 'Isi Nominal', description: `Bulan ke-${inst.monthIndex} dari ${inst.totalMonths}`, input: { type: 'number', placeholder: 'Nominal...', value: inst.amount || '' }, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async (val) => {
             const num = parseInt(val); if (!num || num <= 0) { showToast('Nominal > 0!', 'error'); return false; }
@@ -1132,53 +1025,113 @@
         }}]});
     }
     function payTerm(termId, instId) {
-        const term = userData.savings.find(s => s.id === termId);
-        if(!term || !term.installments) return;
+        const term = userData.savings.find(s => s.id === termId); if(!term || !term.installments) return;
         const inst = term.installments.find(i => i.id === instId);
         showModal({ icon: 'money', iconType: 'success', title: 'Konfirmasi', description: 'Tandai setoran bulan ini sebagai LUNAS?', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Lunas', class: 'success', action: async () => {
             inst.isPaid = true; inst.paidDate = new Date().toISOString().split('T')[0]; inst.paidBy = currentUser.uid;
             await saveData(); switchPage(currentPage); showToast('Setoran dicatat!', 'success');
         }}]});
     }
+    
     function updateSavingsDropdown() {
         let balances = {};
         userData.savings.forEach(s => { if (!balances[s.person]) balances[s.person] = 0; balances[s.person] += (s.amount || 0); });
+        const saveDropdown = document.getElementById('savePersonOptions'), saveVal = selectedValues.savePerson || '';
+        saveDropdown.innerHTML = `<div class="custom-select-option ${saveVal === '' ? 'selected' : ''}" data-value="" onclick="selectOption('savePerson', '', 'Pilih Nama...', event)">Pilih Nama...</div><div class="custom-select-option ${saveVal === 'custom' ? 'selected' : ''}" data-value="custom" onclick="selectOption('savePerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>`;
+        for (const name of Object.keys(balances)) saveDropdown.innerHTML += `<div class="custom-select-option ${saveVal === name ? 'selected' : ''}" data-value="${name}" onclick="selectOption('savePerson', '${name}', '${name}', event)">${name}</div>`;
         
-        const saveDropdown = document.getElementById('savePersonOptions');
-        const saveVal = selectedValues.savePerson || '';
-        saveDropdown.innerHTML = `
-            <div class="custom-select-option ${saveVal === '' ? 'selected' : ''}" data-value="" onclick="selectOption('savePerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
-            <div class="custom-select-option ${saveVal === 'custom' ? 'selected' : ''}" data-value="custom" onclick="selectOption('savePerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
-        `;
-        for (const name of Object.keys(balances)) {
-            saveDropdown.innerHTML += `<div class="custom-select-option ${saveVal === name ? 'selected' : ''}" data-value="${name}" onclick="selectOption('savePerson', '${name}', '${name}', event)">${name}</div>`;
-        }
-        
-        const termDropdown = document.getElementById('termPersonOptions');
-        const termVal = selectedValues.termPerson || '';
-        termDropdown.innerHTML = `
-            <div class="custom-select-option ${termVal === '' ? 'selected' : ''}" data-value="" onclick="selectOption('termPerson', '', 'Pilih Nama...', event)">Pilih Nama...</div>
-            <div class="custom-select-option ${termVal === 'custom' ? 'selected' : ''}" data-value="custom" onclick="selectOption('termPerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
-        `;
-        for (const name of Object.keys(balances)) {
-            termDropdown.innerHTML += `<div class="custom-select-option ${termVal === name ? 'selected' : ''}" data-value="${name}" onclick="selectOption('termPerson', '${name}', '${name}', event)">${name}</div>`;
-        }
+        const termDropdown = document.getElementById('termPersonOptions'), termVal = selectedValues.termPerson || '';
+        termDropdown.innerHTML = `<div class="custom-select-option ${termVal === '' ? 'selected' : ''}" data-value="" onclick="selectOption('termPerson', '', 'Pilih Nama...', event)">Pilih Nama...</div><div class="custom-select-option ${termVal === 'custom' ? 'selected' : ''}" data-value="custom" onclick="selectOption('termPerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>`;
+        for (const name of Object.keys(balances)) termDropdown.innerHTML += `<div class="custom-select-option ${termVal === name ? 'selected' : ''}" data-value="${name}" onclick="selectOption('termPerson', '${name}', '${name}', event)">${name}</div>`;
     }
 
     document.getElementById('loanDateStart').valueAsDate = new Date();
     document.getElementById('termStartDate').valueAsDate = new Date();
-    
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark');
         const darkModeToggle = document.getElementById('darkModeToggle');
-        if (darkModeToggle) {
-            darkModeToggle.classList.add('active');
-            const iconDiv = darkModeToggle.parentElement.querySelector('.menu-icon');
-            if(iconDiv) iconDiv.innerText = '☀️';
-        }
+        if (darkModeToggle) { darkModeToggle.classList.add('active'); const iconDiv = darkModeToggle.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = '☀️'; }
     }
-
     updateVersionDisplay();
+</script>
+
+<!-- LOGIKA KHUSUS ROBOT VOLT -->
+<script>
+  const bubbleText = document.getElementById('bubbleText');
+  const head3d = document.getElementById('head3d');
+  const eyeL = document.getElementById('eyeL'), eyeR = document.getElementById('eyeR');
+  const pupilL = document.getElementById('pupilL'), pupilR = document.getElementById('pupilR');
+  const backLabel = document.getElementById('backLabel');
+  const indicators = [document.getElementById('ind1'), document.getElementById('ind2'), document.getElementById('ind3'), document.getElementById('ind4')];
+  
+  function setBubble(text) { bubbleText.textContent = text; }
+  function turnRobot(turn) { if (turn) head3d.classList.add('turned'); else head3d.classList.remove('turned'); }
+  function shakeRobot() { head3d.classList.add('shake'); setTimeout(() => head3d.classList.remove('shake'), 400); }
+  function blinkEyes() { eyeL.classList.add('blink'); eyeR.classList.add('blink'); setTimeout(() => { eyeL.classList.remove('blink'); eyeR.classList.remove('blink'); }, 150); }
+  function successAnimation() { head3d.classList.add('success'); setTimeout(() => head3d.classList.remove('success'), 500); }
+
+  function switchForm(form) {
+    const loginPanel = document.getElementById('loginPanel'), registerPanel = document.getElementById('registerPanel');
+    const btnLogin = document.getElementById('btnLogin'), btnRegister = document.getElementById('btnRegister');
+    turnRobot(false); indicators.forEach(ind => ind.className = 'back-indicator'); backLabel.textContent = 'NOT LOOKING';
+    document.getElementById('loginPassword').type = 'password'; document.getElementById('regPassword').type = 'password'; document.getElementById('regConfirmPassword').type = 'password';
+    document.getElementById('toggleLoginPwd').textContent = '️'; document.getElementById('toggleRegPwd').textContent = '👁️'; document.getElementById('toggleRegConfirmPwd').textContent = '👁️';
+    if (form === 'login') {
+      loginPanel.classList.add('active'); registerPanel.classList.remove('active'); btnLogin.classList.add('active'); btnRegister.classList.remove('active'); setBubble('Welcome back! Who goes there?');
+    } else {
+      registerPanel.classList.add('active'); loginPanel.classList.remove('active'); btnRegister.classList.add('active'); btnLogin.classList.remove('active'); setBubble('New face? Let\'s get you registered!');
+    }
+    blinkEyes();
+  }
+
+  const loginEmail = document.getElementById('loginEmail'), loginPassword = document.getElementById('loginPassword');
+  loginEmail.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) setBubble('Nice email. Very professional.'); });
+  loginEmail.addEventListener('input', (e) => { if (e.target.value.includes('@') && !head3d.classList.contains('turned')) setBubble('Valid email detected!'); });
+  loginPassword.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); } });
+  loginPassword.addEventListener('blur', () => { if (document.getElementById('toggleLoginPwd').textContent === '👁️') { turnRobot(false); setBubble('Hi. I\'m Volt. I guard this form.'); indicators.forEach(ind => ind.className = 'back-indicator'); backLabel.textContent = 'NOT LOOKING'; } });
+  document.getElementById('toggleLoginPwd').addEventListener('click', function() {
+    const isHidden = loginPassword.type === 'password'; loginPassword.type = isHidden ? 'text' : 'password'; this.textContent = isHidden ? '🙈' : '️';
+    if(isHidden) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); backLabel.textContent = 'NOT LOOKING'; indicators.forEach(ind => ind.className = 'back-indicator'); } 
+    else { if(document.activeElement !== loginPassword) { turnRobot(false); setBubble('Hi. I\'m Volt. I guard this form.'); } }
+  });
+
+  const regUsername = document.getElementById('regName'), regPassword = document.getElementById('regPassword'), regConfirmPassword = document.getElementById('regConfirmPassword');
+  regUsername.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) setBubble('Pick a cool username!'); });
+  regUsername.addEventListener('input', (e) => { if (e.target.value.length > 0 && !head3d.classList.contains('turned')) setBubble(`${e.target.value}? I like it!`); });
+  regPassword.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); } });
+  regPassword.addEventListener('blur', () => { if (document.getElementById('toggleRegPwd').textContent === '️') { turnRobot(false); setBubble('Almost there! Confirm your password.'); indicators.forEach(ind => ind.className = 'back-indicator'); backLabel.textContent = 'NOT LOOKING'; } });
+  regConfirmPassword.addEventListener('input', () => {
+    if (regConfirmPassword.value.length === 0) return;
+    if (regPassword.value === regConfirmPassword.value) { regConfirmPassword.style.borderColor = '#2ecc71'; setBubble('Passwords match! Looking good!'); } 
+    else { regConfirmPassword.style.borderColor = '#e74c3c'; setBubble('Passwords don\'t match! Try again.'); }
+  });
+  document.getElementById('toggleRegPwd').addEventListener('click', function() {
+    const isHidden = regPassword.type === 'password'; regPassword.type = isHidden ? 'text' : 'password'; this.textContent = isHidden ? '🙈' : '👁️';
+    if(isHidden) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); backLabel.textContent = 'NOT LOOKING'; indicators.forEach(ind => ind.className = 'back-indicator'); } 
+    else { if(document.activeElement !== regPassword) { turnRobot(false); setBubble('Almost there! Confirm your password.'); } }
+  });
+  document.getElementById('toggleRegConfirmPwd').addEventListener('click', function() {
+     const isHidden = regConfirmPassword.type === 'password'; regConfirmPassword.type = isHidden ? 'text' : 'password'; this.textContent = isHidden ? '🙈' : '👁️';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (head3d.classList.contains('turned')) return;
+    const scene = document.querySelector('.scene'), rect = scene.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2, centerY = rect.top + 130;
+    const dx = e.clientX - centerX, dy = e.clientY - centerY;
+    const angle = Math.atan2(dy, dx), distance = Math.min(Math.sqrt(dx * dx + dy * dy) / 50, 3);
+    const px = Math.cos(angle) * distance, py = Math.sin(angle) * distance;
+    pupilL.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
+    pupilR.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
+  });
+  setInterval(() => { if (!head3d.classList.contains('turned')) blinkEyes(); }, 3000 + Math.random() * 2000);
+
+  // Initialize Theme based on LocalStorage
+  if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      if (darkModeToggle) { darkModeToggle.classList.add('active'); const iconDiv = darkModeToggle.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = '☀️'; }
+  }
 </script>
 </body>
 </html>
