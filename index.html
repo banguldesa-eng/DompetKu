@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DompetKu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>DompetKu - 3D Circular</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -28,250 +27,338 @@
 
     <style>
         :root {
-            --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #e0e7ff;
-            --danger: #ef4444; --danger-light: #fee2e2; --success: #10b981; --success-light: #d1fae5;
-            --warning: #f59e0b; --warning-light: #fef3c7; --bg: #f3f4f6; --card-bg: #ffffff;
-            --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; --radius: 16px; --input-bg: #f9fafb;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-main: #ffffff; 
+            --text-muted: #e0e0e0; 
+            --input-bg: rgba(255, 255, 255, 0.2);
+            --danger: #ff6b6b;
+            --success: #51cf66;
+            --dark-purple: rgba(45, 30, 80, 0.9);
         }
-        .dark { 
-            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --text-muted: #94a3b8; 
-            --border: #334155; --input-bg: #334155; --primary-light: rgba(79, 70, 229, 0.2);
-            --danger-light: rgba(239, 68, 68, 0.2); --success-light: rgba(16, 185, 129, 0.2); --warning-light: rgba(245, 158, 11, 0.2);
-        }
-        * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); transition: background 0.3s, color 0.3s; }
 
-        /* --- ROBOT VOLT STYLES (UPDATED FOR THEME) --- */
+        * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background: var(--primary-gradient); 
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main); 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ===== AUTH CONTAINER - 3D CIRCULAR ===== */
         .auth-container { 
             min-height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             padding: 20px; 
-            /* UPDATED: Use theme variable instead of fixed dark blue */
-            background: var(--bg); 
-            position: fixed; inset: 0; z-index: 1000; overflow: hidden; 
+            position: fixed; 
+            inset: 0; 
+            z-index: 1000;
         }
+
         .scene { 
-            position: relative; width: 420px; height: 680px; 
-            /* UPDATED: Use card background variable */
-            background: var(--card-bg); 
-            border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            position: relative;
+            width: 420px;
+            min-height: auto;
+            background: var(--dark-purple);
+            border-radius: 50%;
+            padding: 60px 40px 50px;
+            text-align: center;
+            transform-style: preserve-3d;
+            transform: rotateX(10deg);
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.4),
+                0 10px 20px rgba(0, 0, 0, 0.3),
+                inset 0 2px 10px rgba(255, 255, 255, 0.2),
+                inset 0 -2px 10px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: sphereFloat 6s ease-in-out infinite;
+            transition: transform 0.3s ease;
         }
-        .bubble { 
-            position: absolute; top: 30px; left: 50%; transform: translateX(-50%); 
-            /* UPDATED: Use card background and text main */
-            background: var(--card-bg); 
-            border: 2.5px solid var(--text-main); 
-            border-radius: 16px; padding: 10px 18px; font-size: 12px; font-weight: 600; 
-            color: var(--text-main); 
-            text-align: center; z-index: 100; white-space: nowrap; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+
+        .scene:hover { transform: rotateX(0deg) scale(1.02); }
+
+        @keyframes sphereFloat {
+            0%, 100% { transform: rotateX(10deg) translateY(0); }
+            50% { transform: rotateX(10deg) translateY(-10px); }
         }
-        .bubble::after { 
-            content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; 
-            border-left: 10px solid transparent; border-right: 10px solid transparent; 
-            /* UPDATED: Border top matches text color */
-            border-top: 10px solid var(--text-main); 
+
+        .scene::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.5;
         }
-        .bubble::before { 
-            content: ''; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); width: 0; height: 0; 
-            border-left: 8px solid transparent; border-right: 8px solid transparent; 
-            border-top: 8px solid var(--card-bg); z-index: 1; 
+
+        .scene::after {
+            content: '';
+            position: absolute;
+            top: 5%; left: 10%;
+            width: 80%; height: 35%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+            border-radius: 50%;
+            pointer-events: none;
         }
-        .antenna { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 5; }
-        .antenna-rod { display: block; width: 3px; height: 20px; background: var(--text-main); margin: 0 auto; }
-        .antenna-tip { display: block; width: 12px; height: 12px; background: #e07a5f; border-radius: 50%; margin: 0 auto; border: 2px solid var(--text-main); transition: background 0.3s ease; }
-        
-        .head3d { position: absolute; top: 90px; left: 50%; transform: translateX(-50%); z-index: 10; transition: transform 0.6s ease; }
-        .head3d.turned { transform: translateX(-50%) rotateY(180deg); }
-        .head { 
-            width: 90px; height: 75px; 
-            /* UPDATED: Use variables */
-            background: var(--card-bg); 
-            border: 3px solid var(--text-main); 
-            border-radius: 18px; position: relative; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; 
+
+        .form-title { 
+            font-size: 26px; font-weight: 700; color: white; 
+            margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative; z-index: 1;
         }
-        .face { width: 60px; height: 40px; background: var(--text-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; transition: all 0.3s ease; }
-        .eye { width: 14px; height: 16px; background: #fff; border-radius: 50%; transition: all 0.3s ease; position: relative; }
-        .eye.blink { height: 3px; border-radius: 2px; }
-        .pupil { width: 6px; height: 6px; background: var(--text-main); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.15s ease; }
-        
-        .back-face { position: absolute; width: 60px; height: 40px; background: var(--text-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 4px; backface-visibility: hidden; transform: rotateY(180deg); }
-        .back-indicator { width: 10px; height: 10px; background: #555; border-radius: 3px; transition: background 0.3s ease; }
-        .back-indicator.red { background: #e74c3c; } .back-indicator.orange { background: #f39c12; } .back-indicator.green { background: #2ecc71; }
-        .back-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 8px; font-weight: 700; color: #fff; letter-spacing: 1px; white-space: nowrap; }
-        
-        .ear { position: absolute; width: 14px; height: 20px; background: var(--card-bg); border: 2.5px solid var(--text-main); border-radius: 4px; top: 50%; transform: translateY(-50%); }
-        .ear--l { left: -16px; } .ear--r { right: -16px; }
-        
-        .robot-body { position: absolute; top: 170px; left: 50%; transform: translateX(-50%); width: 280px; z-index: 8; }
-        .form-card { 
-            background: var(--card-bg); 
-            border: 3px solid var(--text-main); 
-            border-radius: 20px; padding: 30px 25px 25px; position: relative; 
+        .form-subtitle { 
+            font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 25px;
+            position: relative; z-index: 1;
         }
-        .form-title { text-align: center; font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; }
-        
-        .input-group { position: relative; margin-bottom: 10px; }
-        .input-group .icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #999; z-index: 2; pointer-events: none; }
+
+        .form-toggle { 
+            display: flex; justify-content: center; gap: 0; margin-bottom: 25px; 
+            background: rgba(0,0,0,0.3); border-radius: 50px; padding: 5px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative; z-index: 1;
+        }
+        .toggle-btn { 
+            flex: 1; padding: 10px 30px; background: transparent; border: none; 
+            font-size: 13px; font-weight: 700; cursor: pointer; 
+            color: rgba(255,255,255,0.6); transition: all 0.3s ease; border-radius: 50px;
+        }
+        .toggle-btn.active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .input-group { position: relative; margin-bottom: 15px; text-align: left; z-index: 1; }
+        .input-group label { 
+            display: block; font-size: 11px; font-weight: 600; margin-bottom: 6px; 
+            color: rgba(255,255,255,0.9); margin-left: 4px;
+        }
         .input-group input { 
-            width: 100%; padding: 12px 45px 12px 45px; 
-            border: 2.5px solid var(--border); border-radius: 12px; font-size: 14px; font-family: 'Inter', sans-serif; 
-            background: var(--input-bg); color: var(--text-main); outline: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+            width: 100%; padding: 12px 45px 12px 18px; 
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; 
+            font-size: 14px; background: rgba(0, 0, 0, 0.3); color: white; 
+            outline: none; transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
         }
-        .input-group input:focus { border-color: #e07a5f; box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.15); }
-        .input-group input::placeholder { color: var(--text-muted); opacity: 0.7; }
-        
-        .toggle-password { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; color: var(--text-muted); z-index: 3; transition: color 0.3s; padding: 4px; }
-        .toggle-password:hover { color: var(--text-main); }
-        
-        .submit-btn { width: 100%; padding: 13px; background: #e07a5f; color: #fff; border: 2.5px solid var(--text-main); border-radius: 12px; font-size: 14px; font-weight: 800; letter-spacing: 1.5px; cursor: pointer; margin-top: 6px; transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
-        .submit-btn:hover { background: #d4694f; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(224, 122, 95, 0.4); }
-        .submit-btn:active { transform: translateY(0); }
-        
-        .form-toggle { display: flex; justify-content: center; gap: 0; margin-bottom: 18px; border: 2.5px solid var(--text-main); border-radius: 12px; overflow: hidden; }
-        .toggle-btn { flex: 1; padding: 10px; background: var(--input-bg); border: none; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; color: var(--text-muted); transition: all 0.3s ease; }
-        .toggle-btn.active { background: var(--text-main); color: var(--card-bg); }
-        .toggle-btn:not(.active):hover { background: var(--border); color: var(--text-main); }
-        
-        .form-panel { display: none; animation: fadeSlide 0.4s ease; }
+        .input-group input:focus { 
+            border-color: rgba(255,255,255,0.5); background: rgba(0, 0, 0, 0.4); 
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        .input-group input::placeholder { color: rgba(255,255,255,0.5); }
+        .toggle-password { 
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%); 
+            background: none; border: none; cursor: pointer; font-size: 18px; 
+            color: rgba(255,255,255,0.7); z-index: 3; transition: color 0.3s; padding: 4px; 
+        }
+        .toggle-password:hover { color: white; }
+
+        .form-options {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; font-size: 12px; position: relative; z-index: 1;
+        }
+        .remember-me { display: flex; align-items: center; gap: 6px; cursor: pointer; color: white; }
+        .remember-me input[type="checkbox"] { width: 16px; height: 16px; accent-color: #667eea; cursor: pointer; }
+        .forgot-link { color: #fbc2eb; text-decoration: none; transition: all 0.3s; cursor: pointer; }
+        .forgot-link:hover { text-decoration: underline; color: white; }
+
+        .submit-btn { 
+            width: 100%; padding: 14px; 
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            color: #4c1d95; border: none; border-radius: 15px; 
+            font-size: 15px; font-weight: 800; letter-spacing: 1px; cursor: pointer; 
+            margin-top: 5px; position: relative; z-index: 1;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2), 0 6px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4);
+            transform: translateY(0); transition: all 0.3s ease;
+        }
+        .submit-btn:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3), 0 10px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+        .submit-btn:active { transform: translateY(-1px); }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .form-panel { display: none; animation: fadeSlide 0.4s ease; position: relative; z-index: 1; }
         .form-panel.active { display: block; }
         @keyframes fadeSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .hand { position: absolute; width: 28px; height: 22px; background: var(--card-bg); border: 2.5px solid var(--text-main); border-radius: 8px; top: 175px; z-index: 12; }
-        .hand--l { left: 52px; transform: rotate(-10deg); } .hand--r { right: 52px; transform: rotate(10deg); }
-        .foot { position: absolute; width: 36px; height: 18px; background: var(--card-bg); border: 2.5px solid var(--text-main); border-radius: 8px; bottom: 30px; z-index: 5; }
-        .foot--l { left: 110px; } .foot--r { right: 110px; }
-        .leg { position: absolute; width: 16px; height: 30px; background: var(--card-bg); border: 2.5px solid var(--text-main); bottom: 42px; z-index: 4; }
-        .leg--l { left: 155px; } .leg--r { right: 155px; }
-        
-        .strength-bar-container { display: flex; gap: 4px; margin-top: 4px; margin-bottom: 2px; }
-        .strength-bar { flex: 1; height: 4px; background: #ddd; border-radius: 2px; transition: background 0.3s ease; }
-        .strength-bar.weak { background: #e74c3c; } .strength-bar.medium { background: #f39c12; } .strength-bar.strong { background: #2ecc71; }
-        .strength-text { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: right; margin-bottom: 4px; transition: color 0.3s ease; }
-        
-        @keyframes float { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-5px); } }
-        .head3d:not(.turned) { animation: float 3s ease-in-out infinite; }
-        @keyframes shake { 0%, 100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-50%) rotate(-3deg); } 75% { transform: translateX(-50%) rotate(3deg); } }
-        .head3d.shake { animation: shake 0.4s ease; }
-        @keyframes successPulse { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); } }
-        .head3d.success { animation: successPulse 0.5s ease; }
-        @media (max-width: 460px) { .scene { width: 100%; height: 100vh; border-radius: 0; } }
 
-        /* --- MAIN APP STYLES --- */
-        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; display: none; }
-        header { background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); padding: 24px 20px 30px 20px; color: white; position: sticky; top: 0; z-index: 10; }
-        h1 { font-size: 22px; font-weight: 700; } .subtitle { font-size: 13px; opacity: 0.8; margin-top: 4px; }
-        .header-back { display: inline-flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 12px; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.15); }
+        .strength-bar-container { display: flex; gap: 4px; margin-top: 4px; margin-bottom: 2px; position: relative; z-index: 1; }
+        .strength-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; transition: background 0.3s ease; }
+        .strength-bar.weak { background: #ff6b6b; } 
+        .strength-bar.medium { background: #fcc419; } 
+        .strength-bar.strong { background: #51cf66; }
+        .strength-text { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.8); text-align: right; margin-bottom: 4px; position: relative; z-index: 1; }
+
+        .terms-wrapper { margin-bottom: 15px; font-size: 12px; text-align: left; position: relative; z-index: 1; }
+        .terms-wrapper label { display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; }
+        .terms-wrapper input[type="checkbox"] { width: 16px; height: 16px; accent-color: #667eea; cursor: pointer; }
+
+        @media (max-width: 480px) { 
+            .scene { width: 92%; max-width: 380px; padding: 50px 25px 40px; }
+        }
+
+        /* ===== MAIN APP STYLES ===== */
+        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: transparent; position: relative; display: none; padding-bottom: 80px; }
         
+        header { 
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 20px; color: white; position: sticky; top: 0; z-index: 10; 
+        }
+        h1 { font-size: 22px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2); } 
+        .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        .header-back { display: inline-flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 12px; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); }
         .header-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .header-left { flex: 1; min-width: 0; }
         .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         
-        .page { padding: 24px 20px; display: none; animation: fadeIn 0.3s ease; } .page.active { display: block; }
+        .page { padding: 20px; display: none; animation: fadeIn 0.3s ease; } 
+        .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        .card { 
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); 
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; 
+        }
+        
         .summary-grid { display: grid; gap: 12px; margin-bottom: 24px; }
-        .summary-card { padding: 20px; border-radius: var(--radius); color: white; position: relative; overflow: hidden; }
-        .summary-card.savings { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .summary-card.debt { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-        .summary-card.remaining { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-        .summary-card.info { background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); }
+        .summary-card { padding: 20px; border-radius: 16px; color: white; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        .summary-card.savings { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .summary-card.debt { background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%); }
+        .summary-card.remaining { background: linear-gradient(135deg, #F2994A 0%, #F2C94C 100%); }
+        .summary-card.info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .summary-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; opacity: 0.9; position: relative; z-index: 1; }
-        .summary-value { font-size: 28px; font-weight: 800; margin: 8px 0 0 0; letter-spacing: -1px; position: relative; z-index: 1; }
+        .summary-value { font-size: 26px; font-weight: 800; margin: 8px 0 0 0; letter-spacing: -1px; position: relative; z-index: 1; }
+        
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-        .mini-card { background: var(--card-bg); padding: 16px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); text-align: center; }
-        .mini-card-name { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        .mini-card { background: rgba(255,255,255,0.1); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; backdrop-filter: blur(5px); }
+        .mini-card-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 6px; }
         .mini-card-val { font-size: 16px; font-weight: 700; }
-        .val-danger { color: var(--danger); } .val-success { color: var(--success); } .val-primary { color: var(--primary); }
-        .form-group { margin-bottom: 16px; } label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        .val-danger { color: #ffadad; } .val-success { color: #caffbf; } .val-primary { color: #a0c4ff; }
+        
+        .form-group { margin-bottom: 16px; } 
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 6px; }
+        
         .custom-select-wrapper { position: relative; width: 100%; }
-        .custom-select-trigger { width: 100%; padding: 14px 44px 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); color: var(--text-main); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; user-select: none; min-height: 48px; }
-        .custom-select-trigger:hover { border-color: var(--primary); }
-        .custom-select-trigger.active { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
+        .custom-select-trigger { width: 100%; padding: 14px 44px 14px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; font-size: 15px; background: rgba(0,0,0,0.3); color: white; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; user-select: none; min-height: 48px; backdrop-filter: blur(5px); }
+        .custom-select-trigger:hover { border-color: white; background: rgba(0,0,0,0.4); }
+        .custom-select-trigger.active { border-color: white; background: rgba(0,0,0,0.4); box-shadow: 0 0 0 3px rgba(255,255,255,0.1); }
         .custom-select-trigger .select-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .custom-select-trigger .select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); transition: transform 0.3s; color: var(--text-muted); font-size: 12px; pointer-events: none; }
+        .custom-select-trigger .select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); transition: transform 0.3s; color: rgba(255,255,255,0.7); font-size: 12px; pointer-events: none; }
         .custom-select-trigger.active .select-arrow { transform: translateY(-50%) rotate(180deg); }
-        .custom-select-options { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; max-height: 220px; overflow-y: auto; display: none; animation: dropdownIn 0.2s ease; }
+        .custom-select-options { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: rgba(40, 20, 80, 0.95); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999; max-height: 220px; overflow-y: auto; display: none; animation: dropdownIn 0.2s ease; backdrop-filter: blur(15px); }
         .custom-select-options.show { display: block; }
         @keyframes dropdownIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-        .custom-select-option { padding: 12px 16px; cursor: pointer; transition: background 0.15s; color: var(--text-main); font-size: 15px; border-bottom: 1px solid var(--border); }
-        .custom-select-option:last-child { border-bottom: none; } .custom-select-option:hover { background: var(--input-bg); }
-        .custom-select-option.selected { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .custom-select-option { padding: 12px 16px; cursor: pointer; transition: background 0.15s; color: white; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .custom-select-option:last-child { border-bottom: none; } .custom-select-option:hover { background: rgba(255,255,255,0.1); }
+        .custom-select-option.selected { background: rgba(102, 126, 234, 0.6); color: white; font-weight: 600; }
         .custom-select-option.selected::before { content: '✓ '; margin-right: 4px; }
-        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"] { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; }
-        input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
-        button.action-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        
+        .main-input { width: 100%; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; font-size: 15px; background: rgba(0,0,0,0.3); color: white; transition: all 0.2s; backdrop-filter: blur(5px); }
+        .main-input:focus { border-color: white; background: rgba(0,0,0,0.4); box-shadow: 0 0 0 3px rgba(255,255,255,0.1); }
+        
+        button.action-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         button.action-btn:active { transform: scale(0.98); }
-        .btn-primary { background: var(--primary); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
-        .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-        .list-header { font-size: 16px; font-weight: 700; margin: 30px 0 16px 0; color: var(--text-main); }
-        .item-card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border); }
-        .item-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
-        .icon-loan { background: var(--danger-light); } .icon-save { background: var(--success-light); }
-        .item-info { flex: 1; } .item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; } .item-sub { font-size: 12px; color: var(--text-muted); }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        
+        .list-header { font-size: 16px; font-weight: 700; margin: 30px 0 16px 0; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .list-header:first-child { margin-top: 0; }
+        
+        .item-card { background: rgba(255,255,255,0.1); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
+        .item-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; background: rgba(255,255,255,0.15); }
+        .icon-loan { background: rgba(239, 68, 68, 0.2); } .icon-save { background: rgba(16, 185, 129, 0.2); }
+        .item-info { flex: 1; } .item-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; } .item-sub { font-size: 12px; color: rgba(255,255,255,0.7); }
         .item-action { text-align: right; } .item-amount { font-weight: 700; font-size: 15px; margin-bottom: 6px; display: block; }
         .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .badge-unpaid { background: var(--danger-light); color: var(--danger); } .badge-paid { background: var(--success-light); color: var(--success); }
-        .btn-mini { background: transparent; border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 6px; color: var(--text-muted); }
-        .btn-mini.pay { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
-        .btn-mini.edit { border-color: var(--warning); color: var(--warning); background: var(--warning-light); }
-        .btn-mini.del { border-color: var(--danger); color: var(--danger); background: var(--danger-light); margin-left: 4px; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
+        .badge-unpaid { background: rgba(239, 68, 68, 0.2); color: #ffadad; } .badge-paid { background: rgba(16, 185, 129, 0.2); color: #caffbf; }
+        .btn-mini { background: transparent; border: 1px solid rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 6px; color: rgba(255,255,255,0.8); }
+        .btn-mini.pay { border-color: #667eea; color: white; background: rgba(102, 126, 234, 0.3); }
+        .btn-mini.edit { border-color: #fcc419; color: white; background: rgba(252, 196, 25, 0.2); }
+        .btn-mini.del { border-color: #ef473a; color: white; background: rgba(239, 71, 58, 0.2); margin-left: 4px; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; padding: 4px; }
-        .nav-item.active { color: var(--primary); } .nav-item:not(.active) { color: var(--text-muted); }
-        .nav-icon { width: 22px; height: 22px; } .nav-label { font-size: 10px; font-weight: 600; }
-        .account-header { text-align: center; padding: 30px 20px; background: var(--card-bg); border-radius: var(--radius); margin-bottom: 20px; }
+        .nav-item.active { color: white; text-shadow: 0 0 10px rgba(255,255,255,0.5); } .nav-item:not(.active) { color: rgba(255,255,255,0.6); }
+        .nav-icon { width: 22px; height: 22px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); } .nav-label { font-size: 10px; font-weight: 600; }
+        
+        .account-header { text-align: center; padding: 30px 20px; background: rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
         .avatar-container { position: relative; display: inline-block; margin-bottom: 16px; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #3730a3 100%); display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; object-fit: cover; border: 4px solid var(--card-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; object-fit: cover; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden; }
         .avatar svg { width: 50px; height: 50px; }
-        .avatar-edit-btn { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--card-bg); }
+        .avatar-edit-btn { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid rgba(255,255,255,0.2); }
         .avatar-edit-btn svg { width: 16px; height: 16px; fill: white; }
-        .account-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; } .account-email { font-size: 14px; color: var(--text-muted); }
-        .menu-list { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; }
-        .menu-item { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
-        .menu-item:hover { background: var(--input-bg); } .menu-item:last-child { border-bottom: none; }
-        .menu-icon { width: 24px; height: 24px; flex-shrink: 0; } .menu-text { flex: 1; font-weight: 500; } .menu-arrow { color: var(--text-muted); font-size: 20px; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .account-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; } .account-email { font-size: 14px; color: rgba(255,255,255,0.8); }
+        
+        .menu-list { background: rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
+        .menu-item { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
+        .menu-item:hover { background: rgba(255,255,255,0.1); } .menu-item:last-child { border-bottom: none; }
+        .menu-icon { width: 24px; height: 24px; flex-shrink: 0; } .menu-text { flex: 1; font-weight: 500; } .menu-arrow { color: rgba(255,255,255,0.5); font-size: 20px; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .modal-overlay.show { opacity: 1; visibility: visible; } .modal-overlay.show .modal-content { transform: translateY(0); }
-        .modal-content { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: rgba(30, 20, 60, 0.95); width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.2); }
         .modal-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
         .modal-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .modal-icon svg { width: 28px; height: 28px; }
-        .modal-icon.info { background: var(--primary-light); } .modal-icon.success { background: var(--success-light); } .modal-icon.warning { background: var(--warning-light); } .modal-icon.danger { background: var(--danger-light); }
-        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; } .modal-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+        .modal-icon.info { background: rgba(102, 126, 234, 0.2); } .modal-icon.success { background: rgba(16, 185, 129, 0.2); } .modal-icon.warning { background: rgba(245, 158, 11, 0.2); } .modal-icon.danger { background: rgba(239, 68, 68, 0.2); }
+        .modal-title { font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px; } .modal-desc { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; }
         .modal-body { margin-bottom: 24px; }
-        .modal-body input { background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; padding: 16px; font-size: 16px; width: 100%; color: var(--text-main); }
+        .modal-body input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 16px; font-size: 16px; width: 100%; color: white; }
         .modal-actions { display: flex; gap: 12px; }
         .modal-btn { flex: 1; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .modal-btn.secondary { background: var(--input-bg); color: var(--text-main); } .modal-btn.primary { background: var(--primary); color: white; }
-        .modal-btn.danger { background: var(--danger); color: white; } .modal-btn.success { background: var(--success); color: white; }
+        .modal-btn.secondary { background: rgba(255,255,255,0.1); color: white; } .modal-btn.primary { background: #667eea; color: white; }
+        .modal-btn.danger { background: #ef473a; color: white; } .modal-btn.success { background: #38ef7d; color: white; }
+        
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-        .toast { background: var(--card-bg); padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; animation: toastIn 0.3s ease forwards; pointer-events: auto; min-width: 280px; color: var(--text-main); border: 1px solid var(--border); }
+        .toast { background: rgba(255, 255, 255, 0.95); padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; animation: toastIn 0.3s ease forwards; pointer-events: auto; min-width: 280px; color: #4c1d95; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(10px); }
         .toast.hide { animation: toastOut 0.3s ease forwards; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+        
         .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
         .tab-type-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-        .tab-type-reguler { background: var(--success-light); color: var(--success); } .tab-type-berjangka { background: var(--primary-light); color: var(--primary); }
+        .tab-type-reguler { background: rgba(16, 185, 129, 0.2); color: #caffbf; } .tab-type-berjangka { background: rgba(102, 126, 234, 0.2); color: #a0c4ff; }
+        
         #photoInput { display: none !important; position: absolute; opacity: 0; pointer-events: none; }
-        .toggle-switch { width: 50px; height: 28px; background: #cbd5e1; border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; }
-        .dark .toggle-switch { background: #475569; } .toggle-switch.active { background: var(--primary); }
-        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        .toggle-switch { width: 50px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; border: 1px solid rgba(255,255,255,0.3); }
+        .toggle-switch.active { background: #667eea; }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .toggle-switch.active::after { transform: translateX(22px); }
-        .version-badge { display: inline-block; padding: 4px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px; }
-        .notif-badge { position: absolute; top: 0px; right: 0px; background: var(--danger); color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: none; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--card-bg); animation: pulse 2s infinite; line-height: 1; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .notif-item { background: var(--card-bg); border-left: 4px solid var(--warning); padding: 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .notif-item.overdue { border-left-color: var(--danger); }
+        
+        .version-badge { display: inline-block; padding: 4px 12px; background: rgba(255,255,255,0.2); color: white; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px; border: 1px solid rgba(255,255,255,0.3); }
+        
+        .notif-badge { position: absolute; top: 0px; right: 0px; background: #ef473a; color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: none; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid rgba(255,255,255,0.2); animation: pulse 2s infinite; line-height: 1; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 71, 58, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 71, 58, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 71, 58, 0); } }
+        
+        .notif-item { background: rgba(255,255,255,0.1); border-left: 4px solid #fcc419; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+        .notif-item.overdue { border-left-color: #ef473a; }
+        
         .header-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
         .header-btn:hover { background: rgba(255,255,255,0.3); }
         
         .search-wrapper { position: relative; display: flex; align-items: center; margin-right: 1px; }
-        .search-icon-btn { padding-left: 5; margin-left: 1px; background: none; border: 0px solid rgba(255,255,255,0.3); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
-        .search-icon-btn:hover { background: none; margin-left: 1px; padding-left: 5; }
-        .header-search-input { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; width: 0; opacity: 0; outline: none; transition: all 0.3s cubic-bezier(0.3, 0, 0.2, 1); margin-right: 3px; pointer-events: none; }
+        .search-icon-btn { padding-left: 5; margin-left: 1px; background: none; border: 0; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
+        .header-search-input { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; width: 0; opacity: 0; outline: none; transition: all 0.3s cubic-bezier(0.3, 0, 0.2, 1); margin-right: 3px; pointer-events: none; }
         .header-search-input.active { width: 130px; opacity: 1; pointer-events: auto; }
         .header-search-input::placeholder { color: rgba(255,255,255,0.7); }
         .header-search-input:focus { background: rgba(255,255,255,0.35); border-color: white; }
@@ -282,66 +369,82 @@
 </head>
 <body>
 
-<!-- HALAMAN LOGIN & REGISTER (ROBOT VOLT) -->
+<!-- ===== HALAMAN LOGIN & REGISTER ===== -->
 <div id="loginPage" class="auth-container">
     <div class="scene">
-        <div class="bubble" id="bubble" role="status" aria-live="polite"><span id="bubbleText">Hai. Ini DompetKu. Saya yang menjaga formulir ini..</span></div>
-        <div class="antenna" aria-hidden="true"><span class="antenna-rod"></span><span class="antenna-tip" id="antennaTip"></span></div>
-        <div class="head3d" id="head3d" aria-hidden="true">
-            <div class="head" id="head">
-                <span class="ear ear--l"></span><span class="ear ear--r"></span>
-                <div class="face" id="face">
-                    <div class="eye" id="eyeL"><div class="pupil" id="pupilL"></div></div>
-                    <div class="eye" id="eyeR"><div class="pupil" id="pupilR"></div></div>
-                </div>
-                <div class="back-face" id="backFace">
-                    <div class="back-indicator" id="ind1"></div><div class="back-indicator" id="ind2"></div>
-                    <div class="back-indicator" id="ind3"></div><div class="back-indicator" id="ind4"></div>
-                    <span class="back-label" id="backLabel">NOT LOOKING</span>
-                </div>
-            </div>
+        <div class="form-toggle">
+            <button class="toggle-btn active" id="btnLogin" onclick="switchForm('login')">LOGIN</button>
+            <button class="toggle-btn" id="btnRegister" onclick="switchForm('register')">REGISTER</button>
         </div>
-        <div class="hand hand--l" aria-hidden="true"></div><div class="hand hand--r" aria-hidden="true"></div>
-        <div class="robot-body">
-            <div class="form-card">
-                <div class="form-toggle">
-                    <button class="toggle-btn active" id="btnLogin" onclick="switchForm('login')">LOGIN</button>
-                    <button class="toggle-btn" id="btnRegister" onclick="switchForm('register')">REGISTER</button>
-                </div>
-                <div class="form-panel active" id="loginPanel">
-                    <div class="form-title">Beep boop. Selamat Datang Kembali</div>
-                    <div class="input-group"><span class="icon"></span><input type="email" id="loginEmail" placeholder="Email" autocomplete="off"></div>
-                    <div class="input-group"><span class="icon"></span><input type="password" id="loginPassword" placeholder="password" autocomplete="off"><button class="toggle-password" id="toggleLoginPwd" type="button">👁️</button></div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:11px;">
-                         <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text-main);"><input type="checkbox" id="rememberMe"> Remember me</label>
-                         <a onclick="handleForgotPassword()" style="color:#e07a5f; cursor:pointer; font-weight:600;">Lupa Kata sandi?</a>
-                    </div>
-                    <button class="submit-btn" id="loginBtn" onclick="handleLogin(event)">LOGIN</button>
-                </div>
-                <div class="form-panel" id="registerPanel">
-                    <div class="form-title">Beep boop. Selamat Bergabung!</div>
-                    <div class="input-group"><span class="icon"></span><input type="text" id="regName" placeholder="Masukkan username" autocomplete="off"></div>
-                    <div class="input-group"><span class="icon"></span><input type="email" id="regEmail" placeholder="Masukkan Emailmu" autocomplete="off"></div>
-                    <div class="input-group"><span class="icon"></span><input type="password" id="regPassword" placeholder="Buat Kata Sandi" autocomplete="off" oninput="checkRegPasswordStrength(this.value)"><button class="toggle-password" id="toggleRegPwd" type="button">️</button></div>
-                    <div class="strength-bar-container" id="strengthBars">
-                        <div class="strength-bar" id="bar1"></div><div class="strength-bar" id="bar2"></div>
-                        <div class="strength-bar" id="bar3"></div><div class="strength-bar" id="bar4"></div>
-                    </div>
-                    <div class="strength-text" id="strengthText"></div>
-                    <div class="input-group"><span class="icon"></span><input type="password" id="regConfirmPassword" placeholder="Konfirmasi Sandi" autocomplete="off"><button class="toggle-password" id="toggleRegConfirmPwd" type="button">️</button></div>
-                    <div class="terms-wrapper" style="margin-bottom:10px; font-size:11px;">
-                        <label style="display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text-main);"><input type="checkbox" id="agreeTerms"> Saya Setuju</label>
-                    </div>
-                    <button class="submit-btn" id="registerBtn" style="background: var(--text-main);" onclick="handleRegister(event)">Buat Akun</button>
-                </div>
+        
+        <div class="form-panel active" id="loginPanel">
+            <div class="form-title">Selamat Datang</div>
+            <div class="form-subtitle">Masuk ke akun DompetKu Anda</div>
+            
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="nama@email.com" autocomplete="off">
             </div>
+            <div class="input-group">
+                <label>Kata Sandi</label>
+                <input type="password" id="loginPassword" placeholder="Masukkan kata sandi" autocomplete="off">
+                <button class="toggle-password" id="toggleLoginPwd" type="button">👁️</button>
+            </div>
+            
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe"> Ingat saya
+                </label>
+                <a onclick="handleForgotPassword()" class="forgot-link">Lupa Kata sandi?</a>
+            </div>
+            
+            <button class="submit-btn" id="loginBtn" onclick="handleLogin(event)">MASUK SEKARANG</button>
         </div>
-        <div class="leg leg--l" aria-hidden="true"></div><div class="leg leg--r" aria-hidden="true"></div>
-        <div class="foot foot--l" aria-hidden="true"></div><div class="foot foot--r" aria-hidden="true"></div>
+
+        <div class="form-panel" id="registerPanel">
+            <div class="form-title">Buat Akun Baru</div>
+            <div class="form-subtitle">Bergabunglah untuk mengatur keuangan</div>
+            
+            <div class="input-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="regName" placeholder="Nama Anda" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="nama@email.com" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>Kata Sandi</label>
+                <input type="password" id="regPassword" placeholder="Minimal 6 karakter" autocomplete="off" oninput="checkRegPasswordStrength(this.value)">
+                <button class="toggle-password" id="toggleRegPwd" type="button">👁️</button>
+            </div>
+            
+            <div class="strength-bar-container" id="strengthBars">
+                <div class="strength-bar" id="bar1"></div>
+                <div class="strength-bar" id="bar2"></div>
+                <div class="strength-bar" id="bar3"></div>
+                <div class="strength-bar" id="bar4"></div>
+            </div>
+            <div class="strength-text" id="strengthText"></div>
+            
+            <div class="input-group">
+                <label>Konfirmasi Kata Sandi</label>
+                <input type="password" id="regConfirmPassword" placeholder="Ulangi kata sandi" autocomplete="off">
+                <button class="toggle-password" id="toggleRegConfirmPwd" type="button">👁️</button>
+            </div>
+            
+            <div class="terms-wrapper">
+                <label>
+                    <input type="checkbox" id="agreeTerms"> Saya menyetujui Syarat & Ketentuan
+                </label>
+            </div>
+            
+            <button class="submit-btn" id="registerBtn" onclick="handleRegister(event)">DAFTAR AKUN</button>
+        </div>
     </div>
 </div>
 
-<!-- HALAMAN UTAMA APLIKASI -->
+<!-- ===== HALAMAN UTAMA APLIKASI ===== -->
 <div class="container" id="mainApp">
     <header>
         <div id="backButton" class="header-back" style="display:none;" onclick="goBack()">← Kembali</div>
@@ -393,10 +496,10 @@
                             <div class="custom-select-option" data-value="custom" onclick="selectOption('savePerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
                         </div>
                     </div>
-                    <input type="text" id="savePersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;">
+                    <input type="text" id="savePersonCustom" class="main-input" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;">
                 </div>
-                <div class="form-group"><label>Keterangan</label><input type="text" id="saveNote" placeholder="Gaji bulanan, Bonus, dll"></div>
-                <div class="form-group"><label>Nominal</label><input type="number" id="saveAmount" placeholder="0" min="0"></div>
+                <div class="form-group"><label>Keterangan</label><input type="text" id="saveNote" class="main-input" placeholder="Gaji bulanan, Bonus, dll"></div>
+                <div class="form-group"><label>Nominal</label><input type="number" id="saveAmount" class="main-input" placeholder="0" min="0"></div>
             </div>
             <div id="inputBerjangka" style="display:none;">
                 <div class="form-group">
@@ -408,22 +511,22 @@
                             <div class="custom-select-option" data-value="custom" onclick="selectOption('termPerson', 'custom', '+ Tambah Nama Baru', event)">+ Tambah Nama Baru</div>
                         </div>
                     </div>
-                    <input type="text" id="termPersonCustom" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;">
+                    <input type="text" id="termPersonCustom" class="main-input" placeholder="Ketik nama baru..." style="display:none; margin-top:10px;">
                 </div>
-                <div class="form-group"><label>Tanggal Mulai Menabung</label><input type="date" id="termStartDate"></div>
+                <div class="form-group"><label>Tanggal Mulai Menabung</label><input type="date" id="termStartDate" class="main-input"></div>
             </div>
             <button class="action-btn btn-success" onclick="addSaving()">Simpan Tabungan</button>
         </div>
         <div class="card">
             <h3 style="margin:0 0 16px 0; font-size:18px;">Buat Pinjaman Baru</h3>
-            <div class="form-group"><label>Nama Pemberi Pinjaman</label><input type="text" id="loanSource" placeholder="Contoh: Bank ABC / Teman"></div>
+            <div class="form-group"><label>Nama Pemberi Pinjaman</label><input type="text" id="loanSource" class="main-input" placeholder="Contoh: Bank ABC / Teman"></div>
             <div style="display:flex; gap:10px;">
-                <div class="form-group" style="flex:1"><label>Durasi (Bulan)</label><input type="number" id="loanDuration" placeholder="6" min="1"></div>
-                <div class="form-group" style="flex:1"><label>Tanggal Mulai</label><input type="date" id="loanDateStart"></div>
+                <div class="form-group" style="flex:1"><label>Durasi (Bulan)</label><input type="number" id="loanDuration" class="main-input" placeholder="6" min="1"></div>
+                <div class="form-group" style="flex:1"><label>Tanggal Mulai</label><input type="date" id="loanDateStart" class="main-input"></div>
             </div>
             <div class="form-group">
                 <label>Total Pinjaman (Pokok + Bunga)</label>
-                <input type="number" id="loanTotalAmount" placeholder="Misal: 1.200.000" min="0">
+                <input type="number" id="loanTotalAmount" class="main-input" placeholder="Misal: 1.200.000" min="0">
                 <small id="estInstallment" style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px;"></small>
             </div>
             <button class="action-btn btn-primary" onclick="createLoanSchedule()">Buat Jadwal Cicilan</button>
@@ -456,10 +559,10 @@
         <div style="text-align:center; margin-top:30px;"><div class="version-badge" id="versionBadge">DompetKu v1.0</div></div>
     </div>
     <div id="page-settings" class="page">
-        <div class="list-header" style="margin-top:0;">Akun & Keamanan</div>
+        <div class="list-header">Akun & Keamanan</div>
         <div class="menu-list">
-            <div class="menu-item" onclick="openEditProfile()"><div class="menu-icon">👤</div><div class="menu-text"><div style="font-weight:600;">Profil Saya</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Ubah nama dan foto</div></div><div class="menu-arrow">›</div></div>
-            <div class="menu-item" onclick="openChangePassword()"><div class="menu-icon">🔒</div><div class="menu-text"><div style="font-weight:600;">Ubah Kata Sandi</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Perbarui kata sandi</div></div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openEditProfile()"><div class="menu-icon"></div><div class="menu-text"><div style="font-weight:600;">Profil Saya</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Ubah nama dan foto</div></div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openChangePassword()"><div class="menu-icon"></div><div class="menu-text"><div style="font-weight:600;">Ubah Kata Sandi</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Perbarui kata sandi</div></div><div class="menu-arrow">›</div></div>
         </div>
         <div class="list-header">Preferensi</div>
         <div class="menu-list">
@@ -480,7 +583,7 @@
     </nav>
 </div>
 
-<!-- MODAL & POPUP -->
+<!-- MODAL -->
 <div class="modal-overlay" id="notifModalOverlay" onclick="closeNotifModal(event)">
     <div class="modal-content" style="transform: translateY(0); max-height: 80vh;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -503,7 +606,7 @@
 <div class="toast-container" id="toastContainer"></div>
 <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none;">
 
-<!-- JAVASCRIPT LOGIC -->
+<!-- ===== JAVASCRIPT LENGKAP ===== -->
 <script>
     let currentUser = null;
     let userData = { name: 'Pengguna', email: '', photo: null, loans: [], savings: [] };
@@ -513,36 +616,91 @@
 
     const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
     const pageTitles = { home: { title: 'DompetKu', subtitle: 'Ringkasan keuangan Anda' }, input: { title: 'Input Data', subtitle: 'Tambah tabungan atau pinjaman' }, debt: { title: 'Daftar Hutang', subtitle: 'Kelola semua pinjaman aktif' }, history: { title: 'Riwayat Hutang', subtitle: 'Catatan pembayaran cicilan' }, tabungan: { title: 'Rekapan Tabungan', subtitle: 'Riwayat tabungan' }, account: { title: 'Akun Saya', subtitle: 'Pengaturan profil' }, settings: { title: 'Pengaturan', subtitle: 'Kelola preferensi' } };
-    const svgIcons = { user: '', lock: '🔒', trash: '🗑️', edit: '✏️', money: '💰', logout: '🚪', warning: '⚠️' };
+    const svgIcons = { user: '👤', lock: '🔒', trash: '🗑️', edit: '️', money: '💰', logout: '🚪', warning: '⚠️' };
 
-    function checkNotifications() {
-        const today = new Date().toISOString().split('T')[0];
-        let dueLoans = [], notificationCount = 0;
-        if (userData.loans) {
-            userData.loans.forEach(loan => {
-                loan.installments.forEach(inst => {
-                    if (!inst.isPaid && inst.dueDate <= today) {
-                        dueLoans.push({ loan: loan.source, date: inst.dueDate, amount: inst.amount, month: inst.monthIndex, loanId: loan.id, instId: inst.id });
-                        notificationCount++;
-                    }
-                });
-            });
-        }
-        const badge = document.getElementById('notifBadge');
-        if (badge) { badge.innerText = notificationCount; badge.style.display = notificationCount > 0 ? 'flex' : 'none'; }
-        window.currentNotifications = { dueLoans, count: notificationCount };
-        if (notificationCount > 0 && Notification.permission === 'granted' && !window.hasShownDueNotification) {
-            new Notification('DompetKu - Pengingat Tagihan! 🔔', { body: `Anda memiliki ${notificationCount} cicilan yang jatuh tempo.`, icon: 'https://cdn-icons-png.flaticon.com/512/2933/2933245.png' });
-            window.hasShownDueNotification = true;
-        }
+    // Cek apakah browser mendukung notifikasi
+function isNotificationSupported() {
+    return "Notification" in window && Notification.permission !== "denied";
+}
+
+function requestNotificationPermission() {
+    // Cek dukungan browser
+    if (!("Notification" in window)) {
+        showToast("⚠️ Browser Anda tidak mendukung notifikasi. Gunakan Chrome/Firefox di HTTPS.", "warning");
+        return;
     }
-    function requestNotificationPermission() {
-        if (!("Notification" in window)) { showToast("Browser tidak mendukung notifikasi.", "error"); return; }
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") { showToast("Notifikasi diaktifkan!", "success"); new Notification("DompetKu", { body: "Notifikasi berhasil diaktifkan!" }); }
-            else { showToast("Izin notifikasi ditolak.", "warning"); }
+    
+    // Cek apakah sudah diblokir
+    if (Notification.permission === "denied") {
+        showToast("🚫 Notifikasi diblokir. Buka pengaturan browser untuk mengizinkan.", "error");
+        return;
+    }
+    
+    // Minta izin
+    Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+            showToast("✅ Notifikasi diaktifkan!", "success");
+            new Notification("DompetKu", { 
+                body: "Notifikasi berhasil diaktifkan!",
+                icon: "https://cdn-icons-png.flaticon.com/512/2933/2933245.png"
+            });
+        } else if (permission === "denied") {
+            showToast(" Izin notifikasi ditolak. Buka pengaturan browser untuk mengubahnya.", "warning");
+        } else {
+            showToast("⚠️ Izin notifikasi diabaikan.", "warning");
+        }
+    }).catch(err => {
+        showToast("❌ Gagal: " + err.message, "error");
+    });
+}
+
+function checkNotifications() {
+    const today = new Date().toISOString().split('T')[0];
+    let dueLoans = [], notificationCount = 0;
+    
+    if (userData.loans) {
+        userData.loans.forEach(loan => {
+            loan.installments.forEach(inst => {
+                if (!inst.isPaid && inst.dueDate <= today) {
+                    dueLoans.push({ 
+                        loan: loan.source, 
+                        date: inst.dueDate, 
+                        amount: inst.amount, 
+                        month: inst.monthIndex, 
+                        loanId: loan.id, 
+                        instId: inst.id 
+                    });
+                    notificationCount++;
+                }
+            });
         });
     }
+    
+    const badge = document.getElementById('notifBadge');
+    if (badge) { 
+        badge.innerText = notificationCount; 
+        badge.style.display = notificationCount > 0 ? 'flex' : 'none'; 
+    }
+    
+    window.currentNotifications = { dueLoans, count: notificationCount };
+    
+    // Tampilkan notifikasi browser HANYA jika didukung
+    if (notificationCount > 0 && !window.hasShownDueNotification) {
+        if (isNotificationSupported() && Notification.permission === "granted") {
+            try {
+                new Notification('DompetKu - Pengingat Tagihan! 🔔', { 
+                    body: `Anda memiliki ${notificationCount} cicilan yang jatuh tempo.`, 
+                    icon: 'https://cdn-icons-png.flaticon.com/512/2933/2933245.png' 
+                });
+            } catch(e) {
+                console.log("Notifikasi browser gagal:", e);
+            }
+        }
+        // Fallback: tampilkan toast in-app
+        showToast(` Anda punya ${notificationCount} tagihan jatuh tempo!`, "warning");
+        window.hasShownDueNotification = true;
+    }
+  }
     function openNotificationModal() {
         checkNotifications();
         const modal = document.getElementById('notifModalOverlay'), list = document.getElementById('notifList'), notifs = window.currentNotifications;
@@ -587,6 +745,7 @@
     function updateVersionDisplay() { const v = getAppVersion(); const b = document.getElementById('versionBadge'); if (b) b.textContent = `DompetKu v${v}`; }
     incrementVersion();
 
+    // ===== INI YANG MENANGANI PERPINDAHAN KE HALAMAN UTAMA =====
     auth.onAuthStateChanged((user) => { 
         if (user) { 
             currentUser = user; 
@@ -630,59 +789,72 @@
         catch (error) { showToast('Gagal menyimpan: ' + error.message, 'error'); }
     }
 
-    function showLogin() { switchForm('login'); }
-    function showRegister() { switchForm('register'); }
-    
+    function switchForm(form) {
+        const loginPanel = document.getElementById('loginPanel'), registerPanel = document.getElementById('registerPanel');
+        const btnLogin = document.getElementById('btnLogin'), btnRegister = document.getElementById('btnRegister');
+        document.getElementById('loginPassword').type = 'password'; 
+        document.getElementById('regPassword').type = 'password'; 
+        document.getElementById('regConfirmPassword').type = 'password';
+        document.getElementById('toggleLoginPwd').textContent = '👁️'; 
+        document.getElementById('toggleRegPwd').textContent = '️'; 
+        document.getElementById('toggleRegConfirmPwd').textContent = '👁️';
+
+        if (form === 'login') {
+            loginPanel.classList.add('active'); registerPanel.classList.remove('active'); 
+            btnLogin.classList.add('active'); btnRegister.classList.remove('active'); 
+        } else {
+            registerPanel.classList.add('active'); loginPanel.classList.remove('active'); 
+            btnRegister.classList.add('active'); btnLogin.classList.remove('active'); 
+        }
+    }
+
     function checkRegPasswordStrength(password) { 
         const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
         const strengthText = document.getElementById('strengthText');
-        const indicators = [document.getElementById('ind1'), document.getElementById('ind2'), document.getElementById('ind3'), document.getElementById('ind4')];
-        const backLabel = document.getElementById('backLabel');
         let strength = 0; 
         if (password.length >= 6) strength++; if (/[A-Z]/.test(password)) strength++; if (/[0-9]/.test(password)) strength++; if (/[^A-Za-z0-9]/.test(password)) strength++; 
-        bars.forEach(b => b.className = 'strength-bar'); indicators.forEach(i => i.className = 'back-indicator');
-        if (password.length === 0) { strengthText.innerText = ''; backLabel.textContent = 'NOT LOOKING'; } 
-        else if (strength <= 1) { bars[0].classList.add('weak'); indicators[0].classList.add('red'); strengthText.innerText = 'Too short!'; strengthText.style.color = '#e74c3c'; backLabel.textContent = 'TOO SHORT'; } 
-        else if (strength <= 2) { bars[0].classList.add('medium'); bars[1].classList.add('medium'); indicators[0].classList.add('orange'); indicators[1].classList.add('orange'); strengthText.innerText = 'Weak password'; strengthText.style.color = '#f39c12'; backLabel.textContent = 'WEAK'; } 
-        else { bars.forEach(b => b.classList.add('strong')); indicators.forEach(i => i.classList.add('green')); strengthText.innerText = 'Strong password'; strengthText.style.color = '#2ecc71'; backLabel.textContent = 'FORT KNOX'; } 
+        bars.forEach(b => b.className = 'strength-bar');
+        if (password.length === 0) { strengthText.innerText = ''; } 
+        else if (strength <= 1) { bars[0].classList.add('weak'); strengthText.innerText = 'Terlalu pendek!'; strengthText.style.color = '#ff6b6b'; } 
+        else if (strength <= 2) { bars[0].classList.add('medium'); bars[1].classList.add('medium'); strengthText.innerText = 'Kata sandi lemah'; strengthText.style.color = '#fcc419'; } 
+        else { bars.forEach(b => b.classList.add('strong')); strengthText.innerText = 'Kata sandi kuat'; strengthText.style.color = '#51cf66'; } 
     }
     
     async function handleLogin(e) { 
         if(e) e.preventDefault(); 
         const email = document.getElementById('loginEmail').value.trim(), password = document.getElementById('loginPassword').value, btn = document.getElementById('loginBtn'); 
-        if (!email || !password) { setBubble('Hey! I need credentials first!'); shakeRobot(); return; } 
+        if (!email || !password) { showToast('Mohon isi email dan kata sandi!', 'error'); return; } 
         saveCredentials(); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
         try { 
             await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); 
             await auth.signInWithEmailAndPassword(email, password); 
-            setBubble(`Welcome back! Access granted!`); document.getElementById('antennaTip').style.background = '#2ecc71'; successAnimation();
-            setTimeout(() => { document.getElementById('antennaTip').style.background = '#e07a5f'; }, 2500);
+            showToast(`Selamat datang kembali!`, 'success');
         } catch (error) { 
-            let message = 'Login failed!'; 
-            if (error.code === 'auth/user-not-found') message = 'Account not found!'; 
-            if (error.code === 'auth/wrong-password') message = 'Wrong password!'; 
-            setBubble(message); shakeRobot();
-        } finally { btn.disabled = false; btn.innerText = 'LOG ME IN'; } 
+            let message = 'Login gagal!'; 
+            if (error.code === 'auth/user-not-found') message = 'Akun tidak ditemukan!'; 
+            if (error.code === 'auth/wrong-password') message = 'Kata sandi salah!'; 
+            showToast(message, 'error');
+        } finally { btn.disabled = false; btn.innerText = 'MASUK SEKARANG'; } 
     }
     
     async function handleRegister(e) { 
         if(e) e.preventDefault(); 
         const name = document.getElementById('regName').value.trim(), email = document.getElementById('regEmail').value.trim(), password = document.getElementById('regPassword').value, confirmPassword = document.getElementById('regConfirmPassword').value, agreeTerms = document.getElementById('agreeTerms').checked, btn = document.getElementById('registerBtn'); 
-        if (!name || !email || !password || !confirmPassword) { setBubble('Fill all fields!'); shakeRobot(); return; } 
-        if (!agreeTerms) { setBubble('Agree to terms first!'); shakeRobot(); return; } 
-        if (password.length < 6) { setBubble('Password too short!'); shakeRobot(); return; } 
-        if (password !== confirmPassword) { setBubble('Passwords don\'t match!'); shakeRobot(); return; } 
+        if (!name || !email || !password || !confirmPassword) { showToast('Lengkapi semua kolom!', 'error'); return; } 
+        if (!agreeTerms) { showToast('Setujui syarat & ketentuan!', 'error'); return; } 
+        if (password.length < 6) { showToast('Kata sandi minimal 6 karakter!', 'error'); return; } 
+        if (password !== confirmPassword) { showToast('Kata sandi tidak cocok!', 'error'); return; } 
         btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; 
         try { 
             const userCredential = await auth.createUserWithEmailAndPassword(email, password); 
             await userCredential.user.updateProfile({ displayName: name }); 
             await database.ref('users/' + userCredential.user.uid).set({ name: name, email: email, loans: [], savings: [], createdAt: Date.now() });
-            setBubble(`Welcome to the squad, ${name}!`); document.getElementById('antennaTip').style.background = '#2ecc71'; successAnimation();
+            showToast(`Selamat bergabung, ${name}!`, 'success');
         } catch (error) { 
-            let message = 'Registration failed!'; 
-            if (error.code === 'auth/email-already-in-use') message = 'Email already used!'; 
-            setBubble(message); shakeRobot();
-        } finally { btn.disabled = false; btn.innerText = 'CREATE ACCOUNT'; } 
+            let message = 'Pendaftaran gagal!'; 
+            if (error.code === 'auth/email-already-in-use') message = 'Email sudah digunakan!'; 
+            showToast(message, 'error');
+        } finally { btn.disabled = false; btn.innerText = 'DAFTAR AKUN'; } 
     }
     
     function handleForgotPassword() {
@@ -753,7 +925,7 @@
     
     function openEditProfile() { 
         tempPhotoData = userData.photo; 
-        showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div style="text-align:center; margin-bottom:20px;"><img id="photoPreview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview" class="avatar" style="margin:0 auto 10px auto;"><button class="btn-mini" onclick="triggerPhotoUpload()">📷 Ganti Foto</button><div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" value="${userData.name}"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
+        showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div style="text-align:center; margin-bottom:20px;"><img id="photoPreview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview" class="avatar" style="margin:0 auto 10px auto;"><button class="btn-mini" onclick="triggerPhotoUpload()"> Ganti Foto</button><div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" class="main-input" value="${userData.name}"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
             const newName = document.getElementById('editName').value.trim(); if (!newName) { showToast('Nama harus diisi!', 'error'); return false; } 
             try { 
                 await currentUser.updateProfile({ displayName: newName }); 
@@ -768,7 +940,7 @@
     }
     
     function openChangePassword() { 
-        showModal({ icon: 'lock', iconType: 'warning', title: 'Ubah Kata Sandi', customHTML: `<div class="form-group" style="margin-top:16px;"><label>Kata Sandi Lama</label><input type="password" id="oldPassword" placeholder="Kata sandi lama"></div><div class="form-group"><label>Kata Sandi Baru</label><input type="password" id="newPassword" placeholder="Minimal 6 karakter"></div><div class="form-group"><label>Konfirmasi</label><input type="password" id="confirmPassword" placeholder="Ulangi kata sandi"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ubah', class: 'primary', action: async () => { 
+        showModal({ icon: 'lock', iconType: 'warning', title: 'Ubah Kata Sandi', customHTML: `<div class="form-group" style="margin-top:16px;"><label>Kata Sandi Lama</label><input type="password" id="oldPassword" class="main-input" placeholder="Kata sandi lama"></div><div class="form-group"><label>Kata Sandi Baru</label><input type="password" id="newPassword" class="main-input" placeholder="Minimal 6 karakter"></div><div class="form-group"><label>Konfirmasi</label><input type="password" id="confirmPassword" class="main-input" placeholder="Ulangi kata sandi"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ubah', class: 'primary', action: async () => { 
             const oldPass = document.getElementById('oldPassword').value, newPass = document.getElementById('newPassword').value, confirmPass = document.getElementById('confirmPassword').value; 
             if (!oldPass || !newPass || !confirmPass) { showToast('Semua field harus diisi!', 'error'); return false; } 
             if (newPass.length < 6) { showToast('Minimal 6 karakter!', 'error'); return false; } 
@@ -814,7 +986,7 @@
     function toggleDarkMode(element) { 
         element.classList.toggle('active'); document.body.classList.toggle('dark'); 
         const isDark = document.body.classList.contains('dark'); localStorage.setItem('darkMode', isDark);
-        const iconDiv = element.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = isDark ? '☀️' : '🌙';
+        const iconDiv = element.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = isDark ? '☀️' : '';
     }
     function confirmResetData() { 
         showModal({ icon: 'warning', iconType: 'danger', title: 'Hapus SEMUA Data?', description: 'Seluruh data akan dihapus permanen.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Hapus', class: 'danger', action: async () => { 
@@ -935,7 +1107,7 @@
         else { 
             recentItems.slice(0, 5).forEach(item => { 
                 if (item.type === 'saving') { 
-                    const badge = item.data.type === 'berjangka' ? '<span class="badge" style="background:#e0e7ff;color:#4f46e5">Berjangka</span>' : '<span class="badge badge-paid">Reguler</span>'; 
+                    const badge = item.data.type === 'berjangka' ? '<span class="badge" style="background:rgba(102,126,234,0.3);color:#a0c4ff">Berjangka</span>' : '<span class="badge badge-paid">Reguler</span>'; 
                     recentActivity.innerHTML += `<div class="item-card" style="display:flex; align-items:center;"><div class="item-icon icon-save">💰</div><div class="item-info"><div class="item-title">${item.data.person} ${badge}</div><div class="item-sub">${item.data.note || 'Tabungan Berjangka'} • ${item.data.date || item.data.startDate}</div></div><div class="item-action"><span class="item-amount val-success">+${formatRupiah(item.data.amount || (item.data.installments ? item.data.installments.reduce((sum, i) => sum + (i.amount || 0), 0) : 0))}</span></div></div>`; 
                 } else { 
                     const badge = item.inst.isPaid ? '<span class="badge badge-paid">Lunas</span>' : '<span class="badge badge-unpaid">Belum Bayar</span>'; 
@@ -1055,83 +1227,23 @@
     updateVersionDisplay();
 </script>
 
-<!-- LOGIKA KHUSUS ROBOT VOLT -->
+<!-- TOGGLE PASSWORD -->
 <script>
-  const bubbleText = document.getElementById('bubbleText');
-  const head3d = document.getElementById('head3d');
-  const eyeL = document.getElementById('eyeL'), eyeR = document.getElementById('eyeR');
-  const pupilL = document.getElementById('pupilL'), pupilR = document.getElementById('pupilR');
-  const backLabel = document.getElementById('backLabel');
-  const indicators = [document.getElementById('ind1'), document.getElementById('ind2'), document.getElementById('ind3'), document.getElementById('ind4')];
-  
-  function setBubble(text) { bubbleText.textContent = text; }
-  function turnRobot(turn) { if (turn) head3d.classList.add('turned'); else head3d.classList.remove('turned'); }
-  function shakeRobot() { head3d.classList.add('shake'); setTimeout(() => head3d.classList.remove('shake'), 400); }
-  function blinkEyes() { eyeL.classList.add('blink'); eyeR.classList.add('blink'); setTimeout(() => { eyeL.classList.remove('blink'); eyeR.classList.remove('blink'); }, 150); }
-  function successAnimation() { head3d.classList.add('success'); setTimeout(() => head3d.classList.remove('success'), 500); }
-
-  function switchForm(form) {
-    const loginPanel = document.getElementById('loginPanel'), registerPanel = document.getElementById('registerPanel');
-    const btnLogin = document.getElementById('btnLogin'), btnRegister = document.getElementById('btnRegister');
-    turnRobot(false); indicators.forEach(ind => ind.className = 'back-indicator'); backLabel.textContent = 'NOT LOOKING';
-    document.getElementById('loginPassword').type = 'password'; document.getElementById('regPassword').type = 'password'; document.getElementById('regConfirmPassword').type = 'password';
-    document.getElementById('toggleLoginPwd').textContent = '️'; document.getElementById('toggleRegPwd').textContent = '👁️'; document.getElementById('toggleRegConfirmPwd').textContent = '👁️';
-    if (form === 'login') {
-      loginPanel.classList.add('active'); registerPanel.classList.remove('active'); btnLogin.classList.add('active'); btnRegister.classList.remove('active'); setBubble('Welcome back! Who goes there?');
-    } else {
-      registerPanel.classList.add('active'); loginPanel.classList.remove('active'); btnRegister.classList.add('active'); btnLogin.classList.remove('active'); setBubble('New face? Let\'s get you registered!');
-    }
-    blinkEyes();
-  }
-
-  const loginEmail = document.getElementById('loginEmail'), loginPassword = document.getElementById('loginPassword');
-  loginEmail.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) setBubble('Nice email. Very professional.'); });
-  loginEmail.addEventListener('input', (e) => { if (e.target.value.includes('@') && !head3d.classList.contains('turned')) setBubble('Valid email detected!'); });
-  loginPassword.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); } });
-  loginPassword.addEventListener('blur', () => { if (document.getElementById('toggleLoginPwd').textContent === '👁️') { turnRobot(false); setBubble('Hi. I\'m Volt. I guard this form.'); indicators.forEach(ind => ind.className = 'back-indicator'); backLabel.textContent = 'NOT LOOKING'; } });
   document.getElementById('toggleLoginPwd').addEventListener('click', function() {
-    const isHidden = loginPassword.type === 'password'; loginPassword.type = isHidden ? 'text' : 'password'; this.textContent = isHidden ? '🙈' : '️';
-    if(isHidden) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); backLabel.textContent = 'NOT LOOKING'; indicators.forEach(ind => ind.className = 'back-indicator'); } 
-    else { if(document.activeElement !== loginPassword) { turnRobot(false); setBubble('Hi. I\'m Volt. I guard this form.'); } }
-  });
-
-  const regUsername = document.getElementById('regName'), regPassword = document.getElementById('regPassword'), regConfirmPassword = document.getElementById('regConfirmPassword');
-  regUsername.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) setBubble('Pick a cool username!'); });
-  regUsername.addEventListener('input', (e) => { if (e.target.value.length > 0 && !head3d.classList.contains('turned')) setBubble(`${e.target.value}? I like it!`); });
-  regPassword.addEventListener('focus', () => { if (!head3d.classList.contains('turned')) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); } });
-  regPassword.addEventListener('blur', () => { if (document.getElementById('toggleRegPwd').textContent === '️') { turnRobot(false); setBubble('Almost there! Confirm your password.'); indicators.forEach(ind => ind.className = 'back-indicator'); backLabel.textContent = 'NOT LOOKING'; } });
-  regConfirmPassword.addEventListener('input', () => {
-    if (regConfirmPassword.value.length === 0) return;
-    if (regPassword.value === regConfirmPassword.value) { regConfirmPassword.style.borderColor = '#2ecc71'; setBubble('Passwords match! Looking good!'); } 
-    else { regConfirmPassword.style.borderColor = '#e74c3c'; setBubble('Passwords don\'t match! Try again.'); }
+    const input = document.getElementById('loginPassword');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    this.textContent = input.type === 'password' ? '👁️' : '🙈';
   });
   document.getElementById('toggleRegPwd').addEventListener('click', function() {
-    const isHidden = regPassword.type === 'password'; regPassword.type = isHidden ? 'text' : 'password'; this.textContent = isHidden ? '🙈' : '👁️';
-    if(isHidden) { turnRobot(true); setBubble('A secret? Say no more. *turns around*'); backLabel.textContent = 'NOT LOOKING'; indicators.forEach(ind => ind.className = 'back-indicator'); } 
-    else { if(document.activeElement !== regPassword) { turnRobot(false); setBubble('Almost there! Confirm your password.'); } }
+    const input = document.getElementById('regPassword');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    this.textContent = input.type === 'password' ? '👁️' : '🙈';
   });
   document.getElementById('toggleRegConfirmPwd').addEventListener('click', function() {
-     const isHidden = regConfirmPassword.type === 'password'; regConfirmPassword.type = isHidden ? 'text' : 'password'; this.textContent = isHidden ? '🙈' : '👁️';
+    const input = document.getElementById('regConfirmPassword');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    this.textContent = input.type === 'password' ? '👁️' : '🙈';
   });
-
-  document.addEventListener('mousemove', (e) => {
-    if (head3d.classList.contains('turned')) return;
-    const scene = document.querySelector('.scene'), rect = scene.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2, centerY = rect.top + 130;
-    const dx = e.clientX - centerX, dy = e.clientY - centerY;
-    const angle = Math.atan2(dy, dx), distance = Math.min(Math.sqrt(dx * dx + dy * dy) / 50, 3);
-    const px = Math.cos(angle) * distance, py = Math.sin(angle) * distance;
-    pupilL.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
-    pupilR.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
-  });
-  setInterval(() => { if (!head3d.classList.contains('turned')) blinkEyes(); }, 3000 + Math.random() * 2000);
-
-  // Initialize Theme based on LocalStorage
-  if (localStorage.getItem('darkMode') === 'true') {
-      document.body.classList.add('dark');
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      if (darkModeToggle) { darkModeToggle.classList.add('active'); const iconDiv = darkModeToggle.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = '☀️'; }
-  }
 </script>
 </body>
 </html>
