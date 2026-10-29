@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DompetKu - 3D Circular</title>
+    <title>DompetKu</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -340,11 +340,6 @@
         
         #photoInput { display: none !important; position: absolute; opacity: 0; pointer-events: none; }
         
-        .toggle-switch { width: 50px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; border: 1px solid rgba(255,255,255,0.3); }
-        .toggle-switch.active { background: #667eea; }
-        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .toggle-switch.active::after { transform: translateX(22px); }
-        
         .version-badge { display: inline-block; padding: 4px 12px; background: rgba(255,255,255,0.2); color: white; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px; border: 1px solid rgba(255,255,255,0.3); }
         
         .notif-badge { position: absolute; top: 0px; right: 0px; background: #ef473a; color: white; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: none; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid rgba(255,255,255,0.2); animation: pulse 2s infinite; line-height: 1; }
@@ -561,16 +556,10 @@
     <div id="page-settings" class="page">
         <div class="list-header">Akun & Keamanan</div>
         <div class="menu-list">
-            <div class="menu-item" onclick="openEditProfile()"><div class="menu-icon"></div><div class="menu-text"><div style="font-weight:600;">Profil Saya</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Ubah nama dan foto</div></div><div class="menu-arrow">›</div></div>
-            <div class="menu-item" onclick="openChangePassword()"><div class="menu-icon"></div><div class="menu-text"><div style="font-weight:600;">Ubah Kata Sandi</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Perbarui kata sandi</div></div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openEditProfile()"><div class="menu-icon">👤</div><div class="menu-text"><div style="font-weight:600;">Profil Saya</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Ubah nama dan foto</div></div><div class="menu-arrow">›</div></div>
+            <div class="menu-item" onclick="openChangePassword()"><div class="menu-icon">🔒</div><div class="menu-text"><div style="font-weight:600;">Ubah Kata Sandi</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Perbarui kata sandi</div></div><div class="menu-arrow">›</div></div>
         </div>
-        <div class="list-header">Preferensi</div>
-        <div class="menu-list">
-            <div class="menu-item">
-                <div class="menu-icon">🌙</div><div class="menu-text">Mode Gelap</div>
-                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode(this)"></div>
-            </div>
-        </div>
+        <!-- Bagian Mode Gelap telah dihapus dari sini -->
         <div style="margin-top:30px;"><button class="action-btn" style="background:var(--danger);" onclick="handleLogout()">Keluar dari Akun</button></div>
     </div>
 
@@ -616,91 +605,71 @@
 
     const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0);
     const pageTitles = { home: { title: 'DompetKu', subtitle: 'Ringkasan keuangan Anda' }, input: { title: 'Input Data', subtitle: 'Tambah tabungan atau pinjaman' }, debt: { title: 'Daftar Hutang', subtitle: 'Kelola semua pinjaman aktif' }, history: { title: 'Riwayat Hutang', subtitle: 'Catatan pembayaran cicilan' }, tabungan: { title: 'Rekapan Tabungan', subtitle: 'Riwayat tabungan' }, account: { title: 'Akun Saya', subtitle: 'Pengaturan profil' }, settings: { title: 'Pengaturan', subtitle: 'Kelola preferensi' } };
-    const svgIcons = { user: '👤', lock: '🔒', trash: '🗑️', edit: '️', money: '💰', logout: '🚪', warning: '⚠️' };
+    const svgIcons = { user: '👤', lock: '🔒', trash: '🗑️', edit: '✏️', money: '💰', logout: '🚪', warning: '⚠️' };
 
-    // Cek apakah browser mendukung notifikasi
-function isNotificationSupported() {
-    return "Notification" in window && Notification.permission !== "denied";
-}
+    function isNotificationSupported() {
+        return "Notification" in window && Notification.permission !== "denied";
+    }
 
-function requestNotificationPermission() {
-    // Cek dukungan browser
-    if (!("Notification" in window)) {
-        showToast("⚠️ Browser Anda tidak mendukung notifikasi. Gunakan Chrome/Firefox di HTTPS.", "warning");
-        return;
-    }
-    
-    // Cek apakah sudah diblokir
-    if (Notification.permission === "denied") {
-        showToast("🚫 Notifikasi diblokir. Buka pengaturan browser untuk mengizinkan.", "error");
-        return;
-    }
-    
-    // Minta izin
-    Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-            showToast("✅ Notifikasi diaktifkan!", "success");
-            new Notification("DompetKu", { 
-                body: "Notifikasi berhasil diaktifkan!",
-                icon: "https://cdn-icons-png.flaticon.com/512/2933/2933245.png"
-            });
-        } else if (permission === "denied") {
-            showToast(" Izin notifikasi ditolak. Buka pengaturan browser untuk mengubahnya.", "warning");
-        } else {
-            showToast("⚠️ Izin notifikasi diabaikan.", "warning");
+    function requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            showToast("⚠️ Browser Anda tidak mendukung notifikasi. Gunakan Chrome/Firefox di HTTPS.", "warning");
+            return;
         }
-    }).catch(err => {
-        showToast("❌ Gagal: " + err.message, "error");
-    });
-}
-
-function checkNotifications() {
-    const today = new Date().toISOString().split('T')[0];
-    let dueLoans = [], notificationCount = 0;
-    
-    if (userData.loans) {
-        userData.loans.forEach(loan => {
-            loan.installments.forEach(inst => {
-                if (!inst.isPaid && inst.dueDate <= today) {
-                    dueLoans.push({ 
-                        loan: loan.source, 
-                        date: inst.dueDate, 
-                        amount: inst.amount, 
-                        month: inst.monthIndex, 
-                        loanId: loan.id, 
-                        instId: inst.id 
-                    });
-                    notificationCount++;
-                }
-            });
+        if (Notification.permission === "denied") {
+            showToast("🚫 Notifikasi diblokir. Buka pengaturan browser untuk mengizinkan.", "error");
+            return;
+        }
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                showToast("✅ Notifikasi diaktifkan!", "success");
+                new Notification("DompetKu", { 
+                    body: "Notifikasi berhasil diaktifkan!",
+                    icon: "https://cdn-icons-png.flaticon.com/512/2933/2933245.png"
+                });
+            } else if (permission === "denied") {
+                showToast("🚫 Izin notifikasi ditolak. Buka pengaturan browser untuk mengubahnya.", "warning");
+            } else {
+                showToast("⚠️ Izin notifikasi diabaikan.", "warning");
+            }
+        }).catch(err => {
+            showToast("❌ Gagal: " + err.message, "error");
         });
     }
-    
-    const badge = document.getElementById('notifBadge');
-    if (badge) { 
-        badge.innerText = notificationCount; 
-        badge.style.display = notificationCount > 0 ? 'flex' : 'none'; 
-    }
-    
-    window.currentNotifications = { dueLoans, count: notificationCount };
-    
-    // Tampilkan notifikasi browser HANYA jika didukung
-    if (notificationCount > 0 && !window.hasShownDueNotification) {
-        if (isNotificationSupported() && Notification.permission === "granted") {
-            try {
-                new Notification('DompetKu - Pengingat Tagihan! 🔔', { 
-                    body: `Anda memiliki ${notificationCount} cicilan yang jatuh tempo.`, 
-                    icon: 'https://cdn-icons-png.flaticon.com/512/2933/2933245.png' 
+
+    function checkNotifications() {
+        const today = new Date().toISOString().split('T')[0];
+        let dueLoans = [], notificationCount = 0;
+        if (userData.loans) {
+            userData.loans.forEach(loan => {
+                loan.installments.forEach(inst => {
+                    if (!inst.isPaid && inst.dueDate <= today) {
+                        dueLoans.push({ loan: loan.source, date: inst.dueDate, amount: inst.amount, month: inst.monthIndex, loanId: loan.id, instId: inst.id });
+                        notificationCount++;
+                    }
                 });
-            } catch(e) {
-                console.log("Notifikasi browser gagal:", e);
-            }
+            });
         }
-        // Fallback: tampilkan toast in-app
-        showToast(` Anda punya ${notificationCount} tagihan jatuh tempo!`, "warning");
-        window.hasShownDueNotification = true;
+        const badge = document.getElementById('notifBadge');
+        if (badge) { 
+            badge.innerText = notificationCount; 
+            badge.style.display = notificationCount > 0 ? 'flex' : 'none'; 
+        }
+        window.currentNotifications = { dueLoans, count: notificationCount };
+        if (notificationCount > 0 && !window.hasShownDueNotification) {
+            if (isNotificationSupported() && Notification.permission === "granted") {
+                try {
+                    new Notification('DompetKu - Pengingat Tagihan! 🔔', { 
+                        body: `Anda memiliki ${notificationCount} cicilan yang jatuh tempo.`, 
+                        icon: 'https://cdn-icons-png.flaticon.com/512/2933/2933245.png' 
+                    });
+                } catch(e) { console.log("Notifikasi browser gagal:", e); }
+            }
+            showToast(`⚠️ Anda punya ${notificationCount} tagihan jatuh tempo!`, "warning");
+            window.hasShownDueNotification = true;
+        }
     }
-  }
+
     function openNotificationModal() {
         checkNotifications();
         const modal = document.getElementById('notifModalOverlay'), list = document.getElementById('notifList'), notifs = window.currentNotifications;
@@ -745,7 +714,6 @@ function checkNotifications() {
     function updateVersionDisplay() { const v = getAppVersion(); const b = document.getElementById('versionBadge'); if (b) b.textContent = `DompetKu v${v}`; }
     incrementVersion();
 
-    // ===== INI YANG MENANGANI PERPINDAHAN KE HALAMAN UTAMA =====
     auth.onAuthStateChanged((user) => { 
         if (user) { 
             currentUser = user; 
@@ -796,7 +764,7 @@ function checkNotifications() {
         document.getElementById('regPassword').type = 'password'; 
         document.getElementById('regConfirmPassword').type = 'password';
         document.getElementById('toggleLoginPwd').textContent = '👁️'; 
-        document.getElementById('toggleRegPwd').textContent = '️'; 
+        document.getElementById('toggleRegPwd').textContent = '👁️'; 
         document.getElementById('toggleRegConfirmPwd').textContent = '👁️';
 
         if (form === 'login') {
@@ -925,7 +893,7 @@ function checkNotifications() {
     
     function openEditProfile() { 
         tempPhotoData = userData.photo; 
-        showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div style="text-align:center; margin-bottom:20px;"><img id="photoPreview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview" class="avatar" style="margin:0 auto 10px auto;"><button class="btn-mini" onclick="triggerPhotoUpload()"> Ganti Foto</button><div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" class="main-input" value="${userData.name}"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
+        showModal({ icon: 'user', iconType: 'info', title: 'Edit Profil', customHTML: `<div style="text-align:center; margin-bottom:20px;"><img id="photoPreview" src="${tempPhotoData || ''}" style="${tempPhotoData ? 'display:block' : 'display:none'}" alt="Preview" class="avatar" style="margin:0 auto 10px auto;"><button class="btn-mini" onclick="triggerPhotoUpload()">📷 Ganti Foto</button><div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Maksimal 500KB</div></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="editName" class="main-input" value="${userData.name}"></div>`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async () => { 
             const newName = document.getElementById('editName').value.trim(); if (!newName) { showToast('Nama harus diisi!', 'error'); return false; } 
             try { 
                 await currentUser.updateProfile({ displayName: newName }); 
@@ -983,11 +951,7 @@ function checkNotifications() {
     }
     function goBack() { if (currentPage === 'history') switchPage('debt'); else switchPage(previousPage); }
     function openSettings() { switchPage('settings'); }
-    function toggleDarkMode(element) { 
-        element.classList.toggle('active'); document.body.classList.toggle('dark'); 
-        const isDark = document.body.classList.contains('dark'); localStorage.setItem('darkMode', isDark);
-        const iconDiv = element.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = isDark ? '☀️' : '';
-    }
+    
     function confirmResetData() { 
         showModal({ icon: 'warning', iconType: 'danger', title: 'Hapus SEMUA Data?', description: 'Seluruh data akan dihapus permanen.', buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Ya, Hapus', class: 'danger', action: async () => { 
             userData.loans = []; userData.savings = []; await saveData(); render(); showToast('Data dihapus.', 'warning'); 
@@ -1219,11 +1183,6 @@ function checkNotifications() {
 
     document.getElementById('loanDateStart').valueAsDate = new Date();
     document.getElementById('termStartDate').valueAsDate = new Date();
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark');
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        if (darkModeToggle) { darkModeToggle.classList.add('active'); const iconDiv = darkModeToggle.parentElement.querySelector('.menu-icon'); if(iconDiv) iconDiv.innerText = '☀️'; }
-    }
     updateVersionDisplay();
 </script>
 
