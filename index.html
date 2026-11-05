@@ -293,11 +293,109 @@
         .btn-mini.edit { border-color: #fcc419; color: white; background: rgba(252, 196, 25, 0.2); }
         .btn-mini.del { border-color: #ef473a; color: white; background: rgba(239, 71, 58, 0.2); margin-left: 4px; }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 100; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; padding: 4px; }
-        .nav-item.active { color: white; text-shadow: 0 0 10px rgba(255,255,255,0.5); } .nav-item:not(.active) { color: rgba(255,255,255,0.6); }
-        .nav-icon { width: 22px; height: 22px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); } .nav-label { font-size: 10px; font-weight: 600; }
-        
+        /* ===== NAVIGASI DENGAN LINGKARAN TIMBUL (STYLE KE-3) ===== */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100%);
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255,255,255,0.15); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center;
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); 
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.2); 
+            z-index: 100;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .nav-item { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            gap: 6px; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 8px;
+            position: relative;
+            z-index: 1;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .nav-icon { 
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .nav-label { 
+            font-size: 10px; 
+            font-weight: 600;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        /* Efek lingkaran timbul untuk tab aktif */
+        .nav-item.active .nav-icon {
+            background: linear-gradient(135deg, #66cc99 0%, #4CAF50 100%);
+            box-shadow: 
+                0 4px 15px rgba(102, 204, 153, 0.5),
+                0 0 0 4px rgba(102, 204, 153, 0.2),
+                inset 0 2px 4px rgba(255,255,255,0.3);
+            transform: translateY(-8px) scale(1.1);
+            color: white;
+            filter: none;
+        }
+
+        .nav-item.active .nav-label {
+            opacity: 1;
+            color: #66cc99;
+            font-weight: 700;
+            transform: translateY(-2px);
+        }
+
+        /* Animasi bounce saat aktif */
+        @keyframes bounceIn {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-12px) scale(1.15);
+            }
+            100% {
+                transform: translateY(-8px) scale(1.1);
+            }
+        }
+
+        .nav-item.active .nav-icon {
+            animation: bounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        .nav-item:hover .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-item:not(.active) {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .nav-item:not(.active) .nav-label {
+            color: rgba(255,255,255,0.5);
+        }
+      
         .account-header { text-align: center; padding: 30px 20px; background: rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
         .avatar-container { position: relative; display: inline-block; margin-bottom: 16px; }
         .avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; margin: 0 auto; object-fit: cover; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden; }
@@ -1062,29 +1160,50 @@
 
     function switchPage(page) {
         currentPage = page; 
+        
+        // Update active state di navigation dengan smooth transition
+        const pages = ['home', 'input', 'debt', 'tabungan', 'account'];
+        document.querySelectorAll('.nav-item').forEach((item, index) => {
+            if (pages[index] === page) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
         document.getElementById('backButton').style.display = 'none';
         document.getElementById('btnBackToHome').style.display = 'none';
+        document.getElementById('btnResetSavingsFilter').style.display = 'none';
+        
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById(`page-${page}`).classList.add('active');
-        const navItems = document.querySelectorAll('.nav-item'), navMap = { home: 0, input: 1, debt: 2, tabungan: 3, account: 4 };
-        if (navMap[page] !== undefined) navItems[navMap[page]].classList.add('active');
+        
         document.getElementById('pageTitle').innerText = pageTitles[page].title;
         document.getElementById('pageSubtitle').innerText = pageTitles[page].subtitle;
-        const headerExtra = document.getElementById('headerExtraAction'); headerExtra.innerHTML = '';
-        if (page === 'debt') headerExtra.innerHTML = `<button class="header-btn" onclick="switchPage('history')">📋 Riwayat</button>`;
-        else if (page === 'tabungan') {
-            resetSavingsFilter(); // <-- TAMBAHKAN INI
+        
+        const headerExtra = document.getElementById('headerExtraAction'); 
+        headerExtra.innerHTML = '';
+        
+        if (page === 'debt') {
+            headerExtra.innerHTML = `<button class="header-btn" onclick="switchPage('history')">📋 Riwayat</button>`;
+        } else if (page === 'tabungan') {
+            resetSavingsFilter();
             headerExtra.innerHTML = `<div class="search-wrapper"><input type="text" class="header-search-input" id="searchTabunganHeader" placeholder="Cari nama/ket..." onkeyup="filterTabungan(this.value)"><div class="search-icon-btn" onclick="toggleSearchInput()">🔍</div></div>`;
         }
-        const backButton = document.getElementById('backButton'), bottomNav = document.getElementById('bottomNav');
+        
+        const bottomNav = document.getElementById('bottomNav');
         if (page === 'settings' || page === 'history') { 
-            backButton.style.display = 'inline-flex'; 
-            if(page === 'settings') bottomNav.style.display = 'none'; else bottomNav.style.display = 'flex';
+            document.getElementById('backButton').style.display = 'inline-flex'; 
+            if(page === 'settings') bottomNav.style.display = 'none'; 
+            else bottomNav.style.display = 'flex';
             previousPage = page === 'history' ? 'debt' : 'account'; 
-        } else { backButton.style.display = 'none'; bottomNav.style.display = 'flex'; }
+        } else { 
+            bottomNav.style.display = 'flex'; 
+        }
+        
         render();
     }
+  
     function toggleSearchInput() {
         const input = document.getElementById('searchTabunganHeader');
         if (input) { input.classList.toggle('active'); if (input.classList.contains('active')) input.focus(); else { input.value = ''; filterTabungan(''); } }
@@ -1705,5 +1824,7 @@
     this.textContent = input.type === 'password' ? '👁️' : '🙈';
   });
 </script>
+  
+  
 </body>
 </html>
