@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DompetKu - 3D Circular</title>
+    <title>DompetKu</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -489,6 +489,9 @@
 <div class="container" id="mainApp">
     <header>
         <div id="backButton" class="header-back" style="display:none;" onclick="goBack()">← Kembali</div>
+        <div id="btnBackToHome" class="header-back" style="display:none;" onclick="switchPage('home')">← Kembali</div>
+        <div id="btnResetSavingsFilter" class="header-back" style="display:none;" onclick="resetSavingsFilter()">← Kembali</div>
+      
         <div class="header-content">
             <div class="header-left">
                 <h1 id="pageTitle">DompetKu</h1>
@@ -581,6 +584,14 @@
             <div class="summary-card info"><div class="summary-label">Total Reguler</div><div class="summary-value" id="tabTotalReguler">Rp 0</div></div>
             <div class="summary-card remaining"><div class="summary-label">Total Berjangka</div><div class="summary-value" id="tabTotalBerjangka">Rp 0</div></div>
         </div>
+      <div class="list-header">Ringkasan Reguler Per Orang</div>
+        <div class="grid-cards" id="summaryRegulerGrid"></div>
+        
+        <div class="list-header">Ringkasan Berjangka Per Orang</div>
+        <div class="grid-cards" id="summaryBerjangkaGrid"></div>
+
+        <div class="list-header">Rekapan Detail</div>
+        <div id="tabunganList"></div>
         <div class="list-header">Rekapan Detail</div><div id="tabunganList"></div>
     </div>
     <div id="page-account" class="page">
@@ -652,7 +663,6 @@
 
         <div class="settings-section-title" data-i18n="language">BAHASA</div>
         <div class="menu-list lang-list" id="languageList">
-            <!-- Diisi oleh JavaScript -->
         </div>
 
         <div class="settings-section-title" data-i18n="notifications">NOTIFIKASI</div>
@@ -1052,6 +1062,8 @@
 
     function switchPage(page) {
         currentPage = page; 
+        document.getElementById('backButton').style.display = 'none';
+        document.getElementById('btnBackToHome').style.display = 'none';
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById(`page-${page}`).classList.add('active');
@@ -1061,7 +1073,10 @@
         document.getElementById('pageSubtitle').innerText = pageTitles[page].subtitle;
         const headerExtra = document.getElementById('headerExtraAction'); headerExtra.innerHTML = '';
         if (page === 'debt') headerExtra.innerHTML = `<button class="header-btn" onclick="switchPage('history')">📋 Riwayat</button>`;
-        else if (page === 'tabungan') headerExtra.innerHTML = `<div class="search-wrapper"><input type="text" class="header-search-input" id="searchTabunganHeader" placeholder="Cari nama/ket..." onkeyup="filterTabungan(this.value)"><div class="search-icon-btn" onclick="toggleSearchInput()">🔍</div></div>`;
+        else if (page === 'tabungan') {
+            resetSavingsFilter(); // <-- TAMBAHKAN INI
+            headerExtra.innerHTML = `<div class="search-wrapper"><input type="text" class="header-search-input" id="searchTabunganHeader" placeholder="Cari nama/ket..." onkeyup="filterTabungan(this.value)"><div class="search-icon-btn" onclick="toggleSearchInput()">🔍</div></div>`;
+        }
         const backButton = document.getElementById('backButton'), bottomNav = document.getElementById('bottomNav');
         if (page === 'settings' || page === 'history') { 
             backButton.style.display = 'inline-flex'; 
@@ -1090,24 +1105,61 @@
     }
     document.getElementById('loanDuration').addEventListener('input', updateEstimate);
     document.getElementById('loanTotalAmount').addEventListener('input', updateEstimate);
+  
     function updateEstimate() { 
         const total = parseInt(document.getElementById('loanTotalAmount').value) || 0, duration = parseInt(document.getElementById('loanDuration').value) || 0, estEl = document.getElementById('estInstallment'); 
         if (total > 0 && duration > 0) { estEl.innerText = `Estimasi cicilan/bulan: ${formatRupiah(Math.round(total / duration))}`; } 
         else { estEl.innerText = ''; } 
     }
     async function createLoanSchedule() {
-        const source = document.getElementById('loanSource').value.trim(), duration = parseInt(document.getElementById('loanDuration').value), startDateStr = document.getElementById('loanDateStart').value, totalAmount = parseInt(document.getElementById('loanTotalAmount').value) || 0;
-        if (!source || !duration || !startDateStr || totalAmount <= 0) { showToast('Lengkapi semua data!', 'error'); return; }
-        const loanId = Date.now().toString(), startDate = new Date(startDateStr); let installments = [];
-        for (let i = 1; i <= duration; i++) { 
-            let dueDate = new Date(startDate); dueDate.setMonth(dueDate.getMonth() + i); 
-            installments.push({ id: `${loanId}_${i}`, monthIndex: i, totalMonths: duration, amount: 0, dueDate: dueDate.toISOString().split('T')[0], isPaid: false, paidDate: null, createdBy: currentUser.uid }); 
+        const source = document.getElementById('loanSource').value.trim(), 
+              duration = parseInt(document.getElementById('loanDuration').value), 
+              startDateStr = document.getElementById('loanDateStart').value, 
+              totalAmount = parseInt(document.getElementById('loanTotalAmount').value) || 0;
+        
+        if (!source || !duration || !startDateStr || totalAmount <= 0) { 
+            showToast('Lengkapi semua data!', 'error'); 
+            return; 
         }
-        userData.loans.push({ id: loanId, source, duration, totalAmount, startDate: startDateStr, installments, createdBy: currentUser.uid, createdAt: Date.now() });
+        
+        const loanId = Date.now().toString(), startDate = new Date(startDateStr); 
+        let installments = [];
+        
+        for (let i = 1; i <= duration; i++) {
+            let dueDate = new Date(startDate); 
+            dueDate.setMonth(dueDate.getMonth() + i);
+            installments.push({ 
+                id: `${loanId}_${i}`, 
+                monthIndex: i, 
+                totalMonths: duration, 
+                amount: 0, 
+                dueDate: dueDate.toISOString().split('T')[0], 
+                isPaid: false, 
+                paidDate: null, 
+                createdBy: currentUser.uid 
+            });
+        }
+        
+        userData.loans.push({ 
+            id: loanId, 
+            source, 
+            duration, 
+            totalAmount, 
+            startDate: startDateStr, 
+            installments, 
+            createdBy: currentUser.uid, 
+            createdAt: Date.now() // <-- INI YANG DITAMBAHKAN
+        });
+        
         await saveData();
-        document.getElementById('loanSource').value = ''; document.getElementById('loanDuration').value = ''; document.getElementById('loanTotalAmount').value = ''; document.getElementById('estInstallment').innerText = '';
-        render(); showToast('Jadwal cicilan dibuat!', 'success');
+        document.getElementById('loanSource').value = ''; 
+        document.getElementById('loanDuration').value = ''; 
+        document.getElementById('loanTotalAmount').value = ''; 
+        document.getElementById('estInstallment').innerText = '';
+        render(); 
+        showToast('Jadwal cicilan dibuat!', 'success');
     }
+  
     function editInstallmentAmount(loanId, instId) { 
         const loan = userData.loans.find(l => l.id === loanId), inst = loan.installments.find(i => i.id === instId); 
         showModal({ icon: 'edit', iconType: 'warning', title: 'Isi Nominal', description: `Bulan ke-${inst.monthIndex} dari ${inst.totalMonths}`, input: { type: 'number', placeholder: 'Nominal...', value: inst.amount || '' }, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Simpan', class: 'primary', action: async (val) => { 
@@ -1150,61 +1202,183 @@
             render(); showToast('Jadwal tabungan berjangka dibuat!', 'success');
         }
     }
-    function delSaving(idx) { 
-        const s = userData.savings[idx]; 
+  
+    function delSavingById(id) { 
+        const s = userData.savings.find(x => x.id === id);
+        if (!s) return;
         showModal({ icon: 'trash', iconType: 'danger', title: 'Hapus Transaksi?', description: `Hapus tabungan "${s.person}"?`, buttons: [{ text: 'Batal', class: 'secondary' }, { text: 'Hapus', class: 'danger', action: async () => { 
-            userData.savings.splice(idx, 1); await saveData(); render(); showToast('Transaksi dihapus.', 'success'); 
+            userData.savings = userData.savings.filter(x => x.id !== id); 
+            await saveData(); 
+            render(); 
+            showToast('Transaksi dihapus.', 'success'); 
         }}]}); 
     }
+  
     function checkCustom(type) { 
         const val = selectedValues[type === 'save' ? 'savePerson' : 'termPerson'] || '';
         document.getElementById(type === 'save' ? 'savePersonCustom' : 'termPersonCustom').style.display = (val === 'custom') ? 'block' : 'none'; 
     }
 
     function render() { renderHome(); renderDebtList(); renderHistoryList(); renderTabunganList(); updateSavingsDropdown(); checkNotifications(); }
+
+    function viewPersonDebt(personName) {
+    switchPage('debt');
+    document.getElementById('btnBackToHome').style.display = 'inline-flex';
+    document.getElementById('backButton').style.display = 'none';
+
+    const debtList = document.getElementById('debtList');
+    const allLoans = userData.loans.filter(loan => loan.source === personName);
     
-    function renderHome() {
-        const totalSavingsEl = document.getElementById('dashTotalSavings'), totalDebtEl = document.getElementById('dashTotalDebt'), remainingDebtEl = document.getElementById('dashRemainingDebt'), summaryGrid = document.getElementById('homeSummaryGrid'), recentActivity = document.getElementById('homeRecentActivity');
-        let totalSavings = 0, totalDebt = 0, remainingDebt = 0, summaryMap = {}, recentItems = [];
-        userData.savings.forEach(s => { 
-            if(s.type === 'reguler') totalSavings += s.amount; 
-            if(s.type === 'berjangka' && s.installments) s.installments.forEach(inst => totalSavings += (inst.amount || 0)); 
-            recentItems.push({ type: 'saving', data: s }); 
-        });
-        userData.loans.forEach(loan => { 
-            let loanTotal = 0, loanRemaining = 0; 
-            loan.installments.forEach(inst => { 
-                loanTotal += inst.amount; if (!inst.isPaid && inst.amount > 0) loanRemaining += inst.amount; 
-                recentItems.push({ type: 'loan', loan, inst }); 
-            }); 
-            totalDebt += loanTotal; remainingDebt += loanRemaining; 
-            if (!summaryMap[loan.source]) summaryMap[loan.source] = { debt: 0, remaining: 0 }; 
-            summaryMap[loan.source].debt += loanTotal; summaryMap[loan.source].remaining += loanRemaining; 
-        });
-        totalSavingsEl.innerText = formatRupiah(totalSavings); totalDebtEl.innerText = formatRupiah(totalDebt); remainingDebtEl.innerText = formatRupiah(remainingDebt);
-        summaryGrid.innerHTML = ''; 
-        for (const [name, vals] of Object.entries(summaryMap)) { 
-            summaryGrid.innerHTML += `<div class="mini-card"><div class="mini-card-name">${name}</div><div class="mini-card-val val-danger">${formatRupiah(vals.remaining)}</div><div style="font-size:10px; color:var(--text-muted); margin-top:4px;">dari ${formatRupiah(vals.debt)}</div></div>`; 
-        }
-        recentItems.sort((a, b) => { 
-            const dA = a.type === 'saving' ? new Date(a.data.date || a.data.startDate) : new Date(a.inst.dueDate); 
-            const dB = b.type === 'saving' ? new Date(b.data.date || b.data.startDate) : new Date(b.inst.dueDate); 
-            return dB - dA; 
-        });
-        recentActivity.innerHTML = ''; 
-        if (recentItems.length === 0) { recentActivity.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada aktivitas</div>'; } 
-        else { 
-            recentItems.slice(0, 5).forEach(item => { 
-                if (item.type === 'saving') { 
-                    const badge = item.data.type === 'berjangka' ? '<span class="badge" style="background:rgba(102,126,234,0.3);color:#a0c4ff">Berjangka</span>' : '<span class="badge badge-paid">Reguler</span>'; 
-                    recentActivity.innerHTML += `<div class="item-card" style="display:flex; align-items:center;"><div class="item-icon icon-save">💰</div><div class="item-info"><div class="item-title">${item.data.person} ${badge}</div><div class="item-sub">${item.data.note || 'Tabungan Berjangka'} • ${item.data.date || item.data.startDate}</div></div><div class="item-action"><span class="item-amount val-success">+${formatRupiah(item.data.amount || (item.data.installments ? item.data.installments.reduce((sum, i) => sum + (i.amount || 0), 0) : 0))}</span></div></div>`; 
-                } else { 
-                    const badge = item.inst.isPaid ? '<span class="badge badge-paid">Lunas</span>' : '<span class="badge badge-unpaid">Belum Bayar</span>'; 
-                    recentActivity.innerHTML += `<div class="item-card" style="display:flex; align-items:center;"><div class="item-icon icon-loan">💳</div><div class="item-info"><div class="item-title">${item.loan.source}</div><div class="item-sub">Cicilan ${item.inst.monthIndex}/${item.inst.totalMonths} • ${item.inst.dueDate}</div></div><div class="item-action"><span class="item-amount val-danger">${formatRupiah(item.inst.amount)}</span>${badge}</div></div>`; 
-                } 
-            }); 
-        }
+    if (allLoans.length === 0) {
+        debtList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Tidak ada pinjaman untuk ' + personName + '</div>';
+        return;
     }
+    
+    let html = '';
+    allLoans.forEach(loan => {
+        let itemsHtml = '';
+        loan.installments.forEach(inst => {
+            const dateStr = new Date(inst.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            let actions = '';
+            if (!inst.isPaid) {
+                actions += `<button class="btn-mini edit" onclick="editInstallmentAmount('${loan.id}', '${inst.id}')">Isi</button>`;
+                actions += `<button class="btn-mini pay" onclick="payInstallment('${loan.id}', '${inst.id}')">Bayar</button>`;
+            } else {
+                actions += `<span class="badge badge-paid">Lunas</span>`;
+            }
+            itemsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed rgba(255,255,255,0.1);">
+                <div>
+                    <div style="font-weight:600; font-size:14px;">Cicilan ${inst.monthIndex}/${inst.totalMonths}</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${inst.amount > 0 ? formatRupiah(inst.amount) : '<span style="color:#aaa">Belum diisi</span>'}</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Jatuh tempo: ${dateStr}</div>
+                </div>
+                <div style="text-align:right">${actions}</div>
+            </div>`;
+        });
+        
+        html += `<div class="item-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="item-icon icon-loan"></div>
+                    <div>
+                        <div class="item-title">${loan.source}</div>
+                        <div class="item-sub">${loan.duration} Bulan • Mulai ${loan.startDate}</div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-left:52px;">${itemsHtml}</div>
+        </div>`;
+    });
+    
+    debtList.innerHTML = html;
+    document.getElementById('pageTitle').innerText = 'Hutang - ' + personName;
+    document.getElementById('pageSubtitle').innerText = 'Detail cicilan ' + personName;
+  }
+  
+  function renderHome() {
+    const totalSavingsEl = document.getElementById('dashTotalSavings'), 
+          totalDebtEl = document.getElementById('dashTotalDebt'), 
+          remainingDebtEl = document.getElementById('dashRemainingDebt'), 
+          summaryGrid = document.getElementById('homeSummaryGrid'), 
+          recentActivity = document.getElementById('homeRecentActivity');
+    
+    let totalSavings = 0, totalDebt = 0, remainingDebt = 0, summaryMap = {}, recentItems = [];
+    userData.savings.forEach(s => {
+        if(s.type === 'reguler') totalSavings += s.amount;
+        if(s.type === 'berjangka' && s.installments) s.installments.forEach(inst => totalSavings += (inst.amount || 0));
+        recentItems.push({ type: 'saving', data: s, timestamp: s.date ? new Date(s.date).getTime() : new Date(s.startDate).getTime() });
+    });
+    userData.loans.forEach(loan => {
+        recentItems.push({ 
+            type: 'loan_created', 
+            data: loan, 
+            timestamp: loan.createdAt || new Date(loan.startDate).getTime() 
+        });
+        
+        let loanTotal = 0, loanRemaining = 0;
+        loan.installments.forEach(inst => {
+            loanTotal += inst.amount; 
+            if (!inst.isPaid && inst.amount > 0) loanRemaining += inst.amount;
+            recentItems.push({ 
+                type: 'loan_payment', 
+                loan, 
+                inst,
+                timestamp: inst.paidDate ? new Date(inst.paidDate).getTime() : new Date(inst.dueDate).getTime()
+            });
+        });
+        totalDebt += loanTotal; 
+        remainingDebt += loanRemaining;
+        
+        if (!summaryMap[loan.source]) summaryMap[loan.source] = { debt: 0, remaining: 0 };
+        summaryMap[loan.source].debt += loanTotal; 
+        summaryMap[loan.source].remaining += loanRemaining;
+    });
+    
+    totalSavingsEl.innerText = formatRupiah(totalSavings); 
+    totalDebtEl.innerText = formatRupiah(totalDebt); 
+    remainingDebtEl.innerText = formatRupiah(remainingDebt);
+    summaryGrid.innerHTML = '';
+    for (const [name, vals] of Object.entries(summaryMap)) {
+        summaryGrid.innerHTML += `
+            <div class="mini-card" style="cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="viewPersonDebt('${name}')">
+                <div class="mini-card-name">${name}</div>
+                <div class="mini-card-val val-danger">${formatRupiah(vals.remaining)}</div>
+                <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">dari ${formatRupiah(vals.debt)}</div>
+            </div>`;
+    }
+    recentItems.sort((a, b) => b.timestamp - a.timestamp);
+    recentActivity.innerHTML = '';
+    if (recentItems.length === 0) {
+        recentActivity.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada aktivitas</div>';
+    } else {
+        recentItems.slice(0, 10).forEach(item => {
+            if (item.type === 'saving') {
+                const badge = item.data.type === 'berjangka' ? 
+                    '<span class="badge" style="background:rgba(102,126,234,0.3);color:#a0c4ff">Berjangka</span>' : 
+                    '<span class="badge badge-paid">Reguler</span>';
+                recentActivity.innerHTML += `
+                    <div class="item-card" style="display:flex; align-items:center;">
+                        <div class="item-icon icon-save">💰</div>
+                        <div class="item-info">
+                            <div class="item-title">${item.data.person} ${badge}</div>
+                            <div class="item-sub">Baru menabung • ${item.data.note || 'Tabungan Berjangka'} • ${item.data.date || item.data.startDate}</div>
+                        </div>
+                        <div class="item-action">
+                            <span class="item-amount val-success">+${formatRupiah(item.data.amount || (item.data.installments ? item.data.installments.reduce((sum, i) => sum + (i.amount || 0), 0) : 0))}</span>
+                        </div>
+                    </div>`;
+            } else if (item.type === 'loan_created') {
+                recentActivity.innerHTML += `
+                    <div class="item-card" style="display:flex; align-items:center;">
+                        <div class="item-icon icon-loan">📝</div>
+                        <div class="item-info">
+                            <div class="item-title">${item.data.source}</div>
+                            <div class="item-sub">Membuat daftar hutang baru • ${item.data.duration} bulan • ${item.data.startDate}</div>
+                        </div>
+                        <div class="item-action">
+                            <span class="item-amount val-primary">${formatRupiah(item.data.totalAmount)}</span>
+                            <span class="badge badge-unpaid">Baru</span>
+                        </div>
+                    </div>`;
+            } else if (item.type === 'loan_payment') {
+                const isPaid = item.inst.isPaid;
+                const badge = isPaid ? '<span class="badge badge-paid">Lunas</span>' : '<span class="badge badge-unpaid">Belum Bayar</span>';
+                recentActivity.innerHTML += `
+                    <div class="item-card" style="display:flex; align-items:center;">
+                        <div class="item-icon icon-loan">💳</div>
+                        <div class="item-info">
+                            <div class="item-title">${item.loan.source}</div>
+                            <div class="item-sub">${isPaid ? 'Baru membayar hutang' : 'Jatuh tempo'} • Cicilan ${item.inst.monthIndex}/${item.inst.totalMonths} • ${isPaid ? item.inst.paidDate : item.inst.dueDate}</div>
+                        </div>
+                        <div class="item-action">
+                            <span class="item-amount ${isPaid ? 'val-success' : 'val-danger'}">${formatRupiah(item.inst.amount)}</span>
+                            ${badge}
+                        </div>
+                    </div>`;
+            }
+        });
+    }
+  }  
     
     function renderDebtList() {
         const debtList = document.getElementById('debtList'); debtList.innerHTML = '';
@@ -1245,34 +1419,132 @@
             cards[i].style.display = txtValue.toLowerCase().indexOf(query) > -1 ? "" : "none";
         }
     }
+    let currentSavingsFilter = { person: null, type: null };
 
+    function filterSavingsByPerson(personName, type) {
+        currentSavingsFilter = { person: personName, type: type };
+        document.getElementById('pageTitle').innerText = `Tabungan - ${personName}`;
+        document.getElementById('pageSubtitle').innerText = type === 'reguler' ? 'Tabungan Reguler' : 'Tabungan Berjangka';
+
+        document.getElementById('btnResetSavingsFilter').style.display = 'inline-flex';
+        document.getElementById('backButton').style.display = 'none';
+        document.getElementById('btnBackToHome').style.display = 'none';
+        
+    }
+
+    function resetSavingsFilter() {
+        currentSavingsFilter = { person: null, type: null };
+        document.getElementById('pageTitle').innerText = pageTitles.tabungan.title;
+        document.getElementById('pageSubtitle').innerText = pageTitles.tabungan.subtitle;
+        document.getElementById('btnResetSavingsFilter').style.display = 'none';
+        renderTabunganList();
+    }
+  
     function renderTabunganList() {
-        const list = document.getElementById('tabunganList'); list.innerHTML = '';
+        const list = document.getElementById('tabunganList'); 
+        const regulerGrid = document.getElementById('summaryRegulerGrid');
+        const berjangkaGrid = document.getElementById('summaryBerjangkaGrid');
+        
+        list.innerHTML = '';
+        regulerGrid.innerHTML = '';
+        berjangkaGrid.innerHTML = '';
+        
         let totalReguler = 0, totalBerjangka = 0;
-        if (userData.savings.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada tabungan</div>'; } 
-        else {
-            [...userData.savings].reverse().forEach((s, idx) => {
-                const originalIdx = userData.savings.length - 1 - idx;
+        let regulerMap = {}, berjangkaMap = {};
+
+        // 1. Hitung Total & Kelompokkan Per Orang
+        userData.savings.forEach(s => {
+            if (s.type === 'reguler') {
+                totalReguler += s.amount;
+                if (!regulerMap[s.person]) regulerMap[s.person] = 0;
+                regulerMap[s.person] += s.amount;
+            } else if (s.type === 'berjangka' && s.installments) {
+                let personTotal = 0;
+                s.installments.forEach(inst => {
+                    if (inst.isPaid) { // Hanya hitung yang sudah ditabung
+                        totalBerjangka += (inst.amount || 0);
+                        personTotal += (inst.amount || 0);
+                    }
+                });
+                if (personTotal > 0) {
+                    if (!berjangkaMap[s.person]) berjangkaMap[s.person] = 0;
+                    berjangkaMap[s.person] += personTotal;
+                }
+            }
+        });
+
+        // 2. Render Grid Ringkasan Reguler
+        if (Object.keys(regulerMap).length === 0) {
+            regulerGrid.innerHTML = '<div style="color:var(--text-muted); font-size:12px; grid-column: 1/-1; text-align:center; padding:10px;">Belum ada data</div>';
+        } else {
+            for (const [name, amount] of Object.entries(regulerMap)) {
+                regulerGrid.innerHTML += `
+                    <div class="mini-card" style="cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="filterSavingsByPerson('${name}', 'reguler')">
+                        <div class="mini-card-name">${name}</div>
+                        <div class="mini-card-val val-success">${formatRupiah(amount)}</div>
+                    </div>`;
+            }
+        }
+
+        // 3. Render Grid Ringkasan Berjangka
+        if (Object.keys(berjangkaMap).length === 0) {
+            berjangkaGrid.innerHTML = '<div style="color:var(--text-muted); font-size:12px; grid-column: 1/-1; text-align:center; padding:10px;">Belum ada data</div>';
+        } else {
+            for (const [name, amount] of Object.entries(berjangkaMap)) {
+                berjangkaGrid.innerHTML += `
+                    <div class="mini-card" style="cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="filterSavingsByPerson('${name}', 'berjangka')">
+                        <div class="mini-card-name">${name}</div>
+                        <div class="mini-card-val val-primary">${formatRupiah(amount)}</div>
+                    </div>`;
+            }
+        }
+
+        // 4. Render Daftar Detail (dengan Filter)
+        if (userData.savings.length === 0) { 
+            list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada tabungan</div>'; 
+        } else {
+            let hasVisibleItems = false;
+            
+            [...userData.savings].reverse().forEach((s) => {
+                // TERAPKAN FILTER
+                if (currentSavingsFilter.person && s.person !== currentSavingsFilter.person) return;
+                if (currentSavingsFilter.type && s.type !== currentSavingsFilter.type) return;
+                
+                hasVisibleItems = true;
                 const isTerm = s.type === 'berjangka';
                 const badgeClass = isTerm ? 'tab-type-berjangka' : 'tab-type-reguler';
                 const badgeText = isTerm ? 'Berjangka (1 Thn)' : 'Reguler';
                 let detailsHtml = ''; 
+                
                 if (isTerm && s.installments) {
                     s.installments.forEach(inst => {
-                        totalBerjangka += (inst.amount || 0);
-                        const dateToShow = inst.paidDate ? inst.paidDate : inst.dueDate;
+                        const dateToShow = inst.paidDate ? inst.paidDate : inst.d2ueDate;
                         const dateLabel = inst.paidDate ? 'Tanggal menabung' : 'Jatuh tempo';
                         const dateStr = new Date(dateToShow).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                         let actions = '';
-                        if (!inst.isPaid) { actions += `<button class="btn-mini edit" onclick="editTermAmount('${s.id}', '${inst.id}')">Isi</button>`; actions += `<button class="btn-mini pay" onclick="payTerm('${s.id}', '${inst.id}')">Tabung</button>`; } 
-                        else { actions += `<span class="badge badge-paid">Lunas</span>`; }
-                        detailsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed var(--border);"><div><div style="font-weight:600; font-size:14px;">Bulan ${inst.monthIndex}/${inst.totalMonths}</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${inst.amount > 0 ? formatRupiah(inst.amount) : '<span style="color:#aaa">Belum diisi</span>'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${dateLabel}: ${dateStr}</div></div><div style="text-align:right">${actions}</div></div>`;
+                        if (!inst.isPaid) { 
+                            actions += `<button class="btn-mini edit" onclick="editTermAmount('${s.id}', '${inst.id}')">Isi</button>`; 
+                            actions += `<button class="btn-mini pay" onclick="payTerm('${s.id}', '${inst.id}')">Tabung</button>`; 
+                        } else { 
+                            actions += `<span class="badge badge-paid">Lunas</span>`; 
+                        }
+                        detailsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px dashed rgba(255,255,255,0.1);"><div><div style="font-weight:600; font-size:14px;">Bulan ${inst.monthIndex}/${inst.totalMonths}</div><div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${inst.amount > 0 ? formatRupiah(inst.amount) : '<span style="color:#aaa">Belum diisi</span>'}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${dateLabel}: ${dateStr}</div></div><div style="text-align:right">${actions}</div></div>`;
                     });
-                } else { totalReguler += s.amount; detailsHtml = `<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${s.note} • ${s.date}</div>`; }
-                let deleteButton = !isTerm ? `<button class="btn-mini del" onclick="delSaving(${originalIdx})" style="margin:0">Hapus</button>` : '';
+                } else { 
+                    detailsHtml = `<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${s.note} • ${s.date}</div>`; 
+                }
+                
+                // PERBAIKAN: Gunakan s.id, bukan index array, agar aman saat difilter
+                let deleteButton = !isTerm ? `<button class="btn-mini del" onclick="delSavingById('${s.id}')" style="margin:0">Hapus</button>` : '';
+                
                 list.innerHTML += `<div class="item-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><div style="display:flex; align-items:center; gap:12px;"><div class="item-icon icon-save">💰</div><div><span class="tab-type-badge ${badgeClass}">${badgeText}</span><div class="item-title">${s.person}</div><div class="item-sub">${isTerm ? `Mulai: ${s.startDate} • Jatuh Tempo: ${s.endDate}` : ''}</div></div></div>${deleteButton}</div>${detailsHtml}</div>`;
             });
+
+            if (!hasVisibleItems) {
+                list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Tidak ada data untuk filter ini.</div>`;
+            }
         }
+        
         document.getElementById('tabTotalReguler').innerText = formatRupiah(totalReguler);
         document.getElementById('tabTotalBerjangka').innerText = formatRupiah(totalBerjangka);
     }
