@@ -1429,9 +1429,10 @@
         document.getElementById('btnResetSavingsFilter').style.display = 'inline-flex';
         document.getElementById('backButton').style.display = 'none';
         document.getElementById('btnBackToHome').style.display = 'none';
-        
+        renderTabunganList()
     }
-
+    
+  
     function resetSavingsFilter() {
         currentSavingsFilter = { person: null, type: null };
         document.getElementById('pageTitle').innerText = pageTitles.tabungan.title;
